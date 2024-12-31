@@ -1,0 +1,11 @@
+Dockerfile
+docker-compose
+ampLocalDatabaseVolume
+.dockerignore
+node_modules
+npm-debug.log
+.env
+dist
+
+# AWS directory
+.aws

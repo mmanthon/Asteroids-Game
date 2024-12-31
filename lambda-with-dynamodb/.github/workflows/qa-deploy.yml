@@ -1,0 +1,35 @@
+name: QA Deployment
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FILENAME: current-deployed-version-${{ github.ref_name }}
+  BRANCH: ${{ github.ref_name }}
+
+jobs:
+  unit-test:
+    uses: ./.github/workflows/unit-tests.yml
+    with:
+      environment: qa
+      branch: ${{ github.ref_name }}
+
+  build:
+    needs: unit-test
+    uses: ./.github/workflows/build-docker-image.yml
+    secrets: inherit
+    with:
+      environment: qa
+      branch: ${{ github.ref_name }}
+
+  deploy:
+    needs: build
+    uses: ./.github/workflows/deploy-to-ecs.yml
+    secrets: inherit
+    with:
+      environment: qa
+      branch: ${{ github.ref_name }}

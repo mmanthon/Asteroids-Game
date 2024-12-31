@@ -1,0 +1,29 @@
+service: iscx-template-api
+useDotenv: true
+
+plugins:
+ - serverless-dotenv-plugin
+ - serverless-plugin-typescript
+ - serverless-plugin-optimize
+ - serverless-offline
+
+provider:
+ name: aws
+ stackName: iscx-template-api
+ apiName: iscx-template-api
+ stage: ${opt:stage, 'development'}
+ runtime: nodejs18.x
+ region: us-west-2
+ memorySize: 128
+ timeout: 300
+ role: ${file(./aws-configuration/config.${self:provider.stage}.yml):role}
+ vpc: ${file(./aws-configuration/config.${self:provider.stage}.yml):vpc}
+
+functions:
+ app: 
+   name: iscx-template-api-${self:provider.stage}
+   handler: src/lambda.handler
+   events:
+     - http:
+         method: any
+         path: /{any+}
