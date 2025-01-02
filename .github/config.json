@@ -1,0 +1,42 @@
+{
+    "cluster": "iscx-broker-center-cluster",
+    "development": {
+        "serviceName": "dev-broker-center-api",
+        "logGroup": "/ecs/dev-broker-center-api",
+        "cpu": "512",
+        "memory": "1024",
+        "environment": [],
+        "secrets": [
+            {
+                "name": "Secret",
+                "valueFrom": "placeholder"
+            }
+        ]
+    },
+    "qa": {
+        "serviceName": "qa-broker-center-api",
+        "logGroup": "/ecs/qa-broker-center-api",
+        "cpu": "512",
+        "memory": "1024",
+        "environment": [],
+        "secrets": [
+            {
+                "name": "JWT_SECRET",
+                "valueFrom": "placeholder"
+            }
+        ]
+    },
+    "production": {
+        "serviceName": "broker-center-api",
+        "logGroup": "/ecs/broker-center-api",
+        "cpu": "512",
+        "memory": "1024",
+        "environment": [],
+        "secrets": [
+            {
+                "name": "JWT_SECRET",
+                "valueFrom": "placeholder"
+            }
+        ]
+    }
+}

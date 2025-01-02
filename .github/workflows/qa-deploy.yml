@@ -1,0 +1,20 @@
+name: QA Deployment
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FILENAME: current-deployed-version-${{ github.ref_name }}
+  BRANCH: ${{ github.ref_name }}
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-to-ecs.yml
+    secrets: inherit
+    with:
+      environment: qa
+      branch: ${{ github.ref_name }}

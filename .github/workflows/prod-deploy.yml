@@ -1,0 +1,16 @@
+name: Production Deployment
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-to-ecs.yml
+    secrets: inherit
+    with:
+      environment: production
+      branch: ${{ github.ref_name }}

@@ -1,9 +1,0 @@
-vpc:
-  securityGroupIds:
-    - sg-077612b705d776bc1
-  subnetIds:
-    - subnet-02aecf0214d6cdccd
-    - subnet-07075c40f4d6a2d37
-    - subnet-003d849700da7dcd0
-    - subnet-0ca51417da92cdcc9
-role: arn:aws:iam::694679581764:role/iscx-lambda-execution-role
