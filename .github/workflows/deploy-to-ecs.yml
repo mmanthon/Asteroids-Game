@@ -36,14 +36,14 @@ jobs:
       - name: Load environment-specific configuration
         id: load-config
         run: |
-          # Load the environment-specific configuration
-          CONFIG=$(cat config.json | jq -r ".${{ inputs.environment }}")
+          # Load the environment-specific configuration from .github/config.json
+          CONFIG=$(cat .github/config.json | jq -r ".${{ inputs.environment }}")
           
           # Export all keys and values in the environment-specific configuration
           echo "$CONFIG" | jq -r 'to_entries | .[] | "echo \"\(.key | ascii_upcase)=\(.value)\" >> $GITHUB_ENV"' | bash
           
           # Export the cluster value separately
-          CLUSTER=$(jq -r '.cluster' config.json)
+          CLUSTER=$(jq -r '.cluster' .github/config.json)
           echo "CLUSTER=$CLUSTER" >> $GITHUB_ENV
 
       - name: Build and tag image
@@ -65,6 +65,7 @@ jobs:
       - name: Update task definition
         id: update-task-def
         run: |
+          # Update task definition located in .github/task_definition.json
           jq --arg IMAGE_URI "${{ steps.build-image.outputs.image }}:${{ steps.build-image.outputs.image_tag }}" \
              --arg SERVICE_NAME "$SERVICE_NAME" \
              --arg LOG_GROUP "$LOG_GROUP" \
