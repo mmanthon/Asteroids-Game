@@ -14,7 +14,8 @@ export class HazardhubService {
      * @returns {Promise<any>}
      */
     async findOne(appID: string): Promise<any> {
-        // In the future, we will add logic to handle multiple addresses
+        // TODO: In the future, we will add logic to handle multiple addresses
+        // TODO: Create a dto for the response
         const address = await this.hazardhubUtil.getApplicationAddress(appID);
         const { risks, enhanced_property } = await this.ampApiIntegration.getHazardhubData(address);
 

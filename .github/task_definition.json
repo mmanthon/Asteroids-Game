@@ -34,7 +34,7 @@
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/iscx-dev-broker-center-api",
+                    "awslogs-group": "/ecs/dev-broker-center-api",
                     "awslogs-create-group": "true",
                     "awslogs-region": "us-west-2",
                     "awslogs-stream-prefix": "ecs"
@@ -43,7 +43,7 @@
             "systemControls": []
         }
     ],
-    "family": "iscx-dev-broker-center-api",
+    "family": "dev-broker-center-api",
     "taskRoleArn": "arn:aws:iam::694679581764:role/iscx-ecs-marketplace-execution-role",
     "executionRoleArn": "arn:aws:iam::694679581764:role/iscx-ecs-marketplace-execution-role",
     "networkMode": "awsvpc",
