@@ -46,6 +46,13 @@ jobs:
           CLUSTER=$(jq -r '.cluster' .github/config.json)
           echo "CLUSTER=$CLUSTER" >> $GITHUB_ENV
 
+      - name: Set up .npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "@ignidus:registry=https://npm.pkg.github.com/ignidus" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" >> .npmrc
+
       - name: Build and tag image
         id: build-image
         env:
