@@ -9,7 +9,7 @@
         "secrets": [
             {
                 "name": "Secret",
-                "valueFrom": "placeholder"
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:694679581764:secret:iscx/jwt-secret-key/dev:JWT_SECRET"
             }
         ]
     },
