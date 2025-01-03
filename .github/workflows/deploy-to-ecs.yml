@@ -34,7 +34,7 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
           AWS_REGION: ${{ vars.AWS_REGION }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_SHA: ${{ github.sha }}
         run: |
           bash .github/scripts/deploy-to-ecs.sh
