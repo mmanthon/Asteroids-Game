@@ -6,12 +6,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { WinstonModule } from 'nest-winston';
 
-import awsConfig from '../config/aws.config';
-import commonConfig from '../config/common.config';
-import databaseConfig from '../config/database.config';
-import externalConfig from '../config/external.config';
 import { HazardhubModule } from './apis/hazardhub/hazardhub.module';
 import { HealthModule } from './apis/health/health.module';
+import config from './config';
 import { ExternalModule } from './external/external.module';
 import { AmpModule } from './shared/databases/amp.module';
 import { UtilsModule } from './shared/utils/utils.module';
@@ -21,7 +18,7 @@ import { UtilsModule } from './shared/utils/utils.module';
         HealthModule,
         ConfigModule.forRoot({
             isGlobal: true,
-            load: [commonConfig, databaseConfig, awsConfig, externalConfig],
+            load: [config],
         }),
         JwtModule.registerAsync({
             global: true,

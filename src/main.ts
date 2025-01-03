@@ -30,7 +30,7 @@ async function bootstrap() {
     app.setGlobalPrefix(configService.get<string>('globalApiPrefix'));
     app.useGlobalFilters(new HttpExceptionFilter());
     const config = new DocumentBuilder()
-        .setTitle('ISCx Broker Center APIs')
+        .setTitle('ISCx Underwriter Workbench APIs')
         .addBearerAuth({ name: 'Authorization', type: 'http' })
         .addSecurityRequirements('bearer')
         .build();
