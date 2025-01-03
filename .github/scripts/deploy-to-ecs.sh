@@ -91,7 +91,7 @@ cat updated_task_definition.json
 
 # Deploy to ECS
 echo "Deploying service to ECS..."
-aws ecs update-service --cluster "$CLUSTER" --service "$SERVICENAME" --force-new-deployment
+aws ecs update-service --cluster "$CLUSTER" --service "$SERVICENAME" --force-new-deployment > /dev/null
 echo "Service deployment initiated. Waiting for stability..."
 
 # Wait for ECS service stability
