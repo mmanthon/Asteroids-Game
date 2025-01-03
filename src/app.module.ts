@@ -8,10 +8,10 @@ import { WinstonModule } from 'nest-winston';
 
 import { HazardhubModule } from './apis/hazardhub/hazardhub.module';
 import { HealthModule } from './apis/health/health.module';
-import config from './config';
 import { ExternalModule } from './external/external.module';
 import { AmpModule } from './shared/databases/amp.module';
 import { UtilsModule } from './shared/utils/utils.module';
+import config from '../config';
 
 @Module({
     imports: [
