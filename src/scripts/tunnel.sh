@@ -18,5 +18,5 @@ if [ -z "$hostname" ]
 fi
 
 # localport:tunnelhost:remoteport remotehost
-ssh -i $publickey -L 3333:localhost:3306 $hostname
+ssh -i $publickey -L 3306:localhost:3306 $hostname
 
