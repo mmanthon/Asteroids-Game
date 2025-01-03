@@ -81,7 +81,7 @@ jq --arg IMAGE_URI "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${SERV
     .containerDefinitions[0].name = $SERVICE_NAME |
     .cpu = $CPU |
     .memory = $MEMORY' \
-   .github/task_definition.json > updated_task_definition.json
+   .github/task_definition_template.json > updated_task_definition.json
 echo "Task definition updated successfully."
 
 # Echo the new task definition
