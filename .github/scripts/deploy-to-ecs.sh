@@ -89,9 +89,20 @@ echo "Task definition updated successfully."
 echo "New Task Definition:"
 cat updated_task_definition.json
 
+# Register the new task definition
+echo "Registering the updated task definition..."
+TASK_DEFINITION=$(aws ecs register-task-definition \
+  --cli-input-json file://updated_task_definition.json)
+TASK_DEFINITION_ARN=$(echo "$TASK_DEFINITION" | jq -r '.taskDefinition.taskDefinitionArn')
+echo "Task definition registered successfully: $TASK_DEFINITION_ARN"
+
 # Deploy to ECS
 echo "Deploying service to ECS..."
-aws ecs update-service --cluster "$CLUSTER" --service "$SERVICENAME" --force-new-deployment > /dev/null
+aws ecs update-service \
+  --cluster "$CLUSTER" \
+  --service "$SERVICENAME" \
+  --task-definition "$TASK_DEFINITION_ARN" \
+  --force-new-deployment > /dev/null
 echo "Service deployment initiated. Waiting for stability..."
 
 # Wait for ECS service stability
