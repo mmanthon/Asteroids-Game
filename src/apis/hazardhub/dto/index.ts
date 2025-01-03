@@ -1,1 +1,1 @@
-export * from './hazardhubResponse.dto';
+export {};
