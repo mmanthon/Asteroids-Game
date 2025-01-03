@@ -20,10 +20,6 @@
                 {
                     "name": "PORT",
                     "value": "80"
-                },
-                {
-                    "name": "TEST",
-                    "value": "wow"
                 }
             ],
             "secrets": [],

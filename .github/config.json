@@ -10,7 +10,27 @@
         "secrets": [
             {
                 "name": "Secret",
-                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/jwt-secret-key/dev:JWT_SECRET"
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/jwt-secret-key/dev-biMKJU:JWT_SECRET::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/dev-9qj5Dz:AMP_DB_USER::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/dev-9qj5Dz:AMP_DB_PW::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/dev-9qj5Dz:AMP_DB_HOST::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/dev-9qj5Dz:AMP_DB_PORT::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/dev-9qj5Dz:AMP_DB::"
             }
         ]
     },
@@ -23,8 +43,28 @@
         "environment": [],
         "secrets": [
             {
-                "name": "JWT_SECRET",
-                "valueFrom": "placeholder"
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/jwt-secret-key/qa-09BDyN:JWT_SECRET::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/qa-yrNpFW:AMP_DB_USER::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/qa-yrNpFW:AMP_DB_PW::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/qa-yrNpFW:AMP_DB_HOST::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/qa-yrNpFW:AMP_DB_PORT::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/qa-yrNpFW:AMP_DB::"
             }
         ]
     },
@@ -37,8 +77,28 @@
         "environment": [],
         "secrets": [
             {
-                "name": "JWT_SECRET",
-                "valueFrom": "placeholder"
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/jwt-secret-key/prod-ueDE2o:JWT_SECRET::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/prod-Wi0QL2:AMP_DB_USER::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/prod-Wi0QL2:AMP_DB_PW::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/prod-Wi0QL2:AMP_DB_HOST::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/prod-Wi0QL2:AMP_DB_PORT::"
+            },
+            {
+                "name": "Secret",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/prod-Wi0QL2:AMP_DB::"
             }
         ]
     }
