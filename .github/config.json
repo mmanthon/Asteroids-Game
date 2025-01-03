@@ -3,19 +3,21 @@
     "development": {
         "serviceName": "dev-broker-center-api",
         "logGroup": "/ecs/dev-broker-center-api",
+        "role": "arn:aws:iam::<account-id>:role/iscx-ecs-marketplace-execution-role",
         "cpu": "512",
         "memory": "1024",
         "environment": [],
         "secrets": [
             {
                 "name": "Secret",
-                "valueFrom": "arn:aws:secretsmanager:us-west-2:694679581764:secret:iscx/jwt-secret-key/dev:JWT_SECRET"
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/jwt-secret-key/dev:JWT_SECRET"
             }
         ]
     },
     "qa": {
         "serviceName": "qa-broker-center-api",
         "logGroup": "/ecs/qa-broker-center-api",
+        "role": "arn:aws:iam::<account-id>:role/iscx-ecs-marketplace-execution-role",
         "cpu": "512",
         "memory": "1024",
         "environment": [],
@@ -29,6 +31,7 @@
     "production": {
         "serviceName": "broker-center-api",
         "logGroup": "/ecs/broker-center-api",
+        "role": "arn:aws:iam::<account-id>:role/iscx-ecs-marketplace-execution-role",
         "cpu": "512",
         "memory": "1024",
         "environment": [],

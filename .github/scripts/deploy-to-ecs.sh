@@ -25,6 +25,12 @@ fi
 
 echo "Starting deployment for environment: $ENVIRONMENT"
 
+# Create a temporary copy of config.json and replace <account-id>
+TEMP_CONFIG=$(mktemp)
+cp .github/config.json "$TEMP_CONFIG"
+sed -i "s/<account-id>/$AWS_ACCOUNT_ID/g" "$TEMP_CONFIG"
+echo "Temporary configuration file created with updated account ID."
+
 # Login to Amazon ECR
 echo "Logging in to Amazon ECR..."
 aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
@@ -32,8 +38,8 @@ echo "Successfully logged in to Amazon ECR."
 
 # Load environment-specific configuration
 echo "Loading environment-specific configuration..."
-CONFIG=$(jq -r ".${ENVIRONMENT}" .github/config.json)
-CLUSTER=$(jq -r ".cluster" .github/config.json)
+CONFIG=$(jq -r ".${ENVIRONMENT}" "$TEMP_CONFIG")
+CLUSTER=$(jq -r ".cluster" "$TEMP_CONFIG")
 
 SERVICENAME=$(echo "$CONFIG" | jq -r '.serviceName')
 LOG_GROUP=$(echo "$CONFIG" | jq -r '.logGroup')
@@ -41,8 +47,10 @@ CPU=$(echo "$CONFIG" | jq -r '.cpu')
 MEMORY=$(echo "$CONFIG" | jq -r '.memory')
 ENVIRONMENT=$(echo "$CONFIG" | jq -r '.environment')
 SECRETS=$(echo "$CONFIG" | jq -r '.secrets')
+ROLE_ARN=$(echo "$CONFIG" | jq -r '.role')
 echo "Configuration loaded for service: $SERVICENAME"
 echo "Cluster loaded: $CLUSTER"
+echo "Role ARN: $ROLE_ARN"
 
 # Set up .npmrc
 echo "Setting up .npmrc for npm authentication..."
@@ -60,11 +68,6 @@ echo "Pushing Docker image to Amazon ECR..."
 docker push "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${SERVICENAME}:${GITHUB_SHA}"
 echo "Docker image pushed successfully."
 
-# Remove .npmrc file
-echo "Cleaning up temporary files..."
-rm ./.npmrc
-echo ".npmrc file removed."
-
 # Update task definition
 echo "Updating ECS task definition..."
 jq --arg IMAGE_URI "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${SERVICENAME}:${GITHUB_SHA}" \
@@ -72,12 +75,15 @@ jq --arg IMAGE_URI "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${SERV
    --arg LOG_GROUP "$LOG_GROUP" \
    --arg CPU "$CPU" \
    --arg MEMORY "$MEMORY" \
+   --arg ROLE_ARN "$ROLE_ARN" \
    --argjson NEW_ENVIRONMENT "$ENVIRONMENT" \
    --argjson NEW_SECRETS "$SECRETS" \
    '.containerDefinitions[0].image = $IMAGE_URI |
     .containerDefinitions[0].logConfiguration.options."awslogs-group" = $LOG_GROUP |
     .containerDefinitions[0].environment += $NEW_ENVIRONMENT |
     .containerDefinitions[0].secrets += $NEW_SECRETS |
+    .taskRoleArn = $ROLE_ARN |
+    .executionRoleArn = $ROLE_ARN |
     .family = $SERVICE_NAME |
     .containerDefinitions[0].name = $SERVICE_NAME |
     .cpu = $CPU |
@@ -112,3 +118,9 @@ else
   echo "Service stabilization failed. Please check the ECS service logs for details."
   exit 1
 fi
+
+# Cleanup
+rm "$TEMP_CONFIG"
+echo "Temporary configuration file removed."
+rm ./.npmrc
+echo ".npmrc file removed."
