@@ -29,71 +29,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Load environment-specific configuration
-        id: load-config
-        run: |
-          # Load the environment-specific configuration from .github/config.json
-          CONFIG=$(cat .github/config.json | jq -r ".${{ inputs.environment }}")
-          
-          # Export all keys and values in the environment-specific configuration
-          echo "$CONFIG" | jq -r 'to_entries | .[] | "echo \"\(.key | ascii_upcase)=\(.value)\" >> $GITHUB_ENV"' | bash
-          
-          # Export the cluster value separately
-          CLUSTER=$(jq -r '.cluster' .github/config.json)
-          echo "CLUSTER=$CLUSTER" >> $GITHUB_ENV
-
-      - name: Set up .npmrc
+      - name: Deploy ECS Service
         env:
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ENVIRONMENT: ${{ inputs.environment }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
-          echo "@ignidus:registry=https://npm.pkg.github.com/ignidus" > .npmrc
-          echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" >> .npmrc
-
-      - name: Build and tag image
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          DOCKER_BUILDKIT=1 docker build . -t $ECR_REGISTRY/$SERVICENAME:$IMAGE_TAG --secret id=npmrc,src=./.npmrc
-          echo "image=$ECR_REGISTRY/$SERVICENAME" >> $GITHUB_OUTPUT
-          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-      - name: Remove .npmrc file
-        run: rm ./.npmrc
-
-      - name: Push image to Amazon ECR
-        run: docker push ${{ steps.build-image.outputs.image }} --all-tags
-
-      - name: Update task definition
-        id: update-task-def
-        run: |
-          # Update task definition located in .github/task_definition.json
-          jq --arg IMAGE_URI "${{ steps.build-image.outputs.image }}:${{ steps.build-image.outputs.image_tag }}" \
-             --arg SERVICE_NAME "$SERVICENAME" \
-             --arg LOG_GROUP "$LOG_GROUP" \
-             --arg CPU "$CPU" \
-             --arg MEMORY "$MEMORY" \
-             --argjson NEW_ENVIRONMENT "${{ env.ENVIRONMENT }}" \
-             --argjson NEW_SECRETS "${{ env.SECRETS }}" \
-             '.containerDefinitions[0].image = $IMAGE_URI |
-              .containerDefinitions[0].logConfiguration.options."awslogs-group" = $LOG_GROUP |
-              .containerDefinitions[0].environment += $NEW_ENVIRONMENT |
-              .containerDefinitions[0].secrets += $NEW_SECRETS |
-              .family = $SERVICENAME |
-              .containerDefinitions[0].name = $SERVICENAME |
-              .cpu = $CPU |
-              .memory = $MEMORY' \
-             .github/task_definition.json > updated_task_definition.json
-
-      - name: Deploy ECS service
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: updated_task_definition.json
-          service: $SERVICENAME
-          cluster: $CLUSTER
-          wait-for-service-stability: true
+          bash .github/scripts/deploy-to-ecs.sh

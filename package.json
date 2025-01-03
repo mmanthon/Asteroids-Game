@@ -1,7 +1,7 @@
 {
-  "name": "broker-center-api",
+  "name": "underwriter-workbench-api",
   "version": "1.0.0",
-  "description": "Broker Center APIs",
+  "description": "Underwriter Workbench APIs",
   "author": "ISCx team",
   "private": true,
   "license": "UNLICENSED",

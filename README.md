@@ -1,4 +1,4 @@
-# Brokercenter APIs
+# Underwriter Workbench APIs
 
 ## API Documentation via SwaggerUI
 OpenApi Swagger UI is integrated into the nestjs project. Once you have cloned the repo and have the app running visit http://localhost:3001/docs. You should see the Swagger UI. You can read more about OpenApi Swagger here (https://swagger.io/specification/).
@@ -105,6 +105,8 @@ AMP_DB_PW ='value can be found at -> aws secret manager -> iscx/amp-db/dev'
 AMP_DB ='value can be found at -> aws secret manager -> iscx/amp-db/dev'
 AMP_DB_PORT= '3333'
 JWT_SECRET='value can be found at -> aws secret manager -> iscx/jwt-secret-key/dev'
+AMP_API_BASE_URL=https://dev.isceng.net/amp/api
+AMP_API_KEY='value can be found at -> aws secret manager -> iscx/amp/api-key'
 ```
 
 ## Connecting to DynamoDB

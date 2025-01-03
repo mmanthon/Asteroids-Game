@@ -1,9 +1,8 @@
 {
     "containerDefinitions": [
         {
-            "name": "iscx-dev-broker-center-api",
-            "image": "694679581764.dkr.ecr.us-west-2.amazonaws.com/iscx-dev-broker-center-api:latest",
-            "cpu": 0,
+            "name": "placeholder",
+            "image": "placeholder",
             "portMappings": [
                 {
                     "containerPort": 80,
@@ -23,18 +22,13 @@
                     "value": "80"
                 }
             ],
-            "secrets": [
-                {
-                    "name": "JWT_SECRET",
-                    "valueFrom": "rer"
-                }
-            ],
+            "secrets": [],
             "mountPoints": [],
             "volumesFrom": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/dev-broker-center-api",
+                    "awslogs-group": "placeholder",
                     "awslogs-create-group": "true",
                     "awslogs-region": "us-west-2",
                     "awslogs-stream-prefix": "ecs"
@@ -43,17 +37,17 @@
             "systemControls": []
         }
     ],
-    "family": "dev-broker-center-api",
-    "taskRoleArn": "arn:aws:iam::694679581764:role/iscx-ecs-marketplace-execution-role",
-    "executionRoleArn": "arn:aws:iam::694679581764:role/iscx-ecs-marketplace-execution-role",
+    "family": "placeholder",
+    "taskRoleArn": "placeholder",
+    "executionRoleArn": "placeholder",
     "networkMode": "awsvpc",
     "volumes": [],
     "placementConstraints": [],
     "requiresCompatibilities": [
         "FARGATE"
     ],
-    "cpu": "512",
-    "memory": "1024",
+    "cpu": "placeholder",
+    "memory": "placeholder",
     "runtimePlatform": {
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
