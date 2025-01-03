@@ -6,8 +6,17 @@
         "role": "arn:aws:iam::<account-id>:role/iscx-ecs-marketplace-execution-role",
         "cpu": "512",
         "memory": "1024",
-        "environment": [],
+        "environment": [
+            {
+                "name": "AMP_API_BASE_URL",
+                "value": "https://dev.isceng.net/amp/api"
+            }
+        ],
         "secrets": [
+            {
+                "name": "AMP_API_KEY",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/dev/amp/api-key-z2Vrwd:AMP_API_KEY::"
+            },
             {
                 "name": "JWT_SECRET",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/jwt-secret-key/dev-biMKJU:JWT_SECRET::"
@@ -40,30 +49,39 @@
         "role": "arn:aws:iam::<account-id>:role/iscx-ecs-marketplace-execution-role",
         "cpu": "512",
         "memory": "1024",
-        "environment": [],
+        "environment": [
+            {
+                "name": "AMP_API_BASE_URL",
+                "value": "https://qa.isceng.net/amp/api"
+            }
+        ],
         "secrets": [
             {
-                "name": "Secret",
+                "name": "AMP_API_KEY",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/qa/amp/api-key-wZE28y:AMP_API_KEY::"
+            },
+            {
+                "name": "JWT_SECRET",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/jwt-secret-key/qa-09BDyN:JWT_SECRET::"
             },
             {
-                "name": "Secret",
+                "name": "AMP_DB_USER",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/qa-yrNpFW:AMP_DB_USER::"
             },
             {
-                "name": "Secret",
+                "name": "AMP_DB_PW",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/qa-yrNpFW:AMP_DB_PW::"
             },
             {
-                "name": "Secret",
+                "name": "AMP_DB_HOST",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/qa-yrNpFW:AMP_DB_HOST::"
             },
             {
-                "name": "Secret",
+                "name": "AMP_DB_PORT",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/qa-yrNpFW:AMP_DB_PORT::"
             },
             {
-                "name": "Secret",
+                "name": "AMP_DB",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/qa-yrNpFW:AMP_DB::"
             }
         ]
@@ -74,30 +92,39 @@
         "role": "arn:aws:iam::<account-id>:role/iscx-ecs-marketplace-execution-role",
         "cpu": "512",
         "memory": "1024",
-        "environment": [],
+        "environment": [
+            {
+                "name": "AMP_API_BASE_URL",
+                "value": "https://isc.onlinemga.com/amp/api"
+            }
+        ],
         "secrets": [
             {
-                "name": "Secret",
+                "name": "AMP_API_KEY",
+                "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/prod/amp/api-key-Lsp6RD:AMP_API_KEY::"
+            },
+            {
+                "name": "JWT_SECRET",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/jwt-secret-key/prod-ueDE2o:JWT_SECRET::"
             },
             {
-                "name": "Secret",
+                "name": "AMP_DB_USER",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/prod-Wi0QL2:AMP_DB_USER::"
             },
             {
-                "name": "Secret",
+                "name": "AMP_DB_PW",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/prod-Wi0QL2:AMP_DB_PW::"
             },
             {
-                "name": "Secret",
+                "name": "AMP_DB_HOST",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/prod-Wi0QL2:AMP_DB_HOST::"
             },
             {
-                "name": "Secret",
+                "name": "AMP_DB_PORT",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/prod-Wi0QL2:AMP_DB_PORT::"
             },
             {
-                "name": "Secret",
+                "name": "AMP_DB",
                 "valueFrom": "arn:aws:secretsmanager:us-west-2:<account-id>:secret:iscx/amp-db/prod-Wi0QL2:AMP_DB::"
             }
         ]
