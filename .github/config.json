@@ -1,8 +1,8 @@
 {
-    "cluster": "iscx-broker-center-cluster",
+    "cluster": "iscx-underwriter-workbench-cluster",
     "development": {
-        "serviceName": "dev-broker-center-api",
-        "logGroup": "/ecs/dev-broker-center-api",
+        "serviceName": "dev-uwb-api",
+        "logGroup": "/ecs/dev-uwb-api",
         "role": "arn:aws:iam::<account-id>:role/iscx-ecs-marketplace-execution-role",
         "cpu": "512",
         "memory": "1024",
@@ -35,8 +35,8 @@
         ]
     },
     "qa": {
-        "serviceName": "qa-broker-center-api",
-        "logGroup": "/ecs/qa-broker-center-api",
+        "serviceName": "qa-uwb-api",
+        "logGroup": "/ecs/qa-uwb-api",
         "role": "arn:aws:iam::<account-id>:role/iscx-ecs-marketplace-execution-role",
         "cpu": "512",
         "memory": "1024",
@@ -69,8 +69,8 @@
         ]
     },
     "production": {
-        "serviceName": "broker-center-api",
-        "logGroup": "/ecs/broker-center-api",
+        "serviceName": "uwb-api",
+        "logGroup": "/ecs/uwb-api",
         "role": "arn:aws:iam::<account-id>:role/iscx-ecs-marketplace-execution-role",
         "cpu": "512",
         "memory": "1024",
