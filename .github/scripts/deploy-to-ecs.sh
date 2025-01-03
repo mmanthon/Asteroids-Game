@@ -33,6 +33,7 @@ echo "Successfully logged in to Amazon ECR."
 # Load environment-specific configuration
 echo "Loading environment-specific configuration..."
 CONFIG=$(jq -r ".${ENVIRONMENT}" .github/config.json)
+CLUSTER=$(jq -r ".cluster" .github/config.json)
 
 SERVICENAME=$(echo "$CONFIG" | jq -r '.serviceName')
 LOG_GROUP=$(echo "$CONFIG" | jq -r '.logGroup')
@@ -40,8 +41,8 @@ CPU=$(echo "$CONFIG" | jq -r '.cpu')
 MEMORY=$(echo "$CONFIG" | jq -r '.memory')
 ENVIRONMENT=$(echo "$CONFIG" | jq -r '.environment')
 SECRETS=$(echo "$CONFIG" | jq -r '.secrets')
-CLUSTER=$(echo "$CONFIG" | jq -r '.cluster')
 echo "Configuration loaded for service: $SERVICENAME"
+echo "Cluster loaded: $CLUSTER"
 
 # Set up .npmrc
 echo "Setting up .npmrc for npm authentication..."
