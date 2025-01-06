@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { AddressDto, HazardhubApiResponseDto, HazardhubResultDto } from '@ignidus/iscx-backend-utils';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { Axios } from 'axios';
 
