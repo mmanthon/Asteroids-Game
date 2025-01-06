@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { AddressDto, HazardhubApiResponseDto, HazardhubResultDto } from '@ignidus/iscx-backend-utils';
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { Axios } from 'axios';
 
@@ -24,6 +24,7 @@ export class AmpApiIntegration {
         const payload = {
             ...address,
             street: address.streetAddress,
+            zip: this.normalizeZipCode(address.zip),
         };
 
         try {
@@ -37,14 +38,23 @@ export class AmpApiIntegration {
         } catch (error) {
             const errorMessage = error.response?.data?.response || error.message;
 
-            // Log the error once
             this.logger.error('Amp API request error. Failed to get hazardhub data', {
                 message: errorMessage,
                 statusCode: error.response?.status,
             });
 
-            // Rethrow a sanitized error for the consumer
-            throw new Error('Failed to retrieve hazardhub data');
+            throw error;
         }
+    }
+
+    /**
+     * @description Normalize zip code
+     * @param {string} zip
+     * @returns {string}
+     */
+    private normalizeZipCode(zip: string): string {
+        const cleanedZip = zip.split('-')[0].replace(/[^0-9]/g, '');
+
+        return cleanedZip.padStart(5, '0').slice(-5);
     }
 }
