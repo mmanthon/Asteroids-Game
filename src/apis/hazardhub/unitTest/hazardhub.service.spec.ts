@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AmpApiIntegration } from '../../../external';
+import { HazardHubQuery } from '../hazardhub.query';
 import { HazardhubService } from '../hazardhub.service';
 import { HazardHubUtil } from '../hazardhub.util';
 
@@ -15,6 +16,11 @@ describe('HazardhubService', () => {
                     provide: HazardHubUtil,
                     useValue: {},
                 },
+                {
+                    provide: HazardHubQuery,
+                    useValue: {},
+                },
+
                 {
                     provide: AmpApiIntegration,
                     useValue: {},
