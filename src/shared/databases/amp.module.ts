@@ -1,4 +1,13 @@
-import { ItemEntity } from '@ignidus/iscx-backend-utils';
+import {
+    AclRoleEntity,
+    AgencyEntity,
+    CompanyEntity,
+    ItemEntity,
+    PersonEntity,
+    UserEntity,
+    createEntityProviders,
+    mysqlEntityFactory,
+} from '@ignidus/iscx-backend-utils';
 import { Global, Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import knex, { Knex } from 'knex';
@@ -26,14 +35,19 @@ import knex, { Knex } from 'knex';
             },
             inject: [ConfigService],
         },
-        {
-            provide: ItemEntity,
-            useFactory: (ampKnex: Knex) => {
-                return new ItemEntity(ampKnex);
-            },
-            inject: ['Amp'],
-        },
+        ...createEntityProviders(
+            ['Amp'],
+            [
+                { entityClass: AclRoleEntity },
+                { entityClass: AgencyEntity },
+                { entityClass: CompanyEntity },
+                { entityClass: ItemEntity },
+                { entityClass: PersonEntity },
+                { entityClass: UserEntity },
+            ],
+            mysqlEntityFactory,
+        ),
     ],
-    exports: ['Amp', ItemEntity],
+    exports: ['Amp', AgencyEntity, AclRoleEntity, CompanyEntity, ItemEntity, PersonEntity, UserEntity],
 })
 export class AmpModule {}

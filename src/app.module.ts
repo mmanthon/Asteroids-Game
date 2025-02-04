@@ -6,19 +6,22 @@ import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { WinstonModule } from 'nest-winston';
 
-import config from '../config';
+import configuration from '../config/configuration';
+import { envValidationSchema } from '../config/env.validation';
+import { AuthModule } from './apis/auth/auth.module';
 import { HazardhubModule } from './apis/hazardhub/hazardhub.module';
 import { HealthModule } from './apis/health/health.module';
-import { ExternalModule } from './external/external.module';
 import { AmpModule } from './shared/databases/amp.module';
-import { UtilsModule } from './shared/utils/utils.module';
+import { DynamoDBModule } from './shared/databases/dynamodb.module';
+import { ExternalModule } from './shared/external/external.module';
 
 @Module({
     imports: [
         HealthModule,
         ConfigModule.forRoot({
             isGlobal: true,
-            load: [config],
+            load: [configuration],
+            validationSchema: envValidationSchema,
         }),
         JwtModule.registerAsync({
             global: true,
@@ -36,8 +39,9 @@ import { UtilsModule } from './shared/utils/utils.module';
         WinstonModule.forRoot({
             transports: [...winstonTransports],
         }),
+        AuthModule,
         AmpModule,
-        UtilsModule,
+        DynamoDBModule,
         HazardhubModule,
         ExternalModule,
     ],

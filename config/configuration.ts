@@ -1,16 +1,31 @@
 export default () => ({
     port: parseInt(process.env.PORT, 10) || 3001,
-    awsRegion: process.env.AWS_REGION,
     globalApiPrefix: process.env.GLOBAL_API_PREFIX || '/',
     swaggerUrl: process.env.SWAGGER_URL || '/docs',
     rateLimit: {
         ttl: process.env.TTL || 30,
         limit: process.env.RATE_LIMIT || 100,
     },
+
+    // AWS
+    awsRegion: process.env.AWS_REGION,
+
+    // JWT
     jwt: {
         secret: process.env.JWT_SECRET || 'use a pgp key here',
         signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '2d' },
     },
+
+    // Amp api
+    ampApiBaseUrl: process.env.AMP_API_BASE_URL,
+    ampApiKey: process.env.AMP_API_KEY,
+
+    // DynamoDB tables
+    dynamodb: {
+        accessControlUsersTableName: process.env.DYNAMODB_ACCESS_CONTROL_USERS_TABLE_NAME,
+    },
+
+    // AMP Database
     amp: {
         client: 'mysql2',
         connection: {
@@ -25,6 +40,4 @@ export default () => ({
             },
         },
     },
-    ampApiBaseUrl: process.env.AMP_API_BASE_URL,
-    ampApiKey: process.env.AMP_API_KEY,
 });

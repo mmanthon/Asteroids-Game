@@ -26,7 +26,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.329.0",
     "@aws-sdk/util-dynamodb": "^3.329.0",
-    "@ignidus/iscx-backend-utils": "^1.224.0",
+    "@ignidus/iscx-backend-utils": "^1.242.0",
     "@nestjs/cache-manager": "^1.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
@@ -40,6 +40,7 @@
     "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.6",
     "helmet": "^6.1.5",
+    "joi": "^17.13.3",
     "knex": "^3.1.0",
     "mysql2": "^3.12.0",
     "nest-winston": "^1.9.1",

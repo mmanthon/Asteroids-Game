@@ -1,0 +1,20 @@
+import { AmpRolesEnum } from '@ignidus/iscx-backend-utils';
+
+export const agencyID = '123';
+export const agencyName = 'mockAgencyName';
+export const ampUserID = '1234';
+export const authHeader = 'Bearer mockSessionID';
+export const companyID = '123';
+export const createdDate = '2021-01-01T00:00:00.000Z';
+export const jwt = 'mockJwt';
+export const parentAgencyCompanyName = 'mockParentAgencyCompanyName';
+export const parentAgencyID = '3455';
+export const personID = '123';
+export const sessionID = 'mockSessionID';
+export const updatedDate = '2021-01-01T00:00:00.000Z';
+export const userEmail = 'test@gmail.com';
+export const userFirstName = 'mockFirstName';
+export const userID = '123';
+export const userLastName = 'mockLastName';
+export const userPhone = '3035555555';
+export const userRoles = [AmpRolesEnum.PRODUCER];

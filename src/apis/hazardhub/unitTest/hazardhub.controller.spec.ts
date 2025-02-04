@@ -1,7 +1,7 @@
 import { ItemEntity } from '@ignidus/iscx-backend-utils';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AmpApiIntegration } from '../../../external';
+import { AmpApiIntegration } from '../../../shared/external';
 import { HazardhubController } from '../hazardhub.controller';
 import { HazardHubQuery } from '../hazardhub.query';
 import { HazardhubService } from '../hazardhub.service';

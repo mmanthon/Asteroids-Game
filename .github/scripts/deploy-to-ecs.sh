@@ -25,21 +25,21 @@ fi
 
 echo "Starting deployment for environment: $ENVIRONMENT"
 
-# Create a temporary copy of config.json and replace <account-id>
-TEMP_CONFIG=$(mktemp)
-cp .github/config.json "$TEMP_CONFIG"
-sed -i "s/<account-id>/$AWS_ACCOUNT_ID/g" "$TEMP_CONFIG"
-echo "Temporary configuration file created with updated account ID."
-
 # Login to Amazon ECR
 echo "Logging in to Amazon ECR..."
 aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 echo "Successfully logged in to Amazon ECR."
 
-# Load environment-specific configuration
+# Load environment-specific configuration from the temporary file
+# Create a temporary copy of the environment-specific configuration file and replace <account-id>
+TEMP_CONFIG=$(mktemp)
+cp ".github/configs/${ENVIRONMENT}.json" "$TEMP_CONFIG"
+sed -i "s/<account-id>/$AWS_ACCOUNT_ID/g" "$TEMP_CONFIG"
+echo "Temporary configuration file created with updated account ID."
 echo "Loading environment-specific configuration..."
-CONFIG=$(jq -r ".${ENVIRONMENT}" "$TEMP_CONFIG")
+CONFIG=$(jq -r "." "$TEMP_CONFIG")
 CLUSTER=$(jq -r ".cluster" "$TEMP_CONFIG")
+echo "Configuration and cluster information loaded successfully."
 
 SERVICENAME=$(echo "$CONFIG" | jq -r '.serviceName')
 LOG_GROUP=$(echo "$CONFIG" | jq -r '.logGroup')

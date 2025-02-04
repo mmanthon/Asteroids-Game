@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 import { HazardHubQuery } from './hazardhub.query';
 import { HazardHubUtil } from './hazardhub.util';
-import { AmpApiIntegration } from '../../external';
+import { AmpApiIntegration } from '../../shared/external';
 
 @Injectable()
 export class HazardhubService {

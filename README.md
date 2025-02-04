@@ -93,21 +93,8 @@ $ npm install
 ```
 
 ## Environmental Variables
-1. Create a .env file at the root of the project
-2. The file need to include the below variables
-3. If the variable doesn't have a default value, check AWS parameter store or secret mananger for the values (The variable will have the name of the secret or param where you can find the value)
-```
-PORT='3001'
-AWS_REGION='us-west-2'
-AMP_DB_HOST='localhost'
-AMP_DB_USER='value can be found at -> aws secret manager -> iscx/amp-db/dev'
-AMP_DB_PW='value can be found at -> aws secret manager -> iscx/amp-db/dev'
-AMP_DB='value can be found at -> aws secret manager -> iscx/amp-db/dev'
-AMP_DB_PORT=3306
-JWT_SECRET='value can be found at -> aws secret manager -> iscx/jwt-secret-key/dev'
-AMP_API_BASE_URL=https://dev.isceng.net/amp/api
-AMP_API_KEY='value can be found at -> aws secret manager -> iscx/amp/api-key'
-```
+1. Create a .env file at the root of the project using the .env.example file
+2. If the variable doesn't have a default value, check AWS parameter store or secret mananger for the values (The variable will have the name of the secret or param where you can find the value)
 
 ## Connecting to DynamoDB
 The aws user you are provisioned will have access to dynamodb. To utilize the access in the app, you will need to set your AWS_PROFILE to the profile you created for you dev aws user
