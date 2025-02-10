@@ -23,7 +23,7 @@ export class AmpApiIntegration {
     async getHazardhubData(address: AddressDto): Promise<HazardhubResultDto> {
         const payload = {
             ...address,
-            street: address.streetAddress,
+            street: this.removeAccents(address.streetAddress),
             zip: this.normalizeZipCode(address.zip),
         };
 
@@ -34,14 +34,24 @@ export class AmpApiIntegration {
                 },
             });
 
-            return data.data.results;
+            const { results, success, errors } = data.data;
+
+            if (!success) {
+                const errorMessages =
+                    errors?.map((error) => error.message).join(', ') || 'Missing error message from Amp API';
+
+                throw new Error(errorMessages);
+            }
+
+            return results;
         } catch (error) {
             const errorMessage = error.response?.data?.response || error.message;
 
-            this.logger.error('Amp API request error. Failed to get hazardhub data', {
-                message: errorMessage,
-                statusCode: error.response?.status,
-            });
+            this.logger.error(
+                `Amp API request error. Failed to get hazardhub data: ${errorMessage}, payload: ${JSON.stringify(
+                    payload,
+                )}`,
+            );
 
             throw error;
         }
@@ -56,5 +66,14 @@ export class AmpApiIntegration {
         const cleanedZip = zip.split('-')[0].replace(/[^0-9]/g, '');
 
         return cleanedZip.padStart(5, '0').slice(-5);
+    }
+
+    /**
+     * @description Remove accents from a string
+     * @param {string} value
+     * @returns {string}
+     */
+    private removeAccents(value: string): string {
+        return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 }
