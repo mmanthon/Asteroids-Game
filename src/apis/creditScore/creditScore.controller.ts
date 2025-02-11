@@ -1,6 +1,8 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { AuthenticatedRequest } from '@ignidus/iscx-backend-utils';
+import { Controller, Get, Param, Post, Req } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
+    ApiCreatedResponse,
     ApiInternalServerErrorResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
@@ -21,11 +23,14 @@ export class CreditScoreController {
 
     @Post(':appID')
     @ApiOperation({ summary: 'Pull Credit Score for Drivers on an application' })
-    @ApiOkResponse({ description: 'Success', type: CreditScoreResponseDto })
+    @ApiCreatedResponse({ description: 'Success', type: CreditScoreResponseDto })
     @ApiBadRequestResponse({ description: 'Bad Request' })
     @ApiNotFoundResponse({ description: 'Application not found' })
-    pullCreditScore(@Param('appID') appID: string): Promise<CreditScoreResponseDto> {
-        return this.creditScoreService.pullCreditScore(appID);
+    pullCreditScore(
+        @Param('appID') appID: string,
+        @Req() { user }: AuthenticatedRequest,
+    ): Promise<CreditScoreResponseDto> {
+        return this.creditScoreService.pullCreditScore(appID, user);
     }
 
     @Get(':appID')
@@ -33,7 +38,10 @@ export class CreditScoreController {
     @ApiOkResponse({ description: 'Success', type: CreditScoreResponseDto })
     @ApiBadRequestResponse({ description: 'Bad Request' })
     @ApiNotFoundResponse({ description: 'Application not found' })
-    getCreditScore(@Param('appID') appID: string): Promise<CreditScoreResponseDto> {
-        return this.creditScoreService.getCreditScore(appID);
+    getCreditScore(
+        @Param('appID') appID: string,
+        @Req() { user }: AuthenticatedRequest,
+    ): Promise<CreditScoreResponseDto> {
+        return this.creditScoreService.getCreditScore(appID, user);
     }
 }
