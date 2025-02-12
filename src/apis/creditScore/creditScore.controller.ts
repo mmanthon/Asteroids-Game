@@ -13,6 +13,7 @@ import {
 
 import { CreditScoreService } from './creditScore.service';
 import { CreditScoreResponseDto } from './dto/creditScoreResponse.dto';
+import { AppIDValidator } from '../../shared/validators';
 
 @ApiTags('Credit Score')
 @Controller('credit-score')
@@ -27,7 +28,7 @@ export class CreditScoreController {
     @ApiBadRequestResponse({ description: 'Bad Request' })
     @ApiNotFoundResponse({ description: 'Application not found' })
     pullCreditScore(
-        @Param('appID') appID: string,
+        @Param('appID', AppIDValidator) appID: string,
         @Req() { user }: AuthenticatedRequest,
     ): Promise<CreditScoreResponseDto> {
         return this.creditScoreService.pullCreditScore(appID, user);
@@ -39,7 +40,7 @@ export class CreditScoreController {
     @ApiBadRequestResponse({ description: 'Bad Request' })
     @ApiNotFoundResponse({ description: 'Application not found' })
     getCreditScore(
-        @Param('appID') appID: string,
+        @Param('appID', AppIDValidator) appID: string,
         @Req() { user }: AuthenticatedRequest,
     ): Promise<CreditScoreResponseDto> {
         return this.creditScoreService.getCreditScore(appID, user);

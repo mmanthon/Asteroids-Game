@@ -1,7 +1,11 @@
+import { AuthenticatedRequest, ItemEntity } from '@ignidus/iscx-backend-utils';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { AppIDValidator } from '../../../shared/validators/appID.validator';
 import { CreditScoreController } from '../creditScore.controller';
 import { CreditScoreService } from '../creditScore.service';
+import { appID, mockJWT } from '../mocks';
+import { adminCreditScoreResponseDtoMock } from '../mocks/creditScoreResponse.dto.mock';
 
 describe('CreditScoreController', () => {
     let controller: CreditScoreController;
@@ -10,7 +14,14 @@ describe('CreditScoreController', () => {
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [CreditScoreController],
-            providers: [CreditScoreService],
+            providers: [
+                CreditScoreService,
+                AppIDValidator,
+                {
+                    provide: ItemEntity,
+                    useValue: {},
+                },
+            ],
         }).compile();
 
         controller = module.get<CreditScoreController>(CreditScoreController);
@@ -20,5 +31,16 @@ describe('CreditScoreController', () => {
     it('should be defined', () => {
         expect(controller).toBeDefined();
         expect(service).toBeDefined();
+    });
+
+    it('should call pullCreditScore with valid appID', async () => {
+        const mockRequest: AuthenticatedRequest = {
+            user: mockJWT,
+        } as AuthenticatedRequest;
+
+        jest.spyOn(service, 'pullCreditScore').mockResolvedValue(adminCreditScoreResponseDtoMock);
+
+        expect(await controller.pullCreditScore(appID, mockRequest)).toBe(adminCreditScoreResponseDtoMock);
+        expect(service.pullCreditScore).toHaveBeenCalledWith(appID, mockRequest.user);
     });
 });

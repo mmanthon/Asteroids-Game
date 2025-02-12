@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { CreditScoreService } from '../creditScore.service';
-import { mockJWT } from '../mocks/constants';
-import { mockAdminCreditScoreResponse } from '../mocks/creditScoreResponse.mock';
+import { mockJWT } from '../mocks';
+import { adminCreditScoreResponseDtoMock } from '../mocks/creditScoreResponse.dto.mock';
 
 describe('CreditScoreService', () => {
     let service: CreditScoreService;
@@ -22,6 +22,6 @@ describe('CreditScoreService', () => {
     it('should return admin credit score response for developer role', async () => {
         const result = await service.pullCreditScore('12345', mockJWT);
 
-        expect(result).toEqual({ ...mockAdminCreditScoreResponse, appID: '12345' });
+        expect(result).toEqual({ ...adminCreditScoreResponseDtoMock, appID: '12345' });
     });
 });

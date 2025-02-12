@@ -1,7 +1,7 @@
 import { actionCode1A, actionCode2B, appID, drivers, lastOrderDate, score, scoreRange, status } from './constants';
 import { CreditScoreResponseDto } from '../dto/creditScoreResponse.dto';
 
-export const mockAdminCreditScoreResponse: CreditScoreResponseDto = {
+export const adminCreditScoreResponseDtoMock: CreditScoreResponseDto = {
     status: status,
     appID: appID,
     score: score,
@@ -11,7 +11,7 @@ export const mockAdminCreditScoreResponse: CreditScoreResponseDto = {
     drivers,
 };
 
-export const mockCreditScoreResponse: CreditScoreResponseDto = {
+export const creditScoreResponseDtoMock: CreditScoreResponseDto = {
     status: status,
     appID: appID,
     actionCode: actionCode2B,

@@ -2,7 +2,7 @@ import { AmpRolesEnum, AuthenticatedRequest } from '@ignidus/iscx-backend-utils'
 import { Injectable } from '@nestjs/common';
 
 import { CreditScoreResponseDto } from './dto/creditScoreResponse.dto';
-import { mockAdminCreditScoreResponse, mockCreditScoreResponse } from './mocks';
+import { adminCreditScoreResponseDtoMock, creditScoreResponseDtoMock } from './mocks';
 
 @Injectable()
 export class CreditScoreService {
@@ -16,10 +16,10 @@ export class CreditScoreService {
         // Implement logic to pull credit score from TransUnion
         // Verify if user has proper roler
         if (roles.includes(AmpRolesEnum.DEVELOPER)) {
-            return { ...mockAdminCreditScoreResponse, appID };
+            return { ...adminCreditScoreResponseDtoMock, appID };
         }
 
-        return { ...mockCreditScoreResponse, appID };
+        return { ...creditScoreResponseDtoMock, appID };
     }
 
     /**
@@ -30,9 +30,9 @@ export class CreditScoreService {
     async getCreditScore(appID: string, { roles }: AuthenticatedRequest['user']): Promise<CreditScoreResponseDto> {
         // Implement logic to get credit score from Itrans API
         if (roles.includes(AmpRolesEnum.DEVELOPER)) {
-            return { ...mockAdminCreditScoreResponse, appID };
+            return { ...adminCreditScoreResponseDtoMock, appID };
         }
 
-        return { ...mockCreditScoreResponse, appID };
+        return { ...creditScoreResponseDtoMock, appID };
     }
 }
