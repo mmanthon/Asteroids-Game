@@ -5,8 +5,8 @@ export const mvrApiResponseMock: MvrApiCreditScoreResponse = {
     creditScore: {
         status: status,
         appID: appID,
-        score: score,
-        scoreRange: scoreRange,
+        creditScore: score,
+        creditScoreRange: scoreRange,
         actionCode: actionCode1A,
         color: color,
         lastOrderDate: lastOrderDate,

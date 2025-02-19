@@ -8,8 +8,8 @@ export interface GetDriverQueryResult {
 export interface MvrApiCreditScore {
     status: string;
     appID: string;
-    score: number;
-    scoreRange: string;
+    creditScore: number;
+    creditScoreRange: string;
     actionCode: string;
     color: string;
     lastOrderDate: string;
