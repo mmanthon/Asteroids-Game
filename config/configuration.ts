@@ -40,4 +40,7 @@ export default () => ({
             },
         },
     },
+
+    // MVR API
+    mvrApiUrl: process.env.MVR_API_URL,
 });

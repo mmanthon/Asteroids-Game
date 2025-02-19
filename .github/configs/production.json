@@ -13,6 +13,10 @@
         {
             "name": "DYNAMODB_ACCESS_CONTROL_USERS_TABLE_NAME",
             "value": "ISCxAccessControlUsers"
+        },
+        {
+            "name": "MVR_API_URL",
+            "value": "http://iscx-mvr-api.internal/api"
         }
     ],
     "secrets": [

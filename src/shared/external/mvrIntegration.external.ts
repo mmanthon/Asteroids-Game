@@ -12,7 +12,7 @@ export class MvrIntegrationService {
 
     constructor(private readonly configService: ConfigService) {
         this.axiosClient = axios.create({
-            baseURL: this.configService.get<string>('MVR_API_URL'),
+            baseURL: this.configService.get<string>('mvrApiUrl') + '/credit-score',
         });
     }
 

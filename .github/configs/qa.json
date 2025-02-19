@@ -13,6 +13,10 @@
         {
             "name": "DYNAMODB_ACCESS_CONTROL_USERS_TABLE_NAME",
             "value": "ISCxQAAccessControlUsers"
+        },
+        {
+            "name": "MVR_API_URL",
+            "value": "https://qa-mvr.api.isceng.net/api"
         }
     ],
     "secrets": [
