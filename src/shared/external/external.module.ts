@@ -1,10 +1,10 @@
 import { Global, Module } from '@nestjs/common';
 
-import { AmpApiIntegration } from '.';
+import { AmpApiIntegration, MvrIntegrationService } from '.';
 
 @Global()
 @Module({
-    providers: [AmpApiIntegration],
-    exports: [AmpApiIntegration],
+    providers: [AmpApiIntegration, MvrIntegrationService],
+    exports: [AmpApiIntegration, MvrIntegrationService],
 })
 export class ExternalModule {}

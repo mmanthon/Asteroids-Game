@@ -1,10 +1,13 @@
 import { AuthenticatedRequest, ItemEntity } from '@ignidus/iscx-backend-utils';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { MvrIntegrationService } from '../../../shared/external/mvrIntegration.external';
 import { AppIDValidator } from '../../../shared/validators/appID.validator';
 import { CreditScoreController } from '../creditScore.controller';
+import { CreditScoreQuery } from '../creditScore.query';
 import { CreditScoreService } from '../creditScore.service';
-import { appID, mockJWT } from '../mocks';
+import { CreditScoreUtil } from '../creditScore.util';
+import { adminJwtMock, appID } from '../mocks';
 import { adminCreditScoreResponseDtoMock } from '../mocks/creditScoreResponse.dto.mock';
 
 describe('CreditScoreController', () => {
@@ -16,9 +19,19 @@ describe('CreditScoreController', () => {
             controllers: [CreditScoreController],
             providers: [
                 CreditScoreService,
+                CreditScoreQuery,
+                CreditScoreUtil,
                 AppIDValidator,
                 {
                     provide: ItemEntity,
+                    useValue: {},
+                },
+                {
+                    provide: MvrIntegrationService,
+                    useValue: {},
+                },
+                {
+                    provide: 'Amp',
                     useValue: {},
                 },
             ],
@@ -35,7 +48,7 @@ describe('CreditScoreController', () => {
 
     it('should call pullCreditScore with valid appID', async () => {
         const mockRequest: AuthenticatedRequest = {
-            user: mockJWT,
+            user: adminJwtMock,
         } as AuthenticatedRequest;
 
         jest.spyOn(service, 'pullCreditScore').mockResolvedValue(adminCreditScoreResponseDtoMock);

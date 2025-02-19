@@ -10,14 +10,16 @@ export class DriverDto {
     @ApiProperty({ description: 'Driver Last Name', example: 'Doe' })
     lastName: string;
 
-    @ApiProperty({ description: 'Driver License State', example: 'CA' })
-    licenseState: string;
-
     @ApiProperty({ description: 'Driver Date of Birth', example: '1980-01-01', format: 'date' })
     dob: string;
+}
 
-    @ApiProperty({ description: 'Driver License Number', example: 'D1234567' })
-    licenseNum: string;
+export class MessageDto {
+    @ApiProperty({ description: 'Message Code', example: 'W0006' })
+    code: string;
+
+    @ApiProperty({ description: 'Message Description', example: 'This is a message.' })
+    description: string;
 }
 
 export class CreditScoreResponseDto {
@@ -38,9 +40,18 @@ export class CreditScoreResponseDto {
     @ApiProperty({ description: 'Action Code', example: '1A' })
     actionCode: string;
 
+    @ApiProperty({ description: 'Main Text Color Hex Code', example: '#008000' })
+    color: string;
+
     @ApiProperty({ description: 'Last Order Date', example: '2023-10-01T12:00:00Z', format: 'date-time' })
     lastOrderDate: string;
 
     @ApiProperty({ description: 'Drivers associated with the credit score', type: DriverDto, isArray: true })
     drivers: DriverDto[];
+
+    @ApiPropertyOptional({ description: 'Warnings associated with the credit score', type: MessageDto, isArray: true })
+    warnings?: MessageDto[];
+
+    @ApiPropertyOptional({ description: 'Errors associated with the credit score', type: MessageDto, isArray: true })
+    errors?: MessageDto[];
 }

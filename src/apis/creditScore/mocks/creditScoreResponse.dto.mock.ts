@@ -1,4 +1,4 @@
-import { actionCode1A, actionCode2B, appID, drivers, lastOrderDate, score, scoreRange, status } from './constants';
+import { actionCode1A, appID, color, drivers, lastOrderDate, score, scoreRange, status } from './constants';
 import { CreditScoreResponseDto } from '../dto/creditScoreResponse.dto';
 
 export const adminCreditScoreResponseDtoMock: CreditScoreResponseDto = {
@@ -7,6 +7,7 @@ export const adminCreditScoreResponseDtoMock: CreditScoreResponseDto = {
     score: score,
     scoreRange: scoreRange,
     actionCode: actionCode1A,
+    color: color,
     lastOrderDate: lastOrderDate,
     drivers,
 };
@@ -14,7 +15,8 @@ export const adminCreditScoreResponseDtoMock: CreditScoreResponseDto = {
 export const creditScoreResponseDtoMock: CreditScoreResponseDto = {
     status: status,
     appID: appID,
-    actionCode: actionCode2B,
+    actionCode: actionCode1A,
+    color: color,
     lastOrderDate: lastOrderDate,
     drivers,
 };
