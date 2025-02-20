@@ -29,8 +29,8 @@ export class CreditScoreUtil {
         if (roles.includes(AmpRolesEnum.DEVELOPER)) {
             return {
                 ...response,
-                score: result.creditScore.creditScore,
-                scoreRange: result.creditScore.creditScoreRange,
+                score: result.creditScore.score,
+                scoreRange: result.creditScore.scoreRange,
             };
         }
 
