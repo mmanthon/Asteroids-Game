@@ -16,4 +16,10 @@ export const mockDriverQueryResult: GetDriverQueryResult[] = [
         lastname: 'Doe',
         dob: '1980-01-01',
     },
+    {
+        auto_driver_schedule_id: 67890,
+        firstname: 'Jane',
+        lastname: 'Smith',
+        dob: '1990-02-02',
+    },
 ];

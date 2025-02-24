@@ -9,7 +9,9 @@ import { CreditScoreUtil } from '../creditScore.util';
 import {
     adminCreditScoreResponseDtoMock,
     adminJwtMock,
+    appID,
     creditScoreResponseDtoMock,
+    insufficientDriverError,
     jwtMock,
     mockDriverQueryResult,
 } from '../mocks';
@@ -18,6 +20,7 @@ const mockFormatResponse = jest.fn().mockResolvedValue(adminCreditScoreResponseD
 
 describe('CreditScoreService', () => {
     let service: CreditScoreService;
+    let creditScoreQuery: CreditScoreQuery;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -51,6 +54,7 @@ describe('CreditScoreService', () => {
         }).compile();
 
         service = module.get<CreditScoreService>(CreditScoreService);
+        creditScoreQuery = module.get<CreditScoreQuery>(CreditScoreQuery);
     });
 
     it('should be defined', () => {
@@ -58,17 +62,17 @@ describe('CreditScoreService', () => {
     });
 
     it('should return admin credit score response for developer role', async () => {
-        const result = await service.pullCreditScore('12345', adminJwtMock);
+        const result = await service.pullCreditScore(appID, adminJwtMock);
 
-        expect(result).toEqual({ ...adminCreditScoreResponseDtoMock, appID: '12345' });
+        expect(result).toEqual({ ...adminCreditScoreResponseDtoMock, appID: appID });
     });
 
     it('should return non-admin credit score response for non-developer role', async () => {
         mockFormatResponse.mockResolvedValue(creditScoreResponseDtoMock);
 
-        const result = await service.pullCreditScore('12345', jwtMock);
+        const result = await service.pullCreditScore(appID, jwtMock);
 
-        expect(result).toEqual({ ...creditScoreResponseDtoMock, appID: '12345' });
+        expect(result).toEqual({ ...creditScoreResponseDtoMock, appID: appID });
     });
 
     it('should handle a failed call with an MvrApiException', async () => {
@@ -76,6 +80,24 @@ describe('CreditScoreService', () => {
 
         jest.spyOn(service.mvrIntegrationService, 'pullCreditScoreData').mockRejectedValue(mvrApiException);
 
-        await expect(service.pullCreditScore('12345', jwtMock)).rejects.toThrow(MvrApiException);
+        await expect(service.pullCreditScore(appID, jwtMock)).rejects.toThrow(mvrApiException);
+    });
+
+    it('should throw BadRequestException if there are insufficient drivers when pulling the creditScore', async () => {
+        jest.spyOn(creditScoreQuery, 'getDriversByAppID').mockResolvedValue([mockDriverQueryResult[0]]);
+
+        await expect(service.pullCreditScore(appID, jwtMock)).rejects.toThrow(insufficientDriverError);
+    });
+
+    it('should throw BadRequestException if there are no drivers', async () => {
+        jest.spyOn(creditScoreQuery, 'getDriversByAppID').mockResolvedValue([]);
+
+        await expect(service.pullCreditScore(appID, jwtMock)).rejects.toThrow(insufficientDriverError);
+    });
+
+    it('should throw BadRequestException if there are no drivers for getCreditScore', async () => {
+        jest.spyOn(creditScoreQuery, 'getDriversByAppID').mockResolvedValue([]);
+
+        await expect(service.getCreditScore(appID, jwtMock)).rejects.toThrow(insufficientDriverError);
     });
 });
