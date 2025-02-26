@@ -12,6 +12,9 @@ export class DriverDto {
 
     @ApiProperty({ description: 'Driver Date of Birth', example: '1980-01-01', format: 'date' })
     dob: string;
+
+    @ApiProperty({ description: 'Driver License Number', example: 'D1234567' })
+    licenseNum: string;
 }
 
 export class MessageDto {

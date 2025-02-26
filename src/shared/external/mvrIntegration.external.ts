@@ -71,6 +71,7 @@ export class MvrIntegrationService {
             firstName: driver.firstname,
             lastName: driver.lastname,
             dob: driver.dob ? new Date(driver.dob).toISOString().split('T')[0] : '',
+            licenseNum: driver.license,
         }));
 
         return {

@@ -3,6 +3,7 @@ export interface GetDriverQueryResult {
     firstname: string;
     lastname: string;
     dob: string;
+    license: string;
 }
 
 export interface MvrApiCreditScore {
@@ -32,6 +33,7 @@ export interface MvrApiDriver {
     firstName: string;
     lastName: string;
     dob: string;
+    licenseNum: string;
 }
 
 export interface MvrApiMessage {

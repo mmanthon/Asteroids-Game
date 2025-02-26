@@ -9,11 +9,13 @@ export const drivers = [
         firstName: 'Jake',
         lastName: 'Peralta',
         dob: '1980-01-01',
+        licenseNum: 'J1234567',
     },
     {
         firstName: 'Amy',
         lastName: 'Santiago',
         dob: '1980-01-01',
+        licenseNum: 'A2345678',
     },
 ];
 export const insufficientDriverError = new BadRequestException(

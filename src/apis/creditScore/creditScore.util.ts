@@ -21,6 +21,7 @@ export class CreditScoreUtil {
                 firstName: driver.firstName,
                 lastName: driver.lastName,
                 dob: driver.dob,
+                licenseNum: driver.licenseNum,
             })),
             warnings: result.warnings,
             errors: result.errors,
