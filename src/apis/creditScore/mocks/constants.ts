@@ -26,3 +26,4 @@ export const nonAdminRoleArrayMock = [AmpRolesEnum.UNDERWRITER];
 export const score = 700;
 export const scoreRange = '700-800';
 export const status = 'Completed';
+export const testUrl = 'http://mock-api-url.com';
