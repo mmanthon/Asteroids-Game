@@ -27,7 +27,7 @@ export class CreditScoreUtil {
             errors: result.errors,
         };
 
-        if (roles.includes(AmpRolesEnum.DEVELOPER)) {
+        if (roles.includes(AmpRolesEnum.BUSINESS_ADMIN)) {
             return {
                 ...response,
                 score: result.creditScore.score,

@@ -1,7 +1,7 @@
 import { AmpRolesEnum } from '@ignidus/iscx-backend-utils';
 import { BadRequestException } from '@nestjs/common';
 export const actionCode1A = '1A';
-export const adminRoleArrayMock = [AmpRolesEnum.DEVELOPER];
+export const adminRoleArrayMock = [AmpRolesEnum.BUSINESS_ADMIN];
 export const appID = '12345';
 export const color = '#0080000';
 export const drivers = [
