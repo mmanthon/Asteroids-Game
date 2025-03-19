@@ -1,5 +1,11 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
-import { DynamoUserEntity, createEntityProviders, dynamoEntityFactory } from '@ignidus/iscx-backend-utils';
+import {
+    DynamoApplicationEntity,
+    DynamoUserEntity,
+    DynamodbClaimEntity,
+    createEntityProviders,
+    dynamoEntityFactory,
+} from '@ignidus/iscx-backend-utils';
 import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -20,10 +26,18 @@ import { ConfigService } from '@nestjs/config';
                     entityClass: DynamoUserEntity,
                     metadata: { tableNameKey: 'dynamodb.accessControlUsersTableName' },
                 },
+                {
+                    entityClass: DynamoApplicationEntity,
+                    metadata: { tableNameKey: 'dynamodb.applicationsTableName' },
+                },
+                {
+                    entityClass: DynamodbClaimEntity,
+                    metadata: { tableNameKey: 'dynamodb.claimsTableName' },
+                },
             ],
             dynamoEntityFactory,
         ),
     ],
-    exports: [DynamoUserEntity, DynamoDB],
+    exports: [DynamoUserEntity, DynamoApplicationEntity, DynamodbClaimEntity, DynamoDB],
 })
 export class DynamoDBModule {}

@@ -15,6 +15,14 @@
             "value": "ISCxAccessControlUsers"
         },
         {
+            "name": "DYNAMODB_APPLICATIONS_TABLE_NAME",
+            "value": "ISCxApplications"
+        },
+        {
+            "name": "DYNAMODB_CLAIMS_TABLE_NAME",
+            "value": "ISCxClaims"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "http://iscx-mvr-api.internal/api"
         }

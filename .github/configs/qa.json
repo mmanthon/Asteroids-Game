@@ -15,6 +15,14 @@
             "value": "ISCxQAAccessControlUsers"
         },
         {
+            "name": "DYNAMODB_APPLICATIONS_TABLE_NAME",
+            "value": "ISCxQAApplications"
+        },
+        {
+            "name": "DYNAMODB_CLAIMS_TABLE_NAME",
+            "value": "ISCxQAClaims"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "https://qa-mvr.api.isceng.net/api"
         }

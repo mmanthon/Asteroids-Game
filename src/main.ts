@@ -10,9 +10,10 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule, { logger: false });
+    const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
     const configService = app.get(ConfigService);
+    const httpExceptionFilter = app.get(HttpExceptionFilter);
 
     app.enableCors({
         // any subdomain of isceng.net over HTTPS
@@ -28,7 +29,7 @@ async function bootstrap() {
     const logger = new Logger('Main');
 
     app.setGlobalPrefix(configService.get<string>('globalApiPrefix'));
-    app.useGlobalFilters(new HttpExceptionFilter());
+    app.useGlobalFilters(httpExceptionFilter);
     const config = new DocumentBuilder()
         .setTitle('ISCx Underwriter Workbench APIs')
         .addBearerAuth({ name: 'Authorization', type: 'http' })

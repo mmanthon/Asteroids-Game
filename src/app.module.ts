@@ -1,4 +1,4 @@
-import { JwtAuthGuard, LoggerMiddleware, winstonTransports } from '@ignidus/iscx-backend-utils';
+import { HttpExceptionFilter, JwtAuthGuard, LoggerMiddleware, winstonTransports } from '@ignidus/iscx-backend-utils';
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -8,6 +8,7 @@ import { WinstonModule } from 'nest-winston';
 
 import configuration from '../config/configuration';
 import { envValidationSchema } from '../config/env.validation';
+import { ApplicationModule } from './apis/application/application.module';
 import { AuthModule } from './apis/auth/auth.module';
 import { CreditScoreModule } from './apis/creditScore/creditScore.module';
 import { HazardhubModule } from './apis/hazardhub/hazardhub.module';
@@ -46,6 +47,7 @@ import { ExternalModule } from './shared/external/external.module';
         HazardhubModule,
         CreditScoreModule,
         ExternalModule,
+        ApplicationModule,
     ],
     providers: [
         {
@@ -56,6 +58,8 @@ import { ExternalModule } from './shared/external/external.module';
             provide: APP_GUARD,
             useClass: JwtAuthGuard,
         },
+        HttpExceptionFilter,
+        LoggerMiddleware,
     ],
 })
 export class AppModule {

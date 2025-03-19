@@ -23,6 +23,8 @@ export default () => ({
     // DynamoDB tables
     dynamodb: {
         accessControlUsersTableName: process.env.DYNAMODB_ACCESS_CONTROL_USERS_TABLE_NAME,
+        applicationsTableName: process.env.DYNAMODB_APPLICATIONS_TABLE_NAME,
+        claimsTableName: process.env.DYNAMODB_CLAIMS_TABLE_NAME,
     },
 
     // AMP Database
