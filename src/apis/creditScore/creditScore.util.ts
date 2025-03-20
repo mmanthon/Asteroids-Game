@@ -1,9 +1,12 @@
 import { AmpRolesEnum } from '@ignidus/iscx-backend-utils';
+import { Logger } from '@nestjs/common';
 
 import { CreditScoreResponseDto } from './dto/creditScoreResponse.dto';
 import { MvrApiCreditScoreResponse } from '../../shared/interfaces/mvrApi.interface';
 
 export class CreditScoreUtil {
+    private readonly logger = new Logger(CreditScoreUtil.name);
+
     /**
      * @description Format the response from MVR Credit Score API
      * @param {MvrApiCreditScoreResponse} result
@@ -28,12 +31,17 @@ export class CreditScoreUtil {
         };
 
         if (roles.includes(AmpRolesEnum.BUSINESS_ADMIN)) {
-            return {
+            const adminResponse = {
                 ...response,
                 score: result.creditScore.score,
                 scoreRange: result.creditScore.scoreRange,
             };
+
+            this.logger.log(`Admin Response: ${JSON.stringify(adminResponse)}`);
+
+            return adminResponse;
         }
+        this.logger.log(`Response: ${JSON.stringify(response)}`);
 
         return response;
     }

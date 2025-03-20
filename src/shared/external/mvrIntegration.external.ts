@@ -28,6 +28,8 @@ export class MvrIntegrationService {
         try {
             const { data } = await this.axiosClient.post('/get', driverRequestObject);
 
+            this.logger.log(`MVR API response from getCreditScore: ${JSON.stringify(data)}`);
+
             return data;
         } catch (error) {
             this.logger.error({
@@ -49,6 +51,8 @@ export class MvrIntegrationService {
 
         try {
             const { data } = await this.axiosClient.post('/', driverRequestObject);
+
+            this.logger.log(`MVR API response for pullCreditScore: ${JSON.stringify(data)}`);
 
             return data;
         } catch (error) {
