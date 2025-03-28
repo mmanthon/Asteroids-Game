@@ -96,6 +96,17 @@ $ npm install
 1. Create a .env file at the root of the project using the .env.example file
 2. If the variable doesn't have a default value, check AWS parameter store or secret mananger for the values (The variable will have the name of the secret or param where you can find the value)
 
+## Connecting to AMP DB
+Before running the app you will need to create a ssh tunnel to amp dev(or any db host within isc).
+1. Navigate to the script directory which is located at the root of "src".
+```bash
+cd src/scripts
+```
+2. Run the tunnel script that is located in this directory
+```bash
+./tunnel.sh -h <db host> -k <path to your ssh private key>
+```  
+
 ## Connecting to DynamoDB
 The aws user you are provisioned will have access to dynamodb. To utilize the access in the app, you will need to set your AWS_PROFILE to the profile you created for you dev aws user
 ```bash
