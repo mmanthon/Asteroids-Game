@@ -8,6 +8,7 @@ import {
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+import { HazardhubResponseDto } from './dto';
 import { HazardhubService } from './hazardhub.service';
 import { AppIDValidator } from '../../shared/validators';
 
@@ -20,9 +21,9 @@ export class HazardhubController {
 
     @Get(':appID')
     @ApiOperation({ summary: 'Get application hazardhub data' })
-    @ApiOkResponse({ description: 'Return all hazardhub data', isArray: true })
+    @ApiOkResponse({ description: 'Return all hazardhub data', type: HazardhubResponseDto, isArray: true })
     @ApiNotFoundResponse({ description: 'No hazardhub data found' })
-    findOne(@Param('appID', AppIDValidator) appID: string) {
+    findOne(@Param('appID', AppIDValidator) appID: string): Promise<HazardhubResponseDto[]> {
         return this.hazardhubService.findOne(appID);
     }
 }
