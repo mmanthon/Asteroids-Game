@@ -15,6 +15,10 @@ export class HazardHubUtil {
     validateAddress(address: AddressDto): boolean {
         const missingFields: string[] = [];
 
+        if (!address) {
+            throw new BadRequestException('Missing or empty required address fields');
+        }
+
         if (!address.streetAddress?.trim()) missingFields.push('streetAddress');
         if (!address.city?.trim()) missingFields.push('city');
         if (!address.state?.trim()) missingFields.push('state');

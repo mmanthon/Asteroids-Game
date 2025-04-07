@@ -36,4 +36,58 @@ describe('HazardhubUtil', () => {
 
         expect(() => util.validateAddress(invalidAddress)).toThrow(BadRequestException);
     });
+
+    it('should throw if addres is undefined', () => {
+        expect(() => util.validateAddress(undefined as any)).toThrow(BadRequestException);
+    });
+
+    it('should throw if addres is an empty object', () => {
+        expect(() => util.validateAddress({} as any)).toThrow(BadRequestException);
+    });
+
+    it('should throw with multiple missing fields', () => {
+        const invalidAddress = {
+            ...mockAddress,
+            city: '',
+        };
+
+        try {
+            util.validateAddress(invalidAddress);
+            fail('Expected BadRequestException to be thrown');
+        } catch (error) {
+            expect(error).toBeInstanceOf(BadRequestException);
+            expect(error.message).toContain('city');
+            expect(error.message).toContain('Missing or empty required address fields');
+        }
+    });
+
+    it('should throw if all required fields are empty but address is defined', () => {
+        const invalidAddress = {
+            streetAddress: '',
+            city: '',
+            state: '',
+            zip: '',
+        };
+
+        try {
+            util.validateAddress(invalidAddress);
+            fail('Expected BadRequestException to be thrown');
+        } catch (error) {
+            expect(error).toBeInstanceOf(BadRequestException);
+            expect(error.message).toContain('Missing or empty required address fields');
+            expect(error.message).toContain('streetAddress');
+            expect(error.message).toContain('city');
+            expect(error.message).toContain('state');
+            expect(error.message).toContain('zip');
+        }
+    });
+
+    it('should throw if address is undefined', () => {
+        try {
+            util.validateAddress(undefined as any);
+        } catch (error) {
+            expect(error).toBeInstanceOf(BadRequestException);
+            expect(error.message).toContain('Missing or empty required address fields');
+        }
+    });
 });
