@@ -6,6 +6,6 @@ export const mockAddress = {
     zip: '75201',
     // eslint-disable-next-line camelcase
     location_type: 'ADDRESS',
-    lat: 3321,
+    lat: 33.021,
     lng: 96.698,
 };
