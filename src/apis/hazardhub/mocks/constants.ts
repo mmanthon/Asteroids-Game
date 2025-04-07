@@ -4,7 +4,8 @@ export const mockAddress = {
     city: 'Dallas',
     state: 'TX',
     zip: '75201',
-    locationType: 'ADDRESS',
+    // eslint-disable-next-line camelcase
+    location_type: 'ADDRESS',
     lat: 3321,
     lng: 96.698,
 };

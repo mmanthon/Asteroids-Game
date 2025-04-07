@@ -5,7 +5,7 @@ import { HazardHubQuery } from '../hazardhub.query';
 import { HazardhubService } from '../hazardhub.service';
 import { HazardHubUtil } from '../hazardhub.util';
 import { appID, mockAddress } from '../mocks/constants';
-import { expectedHazardhubResponse, mockHazardhubData } from '../mocks/hazardhubResponse.dto.mock';
+import { hazardhubResponseDtoMock, mockHazardhubData } from '../mocks/hazardhubResponse.dto.mock';
 
 describe('HazardhubService', () => {
     let service: HazardhubService;
@@ -56,7 +56,7 @@ describe('HazardhubService', () => {
 
         expect(hazardHubUtil.validateAddress).toHaveBeenCalledWith(mockAddress);
         expect(ampApiIntegration.getHazardhubData).toHaveBeenLastCalledWith(mockAddress);
-        expect(result).toMatchObject([expectedHazardhubResponse]);
+        expect(result).toMatchObject([hazardhubResponseDtoMock]);
     });
 
     it('should throw if address is invalid', async () => {

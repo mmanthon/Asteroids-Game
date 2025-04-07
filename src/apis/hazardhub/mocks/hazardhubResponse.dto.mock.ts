@@ -1,20 +1,25 @@
-export const expectedHazardhubResponse = {
-    address: '123 Main St',
-    state: 'TX',
-    zip: '75201',
-    lat: 33.021,
-    lng: -96.698,
-    locationType: 'ADDRESS',
+import { HazardhubResponseDto } from '../dto';
+import { mockAddress } from './constants';
+
+export const hazardhubResponseDtoMock: HazardhubResponseDto = {
+    address: mockAddress.streetAddress,
+    state: mockAddress.state,
+    zip: mockAddress.zip,
+    lat: mockAddress.lat,
+    lng: mockAddress.lng,
+    // eslint-disable-next-line camelcase
+    location_type: mockAddress.location_type,
 };
 
 export const mockHazardhubData = {
     risks: {
-        address: expectedHazardhubResponse.address,
-        state: expectedHazardhubResponse.state,
-        zip: expectedHazardhubResponse.zip,
-        lat: expectedHazardhubResponse.lat,
-        lng: expectedHazardhubResponse.lng,
-        locationType: expectedHazardhubResponse.locationType,
+        address: mockAddress.streetAddress,
+        state: mockAddress.state,
+        zip: mockAddress.zip,
+        lat: mockAddress.lat,
+        lng: mockAddress.lng,
+        // eslint-disable-next-line camelcase
+        location_type: mockAddress.location_type,
     },
     enchancedProperty: {},
 };
