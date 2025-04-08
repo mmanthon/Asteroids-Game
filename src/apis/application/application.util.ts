@@ -11,7 +11,7 @@ import {
 import { Injectable } from '@nestjs/common';
 
 import { ApplicationQuery } from './application.query';
-import { ApplicationDto, ApplicationProductDto, AssignedUserDto } from './dto';
+import { ApplicationDto, ApplicationProductDto, AssignedUserDto, SimplifiedApplicationDto } from './dto';
 import { ProductIDEnum } from './enums';
 import { AdditionalProductData, AmpApplication } from './interfaces';
 
@@ -101,6 +101,47 @@ export class ApplicationUtil {
             effectiveDate,
             policyNumber: policy?.policy_number || '',
             ...marketplaceAppData,
+        };
+    }
+
+    /**
+     * @description Format an application object into a simplified shape for list display.
+     * @param {AmpApplication} application - The application to be simplified.
+     * @return {SimplifiedApplicationDto} A simplified application response shape.
+     */
+    async formatSimplifiedApplication(application: AmpApplication): Promise<SimplifiedApplicationDto> {
+        const products = await this.getApplicationProducts(application);
+        const assignedUserIDs = await this.applicationQuery.getTaskUserIDsByAppID(String(application.item_id));
+        const assignedUsers = await Promise.all(
+            assignedUserIDs.map(({ assigned_to }) => this.constructAssignedUserObj(assigned_to)),
+        );
+
+        return {
+            id: String(application.item_id),
+            submissionID: String(application.group_id) || '',
+            insured: {
+                firstName: application.insured_first_name || '',
+                lastName: application.insured_last_name || '',
+                companyName: application.insured_company_name || '',
+                phoneNumber: application.insured_phone || '',
+                email: application.insured_email || '',
+                address: {
+                    streetAddress: application.insured_address || '',
+                    city: application.insured_city || '',
+                    state: application.insured_state || '',
+                    zip: application.insured_zip || '',
+                },
+            },
+            products,
+            agencyName: application.agency_name || '',
+            type: application.created_from_renewal === 1 ? ApplicationTypeEnum.RENEWAL : ApplicationTypeEnum.NEW,
+            assignedUsers: assignedUsers,
+            status: application.status_name as ApplicationStatusDisplayValueEnum,
+            isMarketplaceApp: application.program_type_id === 22,
+            isBundle: (products.length || 0) > 1,
+            totalCost: Number(application.total_cost),
+            effectiveDate: this.formatDate(application.effective_date) || '',
+            lastStatusUpdate: this.formatDate(application.last_status_update) || '',
         };
     }
 

@@ -5,4 +5,5 @@ export * from './claim.dto';
 export * from './filterParam.dto';
 export * from './findAllResponse.dto';
 export * from './product.dto';
+export * from './simplifiedApplication.dto';
 export * from './updateApplicationRequest.dto';

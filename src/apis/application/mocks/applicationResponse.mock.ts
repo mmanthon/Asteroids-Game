@@ -1,0 +1,43 @@
+/* eslint-disable camelcase */
+import { AmpApplication } from '../interfaces';
+
+export const mockApplications: AmpApplication[] = [
+    {
+        item_id: 1,
+        created_from_renewal: 0,
+        user_id: 1,
+        created: '',
+        total_cost: 0,
+        program_id: 100,
+        program_type_id: 200,
+        product_ids: 1,
+        agency_name: 'Agency 1',
+        insured_company_name: 'Company A',
+        insured_first_name: 'John',
+        insured_last_name: 'Doe',
+        product_name: 'Product 1',
+        carrier_name: 'Carrier 1',
+        status_name: 'Active',
+        user_first_name: 'John',
+        user_last_name: 'Doe',
+    },
+    {
+        item_id: 2,
+        created_from_renewal: 1,
+        user_id: 2,
+        created: '',
+        total_cost: 0,
+        program_id: 101,
+        program_type_id: 201,
+        product_ids: 2,
+        agency_name: 'Agency 2',
+        insured_company_name: 'Company B',
+        insured_first_name: 'Jane',
+        insured_last_name: 'Smith',
+        product_name: 'Product 2',
+        carrier_name: 'Carrier 2',
+        status_name: 'Pending',
+        user_first_name: 'Jane',
+        user_last_name: 'Smith',
+    },
+];
