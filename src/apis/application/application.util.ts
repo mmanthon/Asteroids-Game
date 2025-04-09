@@ -5,7 +5,6 @@ import {
     ApplicationStatusDisplayValueEnum,
     ApplicationTypeEnum,
     DynamoApplicationEntity,
-    DynamodbClaimEntity,
     UserEntity,
 } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
@@ -20,7 +19,6 @@ export class ApplicationUtil {
     constructor(
         private readonly applicationQuery: ApplicationQuery,
         private readonly applicationEntity: DynamoApplicationEntity,
-        private readonly claimEntity: DynamodbClaimEntity,
         private readonly userEntity: UserEntity,
     ) {}
 
@@ -115,10 +113,14 @@ export class ApplicationUtil {
         const assignedUsers = await Promise.all(
             assignedUserIDs.map(({ assigned_to }) => this.constructAssignedUserObj(assigned_to)),
         );
+        const isMarketplaceApp = application.program_type_id === 22;
+        const marketplaceAppData = isMarketplaceApp
+            ? await this.getMarketplaceAppData(String(application.item_id))
+            : {};
 
         return {
             id: String(application.item_id),
-            submissionID: String(application.group_id) || '',
+            submissionID: '', // will be set by marketplace data if it's a marketplace app
             insured: {
                 firstName: application.insured_first_name || '',
                 lastName: application.insured_last_name || '',
@@ -137,11 +139,12 @@ export class ApplicationUtil {
             type: application.created_from_renewal === 1 ? ApplicationTypeEnum.RENEWAL : ApplicationTypeEnum.NEW,
             assignedUsers: assignedUsers,
             status: application.status_name as ApplicationStatusDisplayValueEnum,
-            isMarketplaceApp: application.program_type_id === 22,
+            isMarketplaceApp,
             isBundle: (products.length || 0) > 1,
             totalCost: Number(application.total_cost),
             effectiveDate: this.formatDate(application.effective_date) || '',
             lastStatusUpdate: this.formatDate(application.last_status_update) || '',
+            ...marketplaceAppData,
         };
     }
 
@@ -173,13 +176,6 @@ export class ApplicationUtil {
      */
     private async getMarketplaceAppData(id: string): Promise<Partial<ApplicationDto>> {
         const application = await this.applicationEntity.findOne(id);
-        const claims = await this.claimEntity.findAllByAppID(id);
-
-        const filteredClaims = claims.map((claim) => ({
-            ...claim,
-            createdDate: this.formatDate(claim.createdDate),
-            updatedDate: this.formatDate(claim.updatedDate),
-        }));
         const effectiveDate = application?.effectiveDate ? this.formatDate(application?.effectiveDate) : '';
         const expirationDate = application?.expirationDate ? this.formatDate(application?.expirationDate) : '';
         const boundDate = application?.boundDate ? this.formatDate(application?.boundDate) : '';
@@ -191,7 +187,6 @@ export class ApplicationUtil {
             expirationDate,
             policyNumber,
             submissionID: application?.submissionID || '',
-            claims: filteredClaims,
         };
     }
 
