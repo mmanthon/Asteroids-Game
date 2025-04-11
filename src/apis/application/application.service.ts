@@ -20,7 +20,7 @@ export class ApplicationService {
         const { applications, ...pagination } = await this.applicationQuery.findAll(filters);
 
         const formattedApplications = await Promise.all(
-            applications.map((application) => this.applicationUtil.formatSimplifiedApplication(application)),
+            applications.map((application) => this.applicationUtil.getBaseFormattedApplicationData(application)),
         );
 
         return {

@@ -3,18 +3,21 @@ import {
     ApplicationStatusDisplayValueEnum,
     ApplicationStatusIDEnum,
     ApplicationTypeEnum,
+    EmailTrackingEntity,
+    EmailTrackingModel,
     getKeyFromEnum,
+    sanitizeHtml,
 } from '@ignidus/iscx-backend-utils';
 import { Inject, Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 
-import { FilterParamDto } from './dto';
+import { EmailDto, FilterParamDto } from './dto';
 import { SortByEnum, SortByMapToDBEnum, SortOrderEnum } from './enums';
 import { AmpApplication, FindAllResult, GetLinkedProductResult } from './interfaces';
 
 @Injectable()
 export class ApplicationQuery {
-    constructor(@Inject('Amp') private readonly amp: Knex) {}
+    constructor(@Inject('Amp') private readonly amp: Knex, private readonly emailTrackingEntity: EmailTrackingEntity) {}
 
     /**
      * @description Get application by id
@@ -222,6 +225,24 @@ export class ApplicationQuery {
             .leftJoin('omga_carriers as oc', 'ops.carrier_id', 'oc.carrier_id')
             .where('lp.item_id', id)
             .andWhere('lp.active', 1);
+    }
+
+    /**
+     * @description Get emails tied to an amp application by appID
+     * @param {string} id
+     * @returns {Promise<EmailDto[]>}
+     */
+    async getAmpEmailsByAppID(id: string): Promise<EmailDto[]> {
+        const rawEmails = await this.emailTrackingEntity.getByEntityID(id, 'omga_items');
+
+        return rawEmails.map((email: EmailTrackingModel) => ({
+            id: String(email.email_tracking_id),
+            sender: email.from_address,
+            recipients: email?.to_address?.split(',') || [],
+            subject: email.subject || '',
+            body: sanitizeHtml(email.body_html || ''),
+            sentAt: email.sent_at,
+        }));
     }
 
     /**

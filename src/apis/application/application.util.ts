@@ -28,22 +28,9 @@ export class ApplicationUtil {
      * @returns {Promise<ApplicationDto>}
      */
     async formatApplication(application: AmpApplication): Promise<ApplicationDto> {
-        const {
-            item_id,
-            product_ids,
-            effective_date,
-            project_end_date,
-            last_updated,
-            last_status_update,
-            first_bound_date,
-        } = application;
+        const { item_id, product_ids, effective_date, project_end_date, last_updated, first_bound_date } = application;
 
         const additionalProductData = await this.applicationQuery.getAdditionalProductDataByAppID(String(item_id));
-        const assignedUserIDs = await this.applicationQuery.getTaskUserIDsByAppID(String(item_id));
-        const assignedUsers = await Promise.all(
-            assignedUserIDs.map(({ assigned_to }) => this.constructAssignedUserObj(assigned_to)),
-        );
-        const products = await this.getApplicationProducts(application);
         const policy = await this.applicationQuery.findPolicyByAppID(String(item_id));
 
         const foundProductData = additionalProductData.find(({ product_id }) => product_id === product_ids);
@@ -54,13 +41,43 @@ export class ApplicationUtil {
             productData,
             project_end_date,
         );
-
-        const effectiveDate = effective_date ? this.formatDate(effective_date) : '';
         const updatedDate = last_updated ? this.formatDate(application.last_updated) : '';
-        const lastStatusUpdate = last_status_update ? this.formatDate(application.last_status_update) : updatedDate;
         const boundDate = first_bound_date ? this.formatDate(first_bound_date) : '';
         const isMarketplaceApp = application.program_type_id === 22;
-        const marketplaceAppData = isMarketplaceApp ? await this.getMarketplaceAppData(String(item_id)) : {};
+        const emails = !isMarketplaceApp ? await this.applicationQuery.getAmpEmailsByAppID(String(item_id)) : [];
+        const baseFormattedAppData = await this.getBaseFormattedApplicationData(application);
+
+        return {
+            policyNumber: policy?.policy_number || '',
+            expirationDate,
+            updatedDate,
+            boundDate,
+            ...baseFormattedAppData, // contains values that will override the above values for marketplace apps
+            agent: {
+                id: String(application.user_id),
+                name: `${application.user_first_name} ${application.user_last_name}`,
+            },
+            createdDate: this.formatDate(application.created),
+            claims: [],
+            emails,
+        };
+    }
+
+    /**
+     * @description Get base formatted application data
+     * @param {AmpApplication} application - The AMP application object
+     * @returns {Promise<SimplifiedApplicationDto>}
+     */
+    async getBaseFormattedApplicationData(application: AmpApplication): Promise<SimplifiedApplicationDto> {
+        const products = await this.getApplicationProducts(application);
+        const assignedUsers = await this.getFormattedAssignedUsers(application.item_id);
+        const isMarketplaceApp = application.program_type_id === 22;
+        const marketplaceAppData = isMarketplaceApp
+            ? await this.getMarketplaceAppData(String(application.item_id))
+            : {};
+
+        const effectiveDate = application.effective_date ? this.formatDate(application.effective_date) : '';
+        const lastStatusUpdate = application.last_status_update ? this.formatDate(application.last_status_update) : '';
 
         return {
             id: String(application.item_id),
@@ -79,71 +96,15 @@ export class ApplicationUtil {
                 },
             },
             products,
-            agencyName: application.agency_name,
-            agent: {
-                id: String(application.user_id),
-                name: `${application.user_first_name} ${application.user_last_name}`,
-            },
-            totalCost: Number(application.total_cost),
+            agencyName: application.agency_name || '',
             type: application.created_from_renewal === 1 ? ApplicationTypeEnum.RENEWAL : ApplicationTypeEnum.NEW,
+            assignedUsers,
             status: application.status_name as ApplicationStatusDisplayValueEnum,
             isMarketplaceApp,
             isBundle: products.length > 1,
-            assignedUsers,
-            expirationDate,
-            updatedDate,
-            lastStatusUpdate,
-            boundDate,
-            createdDate: this.formatDate(application.created),
-            claims: [],
-            effectiveDate,
-            policyNumber: policy?.policy_number || '',
-            ...marketplaceAppData,
-        };
-    }
-
-    /**
-     * @description Format an application object into a simplified shape for list display.
-     * @param {AmpApplication} application - The application to be simplified.
-     * @return {SimplifiedApplicationDto} A simplified application response shape.
-     */
-    async formatSimplifiedApplication(application: AmpApplication): Promise<SimplifiedApplicationDto> {
-        const products = await this.getApplicationProducts(application);
-        const assignedUserIDs = await this.applicationQuery.getTaskUserIDsByAppID(String(application.item_id));
-        const assignedUsers = await Promise.all(
-            assignedUserIDs.map(({ assigned_to }) => this.constructAssignedUserObj(assigned_to)),
-        );
-        const isMarketplaceApp = application.program_type_id === 22;
-        const marketplaceAppData = isMarketplaceApp
-            ? await this.getMarketplaceAppData(String(application.item_id))
-            : {};
-
-        return {
-            id: String(application.item_id),
-            submissionID: '', // will be set by marketplace data if it's a marketplace app
-            insured: {
-                firstName: application.insured_first_name || '',
-                lastName: application.insured_last_name || '',
-                companyName: application.insured_company_name || '',
-                phoneNumber: application.insured_phone || '',
-                email: application.insured_email || '',
-                address: {
-                    streetAddress: application.insured_address || '',
-                    city: application.insured_city || '',
-                    state: application.insured_state || '',
-                    zip: application.insured_zip || '',
-                },
-            },
-            products,
-            agencyName: application.agency_name || '',
-            type: application.created_from_renewal === 1 ? ApplicationTypeEnum.RENEWAL : ApplicationTypeEnum.NEW,
-            assignedUsers: assignedUsers,
-            status: application.status_name as ApplicationStatusDisplayValueEnum,
-            isMarketplaceApp,
-            isBundle: (products.length || 0) > 1,
             totalCost: Number(application.total_cost),
-            effectiveDate: this.formatDate(application.effective_date) || '',
-            lastStatusUpdate: this.formatDate(application.last_status_update) || '',
+            effectiveDate,
+            lastStatusUpdate,
             ...marketplaceAppData,
         };
     }
@@ -170,6 +131,21 @@ export class ApplicationUtil {
     }
 
     /**
+     * @description formet assigned users for a given appID
+     * @param {number} item_id The application ID
+     * @returns {Promise<Partial<ApplicationDto>>} A list of formatted assigned users
+     */
+    private async getFormattedAssignedUsers(item_id: number): Promise<AssignedUserDto[]> {
+        const assignedUserIDs = await this.applicationQuery.getTaskUserIDsByAppID(String(item_id));
+
+        const users = await Promise.all(
+            assignedUserIDs.map(({ assigned_to }) => this.constructAssignedUserObj(assigned_to)),
+        );
+
+        return users.filter((u): u is AssignedUserDto => u !== null);
+    }
+
+    /**
      * @description Get marketplace application data
      * @param {string} id
      * @returns {Promise<Partial<ApplicationDto>>}
@@ -182,11 +158,11 @@ export class ApplicationUtil {
         const policyNumber = application?.policyNo || '';
 
         return {
+            submissionID: application?.submissionID || '',
             boundDate,
             effectiveDate,
             expirationDate,
             policyNumber,
-            submissionID: application?.submissionID || '',
         };
     }
 
@@ -197,6 +173,8 @@ export class ApplicationUtil {
      */
     private async constructAssignedUserObj(userID: string): Promise<AssignedUserDto> {
         const user = await this.userEntity.getUserByID(userID);
+
+        if (!user) return null;
 
         return {
             id: String(user.user_id),

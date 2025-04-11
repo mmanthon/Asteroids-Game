@@ -5,8 +5,7 @@ import { ApplicationQuery } from '../application.query';
 import { ApplicationService } from '../application.service';
 import { ApplicationUtil } from '../application.util';
 import { FilterParamDto } from '../dto';
-import { AmpApplication } from '../interfaces';
-import { mockFindAllResult, mockPagination, mockSimplifiedApplication } from '../mocks';
+import { mockFindAllResult, mockPaginationDto, mockSimplifiedApplicationDto } from '../mocks';
 
 describe('ApplicationService', () => {
     let service: ApplicationService;
@@ -26,7 +25,7 @@ describe('ApplicationService', () => {
                 {
                     provide: ApplicationUtil,
                     useValue: {
-                        formatSimplifiedApplication: jest.fn(),
+                        getBaseFormattedApplicationData: jest.fn(),
                     },
                 },
                 { provide: ItemEntity, useValue: {} },
@@ -43,18 +42,13 @@ describe('ApplicationService', () => {
     });
 
     it('should return simplified applications with pagination', async () => {
-        const expectedFormatted = [mockSimplifiedApplication, { ...mockSimplifiedApplication, id: '2' }];
-
-        jest.spyOn(applicationUtil, 'formatSimplifiedApplication').mockImplementation(async (app: AmpApplication) => ({
-            ...mockSimplifiedApplication,
-            id: String(app.item_id),
-        }));
+        jest.spyOn(applicationUtil, 'getBaseFormattedApplicationData').mockResolvedValue(mockSimplifiedApplicationDto);
 
         const result = await service.findAll({} as FilterParamDto);
 
         expect(applicationQuery.findAll).toHaveBeenCalled();
-        expect(applicationUtil.formatSimplifiedApplication).toHaveBeenCalled();
-        expect(result.applications).toEqual(expectedFormatted);
-        expect(result.pagination).toEqual(mockPagination);
+        expect(applicationUtil.getBaseFormattedApplicationData).toHaveBeenCalled();
+        expect(result.applications).toEqual([mockSimplifiedApplicationDto]);
+        expect(result.pagination).toEqual(mockPaginationDto);
     });
 });

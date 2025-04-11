@@ -1,8 +1,8 @@
 import { FindAllResult } from '../interfaces';
-import { mockApplications } from './applicationResponse.mock';
+import { mockAmpApplication } from './ampApplication.interface.mock';
 
 export const mockFindAllResult: FindAllResult = {
-    applications: mockApplications,
+    applications: [mockAmpApplication],
     currentPage: 1,
     nextPage: null,
     totalPages: 1,

@@ -1,6 +1,6 @@
 import { PaginationDto } from '../dto/pagination.dto';
 
-export const mockPagination: PaginationDto = {
+export const mockPaginationDto: PaginationDto = {
     currentPage: 1,
     nextPage: null,
     totalPages: 1,

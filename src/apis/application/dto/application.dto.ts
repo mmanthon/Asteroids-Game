@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 
 import { InsuredDto } from './insured.dto';
 
-import { ApplicationAgentDto, ApplicationProductDto, AssignedUserDto, ClaimDto } from './index';
+import { ApplicationAgentDto, ApplicationProductDto, AssignedUserDto, ClaimDto, EmailDto } from './index';
 
 export class ApplicationDto {
     @ApiProperty({ description: 'Application ID', example: '123456' })
@@ -70,4 +70,7 @@ export class ApplicationDto {
 
     @ApiProperty({ description: 'Created Date', example: '2021-01-01' })
     createdDate: string;
+
+    @ApiProperty({ description: 'List of emails tied to the application', type: EmailDto, isArray: true, example: [] })
+    emails: EmailDto[];
 }
