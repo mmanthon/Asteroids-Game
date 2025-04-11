@@ -1,1 +1,1 @@
-export * from './query.interface';
+export * from './ampQuery.interface';

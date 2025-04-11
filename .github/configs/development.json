@@ -23,6 +23,10 @@
             "value": "ISCxDevClaims"
         },
         {
+            "name": "DYNAMODB_NOTES_TABLE_NAME",
+            "value": "ISCxDevNotes"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "https://dev-mvr.api.isceng.net/api"
         }

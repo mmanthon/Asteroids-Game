@@ -2,15 +2,29 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable camelcase */
 import {
+    AclRoleEntity,
+    AmpRolesEnum,
     ApplicationStatusDisplayValueEnum,
     ApplicationTypeEnum,
     DynamoApplicationEntity,
+    DynamoNoteEntity,
+    EmailTrackingEntity,
+    EmailTrackingModel,
+    IJWT,
+    MarketplaceRolesEnum,
+    NoteAuthorDto,
+    NoteAuthorRoleEnum,
+    NoteCategoryEnum,
+    NoteEntityTypeEnum,
+    NoteNotificationTypeEnum,
+    NoteResponseDto,
     UserEntity,
+    sanitizeHtml,
 } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
 
 import { ApplicationQuery } from './application.query';
-import { ApplicationDto, ApplicationProductDto, AssignedUserDto, SimplifiedApplicationDto } from './dto';
+import { ApplicationDto, ApplicationProductDto, AssignedUserDto, EmailDto, SimplifiedApplicationDto } from './dto';
 import { ProductIDEnum } from './enums';
 import { AdditionalProductData, AmpApplication } from './interfaces';
 
@@ -20,14 +34,18 @@ export class ApplicationUtil {
         private readonly applicationQuery: ApplicationQuery,
         private readonly applicationEntity: DynamoApplicationEntity,
         private readonly userEntity: UserEntity,
+        private readonly aclRoleEntity: AclRoleEntity,
+        private readonly noteEntity: DynamoNoteEntity,
+        private readonly emailTrackingEntity: EmailTrackingEntity,
     ) {}
 
     /**
      * @description Format application
      * @param {AmpApplication} application
+     * @param {IJWT} user - the requesting user
      * @returns {Promise<ApplicationDto>}
      */
-    async formatApplication(application: AmpApplication): Promise<ApplicationDto> {
+    async formatApplication(application: AmpApplication, user: IJWT): Promise<ApplicationDto> {
         const { item_id, product_ids, effective_date, project_end_date, last_updated, first_bound_date } = application;
 
         const additionalProductData = await this.applicationQuery.getAdditionalProductDataByAppID(String(item_id));
@@ -44,8 +62,11 @@ export class ApplicationUtil {
         const updatedDate = last_updated ? this.formatDate(application.last_updated) : '';
         const boundDate = first_bound_date ? this.formatDate(first_bound_date) : '';
         const isMarketplaceApp = application.program_type_id === 22;
-        const emails = !isMarketplaceApp ? await this.applicationQuery.getAmpEmailsByAppID(String(item_id)) : [];
+        const emails = !isMarketplaceApp ? await this.getAmpEmails(String(item_id)) : [];
         const baseFormattedAppData = await this.getBaseFormattedApplicationData(application);
+        const notes = isMarketplaceApp
+            ? await this.getMarketplaceNotes(String(item_id), baseFormattedAppData.submissionID, user.roles)
+            : await this.getAmpNotes(String(item_id));
 
         return {
             policyNumber: policy?.policy_number || '',
@@ -60,6 +81,7 @@ export class ApplicationUtil {
             createdDate: this.formatDate(application.created),
             claims: [],
             emails,
+            notes,
         };
     }
 
@@ -143,6 +165,131 @@ export class ApplicationUtil {
         );
 
         return users.filter((u): u is AssignedUserDto => u !== null);
+    }
+
+    /**
+     * @description Get marketplace notes for a given appID
+     * @param {string} appID The application ID
+     * @param {string} submissionID The submission ID
+     * @param {IJWT['roles']} userRoles The user roles
+     * @returns {Promise<NoteResponseDto[]>} A list of formatted notes
+     */
+    private async getMarketplaceNotes(
+        appID: string,
+        submissionID: string,
+        userRoles: IJWT['roles'],
+    ): Promise<NoteResponseDto[]> {
+        const authorCache: { [userID: string]: Promise<NoteAuthorDto> } = {};
+        const includeInternal = userRoles.includes(AmpRolesEnum.UNDERWRITER);
+        const appNotes = await this.noteEntity.findAllByEntity(appID, NoteEntityTypeEnum.APPLICATION, includeInternal);
+        const submissionNotes = await this.noteEntity.findAllByEntity(
+            submissionID,
+            NoteEntityTypeEnum.SUBMISSION,
+            includeInternal,
+        );
+        const notes = [...appNotes, ...submissionNotes];
+
+        notes.sort((a, b) => new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime());
+
+        return Promise.all(
+            notes.map(async ({ userID, ...note }) => {
+                const author = await (authorCache[userID] ||= this.getNoteAuthor(userID));
+
+                return {
+                    id: note.id,
+                    entityType: note.entityType,
+                    entityID: note.entityID,
+                    category: note.category,
+                    createdBy: note.createdBy || `${author.firstName} ${author.lastName}`,
+                    content: note.isActive ? note.content : '',
+                    updatedDate: note.updatedDate,
+                    createdDate: note.createdDate,
+                    notify: note.notify || [],
+                    isActive: note.isActive,
+                    author,
+                    isInternal: note.isInternal || false,
+                    parentNoteID: note.parentNoteID,
+                };
+            }),
+        );
+    }
+
+    /**
+     * * @description Get AMP notes for a given appID
+     * * @param {string} appID The application ID
+     * * @returns {Promise<NoteResponseDto[]>} A list of formatted notes
+     * */
+    private async getAmpNotes(appID: string): Promise<NoteResponseDto[]> {
+        const notes = await this.applicationQuery.getAmpNotesByAppID(appID);
+
+        notes.sort((a, b) => new Date(a.written).getTime() - new Date(b.written).getTime());
+
+        return notes.map((note) => {
+            const notify: NoteNotificationTypeEnum[] = [
+                ...(note.sent_to_producer === 1 ? [NoteNotificationTypeEnum.PRODUCER] : []),
+                ...(note.sent_to_underwriter === 1 ? [NoteNotificationTypeEnum.UNDERWRITER] : []),
+            ];
+            const creatorFirstName = note.first_name || 'System';
+            const creatorLastName = note.last_name || 'User';
+            const isInternal = note.sent_to_producer === 0 && note.sent_to_underwriter === 0;
+
+            return {
+                id: String(note.note_id),
+                entityID: appID,
+                entityType: NoteEntityTypeEnum.APPLICATION,
+                category: NoteCategoryEnum.PRE_BIND_APPLICATION,
+                notify,
+                content: note.note || '',
+                author: {
+                    id: String(note.user_id),
+                    firstName: creatorFirstName,
+                    lastName: creatorLastName,
+                    role: note.acl_role_id === 6 ? NoteAuthorRoleEnum.UNDERWRITER : NoteAuthorRoleEnum.PRODUCER,
+                },
+                createdBy: `${creatorFirstName} ${creatorLastName}`, // deprecated, to be removed
+                parentNoteID: note.parent_note_id ? String(note.parent_note_id) : undefined,
+                isActive: note.entry_status === 'Active',
+                isInternal,
+                updatedDate: note.written,
+                createdDate: note.written,
+            };
+        });
+    }
+
+    /**
+     * @description Get AMP emails for a given appID
+     * @param {string} appID The application ID
+     * @returns {Promise<EmailDto[]>} A list of formatted emails
+     */
+    private async getAmpEmails(appID: string): Promise<EmailDto[]> {
+        const rawEmails = await this.emailTrackingEntity.getByEntityID(appID, 'omga_items');
+
+        return rawEmails.map((email: EmailTrackingModel) => ({
+            id: String(email.email_tracking_id),
+            sender: email.from_address,
+            recipients: email?.to_address?.split(',') || [],
+            subject: email.subject || '',
+            body: sanitizeHtml(email.body_html || ''),
+            sentAt: email.sent_at,
+        }));
+    }
+
+    /**
+     * @description Get the author DTO for a user
+     * @param {string} userID
+     * @returns {Promise<NoteAuthorDto>}
+     */
+    private async getNoteAuthor(userID: string): Promise<NoteAuthorDto> {
+        const user = await this.userEntity.getUserByID(userID);
+        const roles = await this.aclRoleEntity.getRolesForUser(Number(userID));
+
+        return {
+            firstName: user.first_name || 'System',
+            lastName: user.last_name || 'User',
+            role: roles.includes(AmpRolesEnum.UNDERWRITER)
+                ? NoteAuthorRoleEnum.UNDERWRITER
+                : NoteAuthorRoleEnum.PRODUCER,
+        };
     }
 
     /**

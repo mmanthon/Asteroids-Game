@@ -42,6 +42,20 @@ export interface FindAllResult {
     totalPages: number;
 }
 
+export interface GetAmpNotesByAppIDResult {
+    note_id: number;
+    written: string;
+    user_id?: number;
+    first_name?: string;
+    last_name?: string;
+    note?: string;
+    entry_status: string; // default Active;
+    parent_note_id?: number;
+    sent_to_producer?: number; // default 0;
+    sent_to_underwriter?: number; // default 0;
+    acl_role_id?: number;
+}
+
 export interface GetLinkedProductResult {
     product_id: number;
     product_name: string;

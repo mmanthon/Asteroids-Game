@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
+import { AuthenticatedRequest } from '@ignidus/iscx-backend-utils';
+import { Body, Controller, Get, Param, Patch, Query, Req } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiBody,
@@ -34,8 +35,8 @@ export class ApplicationController {
     @ApiOperation({ summary: 'Get one application' })
     @ApiOkResponse({ description: 'Application found', type: ApplicationDto })
     @ApiNotFoundResponse({ description: 'Not found' })
-    findOne(@Param('id', AppIDValidator) id: string): Promise<ApplicationDto> {
-        return this.applicationService.findOne(id);
+    findOne(@Param('id', AppIDValidator) id: string, @Req() { user }: AuthenticatedRequest): Promise<ApplicationDto> {
+        return this.applicationService.findOne(id, user);
     }
 
     @Patch(':id')
@@ -46,7 +47,8 @@ export class ApplicationController {
     updateOne(
         @Param('id', AppIDValidator) id: string,
         @Body(PatchApplicationValidator) updateParam: UpdateApplicationRequestDto,
+        @Req() { user }: AuthenticatedRequest,
     ): Promise<ApplicationDto> {
-        return this.applicationService.updateOne(id, updateParam);
+        return this.applicationService.updateOne(id, updateParam, user);
     }
 }

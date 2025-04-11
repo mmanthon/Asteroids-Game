@@ -1,4 +1,4 @@
-import { ApplicationStatusDisplayValueEnum, ApplicationTypeEnum } from '@ignidus/iscx-backend-utils';
+import { ApplicationStatusDisplayValueEnum, ApplicationTypeEnum, NoteResponseDto } from '@ignidus/iscx-backend-utils';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -68,9 +68,12 @@ export class ApplicationDto {
     @ApiProperty({ description: 'Claims', type: ClaimDto, isArray: true, example: [] })
     claims: ClaimDto[];
 
-    @ApiProperty({ description: 'Created Date', example: '2021-01-01' })
-    createdDate: string;
-
     @ApiProperty({ description: 'List of emails tied to the application', type: EmailDto, isArray: true, example: [] })
     emails: EmailDto[];
+
+    @ApiProperty({ description: 'Notes', type: NoteResponseDto, isArray: true })
+    notes: NoteResponseDto[];
+
+    @ApiProperty({ description: 'Created Date', example: '2021-01-01' })
+    createdDate: string;
 }

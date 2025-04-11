@@ -23,6 +23,10 @@
             "value": "ISCxClaims"
         },
         {
+            "name": "DYNAMODB_NOTES_TABLE_NAME",
+            "value": "ISCxNotes"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "http://iscx-mvr-api.internal/api"
         }

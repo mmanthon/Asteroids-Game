@@ -1,5 +1,11 @@
 /* eslint-disable camelcase */
-import { DynamoApplicationEntity, UserEntity } from '@ignidus/iscx-backend-utils';
+import {
+    AclRoleEntity,
+    DynamoApplicationEntity,
+    DynamoNoteEntity,
+    EmailTrackingEntity,
+    UserEntity,
+} from '@ignidus/iscx-backend-utils';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { ApplicationQuery } from '../application.query';
@@ -40,6 +46,14 @@ describe('ApplicationUtil', () => {
                     provide: DynamoApplicationEntity,
                     useValue: {},
                 },
+                {
+                    provide: AclRoleEntity,
+                    useValue: {
+                        getRolesForUser: jest.fn(),
+                    },
+                },
+                { provide: DynamoNoteEntity, useValue: { findAllByEntity: jest.fn() } },
+                { provide: EmailTrackingEntity, useValue: { getByEntityID: jest.fn() } },
             ],
         }).compile();
 

@@ -1,3 +1,4 @@
+import { IJWT } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
 
 import { ApplicationQuery } from './application.query';
@@ -32,21 +33,23 @@ export class ApplicationService {
     /**
      * @description Get one application
      * @param {string} id
+     * @param {IJWT} user - the requesting user
      * @returns {Promise<ApplicationDto>}
      */
-    async findOne(id: string): Promise<ApplicationDto> {
+    async findOne(id: string, user: IJWT): Promise<ApplicationDto> {
         const application = await this.applicationQuery.findOne(id);
 
-        return this.applicationUtil.formatApplication(application);
+        return this.applicationUtil.formatApplication(application, user);
     }
 
     /**
      * @description Update application
      * @param {string} id
      * @param {UpdateApplicationRequestDto} updateParam
+     * @param {IJWT} user - the requesting user
      * @returns {Promise<ApplicationDto>}
      */
-    async updateOne(id: string, updateParam: UpdateApplicationRequestDto): Promise<ApplicationDto> {
+    async updateOne(id: string, updateParam: UpdateApplicationRequestDto, user: IJWT): Promise<ApplicationDto> {
         const { underwriterUserIDs, agentID } = updateParam;
 
         // Assign users to application
@@ -57,6 +60,6 @@ export class ApplicationService {
 
         const application = await this.applicationQuery.findOne(id);
 
-        return this.applicationUtil.formatApplication(application);
+        return this.applicationUtil.formatApplication(application, user);
     }
 }

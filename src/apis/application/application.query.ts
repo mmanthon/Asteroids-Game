@@ -3,21 +3,18 @@ import {
     ApplicationStatusDisplayValueEnum,
     ApplicationStatusIDEnum,
     ApplicationTypeEnum,
-    EmailTrackingEntity,
-    EmailTrackingModel,
     getKeyFromEnum,
-    sanitizeHtml,
 } from '@ignidus/iscx-backend-utils';
 import { Inject, Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 
-import { EmailDto, FilterParamDto } from './dto';
+import { FilterParamDto } from './dto';
 import { SortByEnum, SortByMapToDBEnum, SortOrderEnum } from './enums';
-import { AmpApplication, FindAllResult, GetLinkedProductResult } from './interfaces';
+import { AmpApplication, FindAllResult, GetAmpNotesByAppIDResult, GetLinkedProductResult } from './interfaces';
 
 @Injectable()
 export class ApplicationQuery {
-    constructor(@Inject('Amp') private readonly amp: Knex, private readonly emailTrackingEntity: EmailTrackingEntity) {}
+    constructor(@Inject('Amp') private readonly amp: Knex) {}
 
     /**
      * @description Get application by id
@@ -228,21 +225,28 @@ export class ApplicationQuery {
     }
 
     /**
-     * @description Get emails tied to an amp application by appID
+     * @description Get notes by appID
      * @param {string} id
-     * @returns {Promise<EmailDto[]>}
+     * @returns {Promise<GetAmpNotesByAppIDResult[]>}
      */
-    async getAmpEmailsByAppID(id: string): Promise<EmailDto[]> {
-        const rawEmails = await this.emailTrackingEntity.getByEntityID(id, 'omga_items');
-
-        return rawEmails.map((email: EmailTrackingModel) => ({
-            id: String(email.email_tracking_id),
-            sender: email.from_address,
-            recipients: email?.to_address?.split(',') || [],
-            subject: email.subject || '',
-            body: sanitizeHtml(email.body_html || ''),
-            sentAt: email.sent_at,
-        }));
+    async getAmpNotesByAppID(id: string): Promise<GetAmpNotesByAppIDResult[]> {
+        return this.amp('notes as n')
+            .select(
+                'n.note_id',
+                'n.user_id',
+                'u.first_name',
+                'u.last_name',
+                'n.written',
+                'n.note',
+                'n.entry_status',
+                'n.parent_note_id',
+                'nd.sent_to_producer',
+                'nd.sent_to_underwriter',
+            )
+            .leftJoin('omga_note_data as nd', 'n.note_id', 'nd.note_id')
+            .leftJoin('users as u', 'u.user_id', 'n.user_id')
+            .where('n.entity_table', 'omga_items')
+            .andWhere('n.entity_id', id);
     }
 
     /**

@@ -1,6 +1,7 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import {
     DynamoApplicationEntity,
+    DynamoNoteEntity,
     DynamoUserEntity,
     DynamodbClaimEntity,
     createEntityProviders,
@@ -34,10 +35,14 @@ import { ConfigService } from '@nestjs/config';
                     entityClass: DynamodbClaimEntity,
                     metadata: { tableNameKey: 'dynamodb.claimsTableName' },
                 },
+                {
+                    entityClass: DynamoNoteEntity,
+                    metadata: { tableNameKey: 'dynamodb.notesTableName' },
+                },
             ],
             dynamoEntityFactory,
         ),
     ],
-    exports: [DynamoUserEntity, DynamoApplicationEntity, DynamodbClaimEntity, DynamoDB],
+    exports: [DynamoUserEntity, DynamoApplicationEntity, DynamodbClaimEntity, DynamoNoteEntity, DynamoDB],
 })
 export class DynamoDBModule {}

@@ -18,6 +18,7 @@ export const envValidationSchema = Joi.object({
     DYNAMODB_ACCESS_CONTROL_USERS_TABLE_NAME: Joi.string().required(),
     DYNAMODB_APPLICATIONS_TABLE_NAME: Joi.string().required(),
     DYNAMODB_CLAIMS_TABLE_NAME: Joi.string().required(),
+    DYNAMODB_NOTES_TABLE_NAME: Joi.string().required(),
 
     // Amp api
     AMP_API_BASE_URL: Joi.string().required(),

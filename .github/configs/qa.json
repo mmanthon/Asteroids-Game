@@ -23,6 +23,10 @@
             "value": "ISCxQAClaims"
         },
         {
+            "name": "DYNAMODB_NOTES_TABLE_NAME",
+            "value": "ISCxQANotes"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "https://qa-mvr.api.isceng.net/api"
         }
