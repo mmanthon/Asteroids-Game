@@ -11,7 +11,6 @@ import {
     EmailTrackingEntity,
     EmailTrackingModel,
     IJWT,
-    MarketplaceRolesEnum,
     NoteAuthorDto,
     NoteAuthorRoleEnum,
     NoteCategoryEnum,
