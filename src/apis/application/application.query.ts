@@ -22,7 +22,7 @@ export class ApplicationQuery {
      * @returns {Promise<AmpApplication>}
      */
     async findOne(id: string): Promise<AmpApplication> {
-        return this.buildBaseQuery().select('*').where('oi.item_id', id).first();
+        return this.buildBaseQuery().select(this.getSelectFields()).where('oi.item_id', id).first();
     }
 
     /**
