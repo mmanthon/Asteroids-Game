@@ -26,7 +26,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.329.0",
     "@aws-sdk/util-dynamodb": "^3.329.0",
-    "@ignidus/iscx-backend-utils": "^1.283.0",
+    "@ignidus/iscx-backend-utils": "^1.287.0",
     "@nestjs/cache-manager": "^1.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",

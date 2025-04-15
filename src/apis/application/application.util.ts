@@ -16,15 +16,21 @@ import {
     NoteCategoryEnum,
     NoteEntityTypeEnum,
     NoteNotificationTypeEnum,
-    NoteResponseDto,
     UserEntity,
     sanitizeHtml,
 } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
 
 import { ApplicationQuery } from './application.query';
-import { ApplicationDto, ApplicationProductDto, AssignedUserDto, EmailDto, SimplifiedApplicationDto } from './dto';
-import { ProductIDEnum } from './enums';
+import {
+    ApplicationDto,
+    ApplicationProductDto,
+    AssignedUserDto,
+    EmailDto,
+    NoteDto,
+    SimplifiedApplicationDto,
+} from './dto';
+import { NoteTypeEnum, ProductIDEnum } from './enums';
 import { AdditionalProductData, AmpApplication } from './interfaces';
 
 @Injectable()
@@ -171,13 +177,13 @@ export class ApplicationUtil {
      * @param {string} appID The application ID
      * @param {string} submissionID The submission ID
      * @param {IJWT['roles']} userRoles The user roles
-     * @returns {Promise<NoteResponseDto[]>} A list of formatted notes
+     * @returns {Promise<NoteDto[]>} A list of formatted notes
      */
     private async getMarketplaceNotes(
         appID: string,
         submissionID: string,
         userRoles: IJWT['roles'],
-    ): Promise<NoteResponseDto[]> {
+    ): Promise<NoteDto[]> {
         const authorCache: { [userID: string]: Promise<NoteAuthorDto> } = {};
         const includeInternal = userRoles.includes(AmpRolesEnum.UNDERWRITER);
         const appNotes = await this.noteEntity.findAllByEntity(appID, NoteEntityTypeEnum.APPLICATION, includeInternal);
@@ -208,6 +214,7 @@ export class ApplicationUtil {
                     author,
                     isInternal: note.isInternal || false,
                     parentNoteID: note.parentNoteID,
+                    type: NoteTypeEnum.DEFAULT,
                 };
             }),
         );
@@ -216,9 +223,9 @@ export class ApplicationUtil {
     /**
      * * @description Get AMP notes for a given appID
      * * @param {string} appID The application ID
-     * * @returns {Promise<NoteResponseDto[]>} A list of formatted notes
+     * * @returns {Promise<NoteDto[]>} A list of formatted notes
      * */
-    private async getAmpNotes(appID: string): Promise<NoteResponseDto[]> {
+    private async getAmpNotes(appID: string): Promise<NoteDto[]> {
         const notes = await this.applicationQuery.getAmpNotesByAppID(appID);
 
         notes.sort((a, b) => new Date(a.written).getTime() - new Date(b.written).getTime());
@@ -228,17 +235,17 @@ export class ApplicationUtil {
                 ...(note.sent_to_producer === 1 ? [NoteNotificationTypeEnum.PRODUCER] : []),
                 ...(note.sent_to_underwriter === 1 ? [NoteNotificationTypeEnum.UNDERWRITER] : []),
             ];
-            const creatorFirstName = note.first_name || 'System';
-            const creatorLastName = note.last_name || 'User';
+            const creatorFirstName = note.first_name || 'Lance';
+            const creatorLastName = note.last_name || 'Bishop';
             const isInternal = note.sent_to_producer === 0 && note.sent_to_underwriter === 0;
 
             return {
                 id: String(note.note_id),
                 entityID: appID,
                 entityType: NoteEntityTypeEnum.APPLICATION,
-                category: NoteCategoryEnum.PRE_BIND_APPLICATION,
+                category: NoteCategoryEnum.DETAIL_VIEW,
                 notify,
-                content: note.note || '',
+                content: sanitizeHtml(note.note || ''),
                 author: {
                     id: String(note.user_id),
                     firstName: creatorFirstName,
@@ -249,6 +256,7 @@ export class ApplicationUtil {
                 parentNoteID: note.parent_note_id ? String(note.parent_note_id) : undefined,
                 isActive: note.entry_status === 'Active',
                 isInternal,
+                type: note.user_id === 0 ? NoteTypeEnum.SYSTEM_ONLY : NoteTypeEnum.DEFAULT,
                 updatedDate: note.written,
                 createdDate: note.written,
             };
