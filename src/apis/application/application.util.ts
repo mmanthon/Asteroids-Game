@@ -16,6 +16,7 @@ import {
     NoteCategoryEnum,
     NoteEntityTypeEnum,
     NoteNotificationTypeEnum,
+    SanitizeOptions,
     UserEntity,
     sanitizeHtml,
 } from '@ignidus/iscx-backend-utils';
@@ -35,6 +36,12 @@ import { AdditionalProductData, AmpApplication } from './interfaces';
 
 @Injectable()
 export class ApplicationUtil {
+    private readonly sanitizerOptions: SanitizeOptions = {
+        allowedAttributes: {
+            '*': ['style'],
+        },
+    };
+
     constructor(
         private readonly applicationQuery: ApplicationQuery,
         private readonly applicationEntity: DynamoApplicationEntity,
@@ -206,7 +213,7 @@ export class ApplicationUtil {
                     entityID: note.entityID,
                     category: note.category,
                     createdBy: note.createdBy || `${author.firstName} ${author.lastName}`,
-                    content: note.isActive ? note.content : '',
+                    content: note.isActive ? sanitizeHtml(note.content, this.sanitizerOptions) : '',
                     updatedDate: note.updatedDate,
                     createdDate: note.createdDate,
                     notify: note.notify || [],
@@ -245,7 +252,7 @@ export class ApplicationUtil {
                 entityType: NoteEntityTypeEnum.APPLICATION,
                 category: NoteCategoryEnum.DETAIL_VIEW,
                 notify,
-                content: sanitizeHtml(note.note || ''),
+                content: sanitizeHtml(note.note || '', this.sanitizerOptions),
                 author: {
                     id: String(note.user_id),
                     firstName: creatorFirstName,
@@ -276,7 +283,7 @@ export class ApplicationUtil {
             sender: email.from_address,
             recipients: email?.to_address?.split(',') || [],
             subject: email.subject || '',
-            body: sanitizeHtml(email.body_html || ''),
+            body: sanitizeHtml(email.body_html || '', this.sanitizerOptions),
             sentAt: email.sent_at,
         }));
     }
