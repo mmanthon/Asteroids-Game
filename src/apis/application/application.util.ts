@@ -39,6 +39,7 @@ export class ApplicationUtil {
     private readonly sanitizerOptions: SanitizeOptions = {
         allowedAttributes: {
             '*': ['style'],
+            a: ['href'],
         },
     };
 
