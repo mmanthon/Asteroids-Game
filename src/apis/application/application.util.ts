@@ -36,10 +36,34 @@ import { AdditionalProductData, AmpApplication } from './interfaces';
 
 @Injectable()
 export class ApplicationUtil {
-    private readonly sanitizerOptions: SanitizeOptions = {
+    private readonly emailSanitizerOptions: SanitizeOptions = {
         allowedAttributes: {
             '*': ['style'],
-            a: ['href'],
+            a: ['href', 'target'],
+        },
+        allowedStyles: {
+            '*': {
+                'font-size': [/^\d+(px|em|rem|%)$/],
+                'font-weight': [/^(normal|bold|[1-9]00)$/],
+                'font-style': [/^(normal|italic|oblique)$/],
+                'text-align': [/^(left|right|center|justify)$/],
+                'text-decoration': [/^(none|underline|line-through)$/],
+                'font-family': [/^[\w\s,-]+$/],
+                'line-height': [/^\d+(px|em|rem|%|)$/],
+                margin: [/^(auto|\d+(px|em|rem|%))$/],
+                'margin-top': [/^(auto|\d+(px|em|rem|%))$/],
+                'margin-right': [/^(auto|\d+(px|em|rem|%))$/],
+                'margin-bottom': [/^(auto|\d+(px|em|rem|%))$/],
+                'margin-left': [/^(auto|\d+(px|em|rem|%))$/],
+                padding: [/^\d+(px|em|rem|%)$/],
+                'padding-top': [/^\d+(px|em|rem|%)$/],
+                'padding-right': [/^\d+(px|em|rem|%)$/],
+                'padding-bottom': [/^\d+(px|em|rem|%)$/],
+                'padding-left': [/^\d+(px|em|rem|%)$/],
+                'border-collapse': [/^(collapse|separate)$/],
+                'border-spacing': [/^\d+(px|em|rem|%)$/],
+                'vertical-align': [/^(baseline|sub|super|top|text-top|middle|bottom|text-bottom)$/],
+            },
         },
     };
     private readonly noteSanitizerOptions: SanitizeOptions = {
@@ -288,7 +312,7 @@ export class ApplicationUtil {
             sender: email.from_address,
             recipients: email?.to_address?.split(',') || [],
             subject: email.subject || '',
-            body: sanitizeHtml(email.body_html || '', this.sanitizerOptions),
+            body: sanitizeHtml(email.body_html || '', this.emailSanitizerOptions),
             sentAt: email.sent_at,
         }));
     }
