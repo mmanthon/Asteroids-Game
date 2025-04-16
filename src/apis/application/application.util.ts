@@ -42,6 +42,10 @@ export class ApplicationUtil {
             a: ['href'],
         },
     };
+    private readonly noteSanitizerOptions: SanitizeOptions = {
+        allowedTags: [],
+        allowedAttributes: {},
+    };
 
     constructor(
         private readonly applicationQuery: ApplicationQuery,
@@ -214,7 +218,7 @@ export class ApplicationUtil {
                     entityID: note.entityID,
                     category: note.category,
                     createdBy: note.createdBy || `${author.firstName} ${author.lastName}`,
-                    content: note.isActive ? sanitizeHtml(note.content, this.sanitizerOptions) : '',
+                    content: note.isActive ? sanitizeHtml(note.content, this.noteSanitizerOptions).trim() : '',
                     updatedDate: note.updatedDate,
                     createdDate: note.createdDate,
                     notify: note.notify || [],
@@ -253,7 +257,7 @@ export class ApplicationUtil {
                 entityType: NoteEntityTypeEnum.APPLICATION,
                 category: NoteCategoryEnum.DETAIL_VIEW,
                 notify,
-                content: sanitizeHtml(note.note || '', this.sanitizerOptions),
+                content: sanitizeHtml(note.note || '', this.noteSanitizerOptions).trim(),
                 author: {
                     id: String(note.user_id),
                     firstName: creatorFirstName,
