@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 
 import { InsuredDto } from './insured.dto';
 
-import { ApplicationAgentDto, ApplicationProductDto, AssignedUserDto, ClaimDto, EmailDto, NoteDto } from './index';
+import { AgentDto, ApplicationProductDto, AssignedUserDto, ClaimDto, EmailDto, NoteDto } from './index';
 
 export class ApplicationDto {
     @ApiProperty({ description: 'Application ID', example: '123456' })
@@ -24,9 +24,9 @@ export class ApplicationDto {
     @ApiProperty({ description: 'Agency', example: 'ISC' })
     agencyName: string;
 
-    @ApiProperty({ description: 'Agent', type: ApplicationAgentDto })
-    @Type(() => ApplicationAgentDto)
-    agent: ApplicationAgentDto;
+    @ApiProperty({ description: 'Agent', type: AgentDto })
+    @Type(() => AgentDto)
+    agent: AgentDto;
 
     @ApiProperty({ description: 'Type', enum: ApplicationTypeEnum })
     type: ApplicationTypeEnum;
