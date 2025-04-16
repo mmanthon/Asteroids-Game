@@ -1,4 +1,10 @@
-import { HttpExceptionFilter, JwtAuthGuard, LoggerMiddleware, winstonTransports } from '@ignidus/iscx-backend-utils';
+import {
+    HttpExceptionFilter,
+    JwtAuthGuard,
+    LoggerMiddleware,
+    SanitizeMiddleware,
+    winstonTransports,
+} from '@ignidus/iscx-backend-utils';
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -60,10 +66,11 @@ import { ExternalModule } from './shared/external/external.module';
         },
         HttpExceptionFilter,
         LoggerMiddleware,
+        SanitizeMiddleware,
     ],
 })
 export class AppModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(LoggerMiddleware).forRoutes('*');
+        consumer.apply(LoggerMiddleware, SanitizeMiddleware).forRoutes('*');
     }
 }
