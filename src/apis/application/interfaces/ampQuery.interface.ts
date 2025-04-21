@@ -19,8 +19,6 @@ export interface AmpApplication {
     product_name: string;
     carrier_name: string;
     status_name: string;
-    user_first_name: string;
-    user_last_name: string;
     first_bound_date?: string;
     group_id?: number;
     insured_email?: string;

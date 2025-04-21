@@ -8,7 +8,7 @@ import {
 import { Inject, Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 
-import { FilterParamDto } from './dto';
+import { AgentDto, FilterParamDto } from './dto';
 import { SortByEnum, SortByMapToDBEnum, SortOrderEnum } from './enums';
 import { AmpApplication, FindAllResult, GetAmpNotesByAppIDResult, GetLinkedProductResult } from './interfaces';
 
@@ -156,6 +156,37 @@ export class ApplicationQuery {
      */
     async assignAgentToApplication(id: string, agentID: string): Promise<void> {
         await this.amp('omga_items').where('item_id', id).update({ user_id: agentID });
+    }
+
+    /**
+     * @description Get agent details by userId.
+     * @param {string} userID - The ID of the gent.
+     * @returns {Promise<AgentDto>}
+     */
+    async getAgentInfoByUserId(userID: string): Promise<AgentDto> {
+        const result = await this.amp
+            .from('users as u')
+            .select({
+                id: this.amp.raw('CAST(u.user_id AS CHAR)'),
+                firstName: 'u.first_name',
+                lastName: 'u.last_name',
+                email: 'u.email',
+                phone: 'p.phone',
+                agencyPhone: 'c.phone',
+            })
+            .leftJoin('people as p', 'u.person_id', 'p.person_id')
+            .leftJoin('omga_agencies as a', 'u.agency_id', 'a.agency_id')
+            .leftJoin('companies as c', 'a.company_id', 'c.company_id')
+            .where('u.user_id', userID)
+            .first();
+
+        return {
+            id: result.id,
+            firstName: result.firstName,
+            lastName: result.lastName,
+            email: result.email,
+            phone: result.phone || result.agencyPhone || '',
+        };
     }
 
     /**
@@ -380,8 +411,6 @@ export class ApplicationQuery {
             'ops.name as product_name',
             'oc.name as carrier_name',
             'os.name as status_name',
-            'u.first_name as user_first_name',
-            'u.last_name as user_last_name',
             'opg.program_type_id',
             'oed.project_end_date',
             'oli.group_id',

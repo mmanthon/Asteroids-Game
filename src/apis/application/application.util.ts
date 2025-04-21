@@ -90,6 +90,7 @@ export class ApplicationUtil {
         const { item_id, product_ids, effective_date, project_end_date, last_updated, first_bound_date } = application;
 
         const additionalProductData = await this.applicationQuery.getAdditionalProductDataByAppID(String(item_id));
+        const agent = await this.applicationQuery.getAgentInfoByUserId(String(application.user_id));
         const policy = await this.applicationQuery.findPolicyByAppID(String(item_id));
 
         const foundProductData = additionalProductData.find(({ product_id }) => product_id === product_ids);
@@ -115,10 +116,7 @@ export class ApplicationUtil {
             updatedDate,
             boundDate,
             ...baseFormattedAppData, // contains values that will override the above values for marketplace apps
-            agent: {
-                id: String(application.user_id),
-                name: `${application.user_first_name} ${application.user_last_name}`,
-            },
+            agent,
             createdDate: this.formatDate(application.created),
             claims: [],
             emails,
