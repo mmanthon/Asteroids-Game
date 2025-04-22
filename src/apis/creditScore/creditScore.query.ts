@@ -5,7 +5,7 @@ import { GetDriverQueryResult } from '../../shared/interfaces';
 
 @Injectable()
 export class CreditScoreQuery {
-    constructor(@Inject('Amp') private readonly ampDB: Knex) {}
+    constructor(@Inject('Amp') private readonly amp: Knex) {}
 
     /**
      * @description Get drivers by application ID
@@ -13,7 +13,7 @@ export class CreditScoreQuery {
      * @returns {Promise<MvrDriverQueryResult[]>}
      */
     getDriversByAppID(appID: string): Promise<GetDriverQueryResult[]> {
-        return this.ampDB
+        return this.amp
             .select('ads.auto_driver_schedule_id', 'ads.firstname', 'ads.lastname', 'ads.dob', 'ads.license')
             .from('omga_auto_driver_schedules as ads')
             .where('ads.item_id', appID)

@@ -29,6 +29,10 @@
         {
             "name": "MVR_API_URL",
             "value": "https://dev-mvr.api.isceng.net/api"
+        },
+        {
+            "name": "TRACKING_DB",
+            "value": "tracking"
         }
     ],
     "secrets": [

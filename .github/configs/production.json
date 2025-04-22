@@ -29,6 +29,10 @@
         {
             "name": "MVR_API_URL",
             "value": "http://iscx-mvr-api.internal/api"
+        },
+        {
+            "name": "TRACKING_DB",
+            "value": "tracking"
         }
     ],
     "secrets": [

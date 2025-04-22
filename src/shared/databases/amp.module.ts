@@ -36,6 +36,25 @@ import knex, { Knex } from 'knex';
             },
             inject: [ConfigService],
         },
+        {
+            provide: 'TrackingDB',
+            useFactory: (configService: ConfigService): Knex => {
+                const knexInstance = knex(configService.get<object>('trackingDB'));
+                const logger = new Logger(AmpModule.name);
+
+                // Validate connection on initialization
+                knexInstance
+                    .raw('SELECT 1')
+                    .then(() => logger.log('Tracking database connection successful'))
+                    .catch((error) => {
+                        logger.error('Tracking database connection failed', error.message);
+                        process.exit(1);
+                    });
+
+                return knexInstance;
+            },
+            inject: [ConfigService],
+        },
         ...createEntityProviders(
             ['Amp'],
             [
@@ -52,6 +71,7 @@ import knex, { Knex } from 'knex';
     ],
     exports: [
         'Amp',
+        'TrackingDB',
         AgencyEntity,
         AclRoleEntity,
         CompanyEntity,

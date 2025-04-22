@@ -19,6 +19,7 @@ import { AuthModule } from './apis/auth/auth.module';
 import { CreditScoreModule } from './apis/creditScore/creditScore.module';
 import { HazardhubModule } from './apis/hazardhub/hazardhub.module';
 import { HealthModule } from './apis/health/health.module';
+import { LanceInsightsModule } from './apis/lanceInsights/lanceInsights.module';
 import { AmpModule } from './shared/databases/amp.module';
 import { DynamoDBModule } from './shared/databases/dynamodb.module';
 import { ExternalModule } from './shared/external/external.module';
@@ -48,12 +49,13 @@ import { ExternalModule } from './shared/external/external.module';
             transports: [...winstonTransports],
         }),
         AuthModule,
+        ApplicationModule,
         AmpModule,
+        CreditScoreModule,
         DynamoDBModule,
         HazardhubModule,
-        CreditScoreModule,
         ExternalModule,
-        ApplicationModule,
+        LanceInsightsModule,
     ],
     providers: [
         {

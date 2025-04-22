@@ -30,6 +30,7 @@ export const envValidationSchema = Joi.object({
     AMP_DB_PW: Joi.string().required(),
     AMP_DB: Joi.string().required(),
     AMP_DB_PORT: Joi.number().required(),
+    TRACKING_DB: Joi.string().required(),
 
     // MVR API
     MVR_API_URL: Joi.string().required(),
