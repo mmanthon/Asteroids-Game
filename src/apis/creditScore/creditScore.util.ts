@@ -2,7 +2,7 @@ import { AmpRolesEnum } from '@ignidus/iscx-backend-utils';
 import { Logger } from '@nestjs/common';
 
 import { CreditScoreResponseDto } from './dto/creditScoreResponse.dto';
-import { MvrApiCreditScoreResponse } from '../../shared/interfaces/mvrApi.interface';
+import { MvrApiCreditScoreResponse } from '../../shared/external';
 
 export class CreditScoreUtil {
     private readonly logger = new Logger(CreditScoreUtil.name);

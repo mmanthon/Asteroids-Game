@@ -1,2 +1,2 @@
-export * from './ampApiIntegration.external';
-export * from './mvrIntegration.external';
+export * from './ampApi';
+export * from './mvr';

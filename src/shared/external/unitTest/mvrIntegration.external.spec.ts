@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import { mockDriverQueryResult, mvrApiResponseMock, testUrl } from '../../../apis/creditScore/mocks';
 import { MvrApiException } from '../../exceptions/mvrApi.exception';
-import { MvrIntegrationService } from '../mvrIntegration.external';
+import { MvrIntegrationService } from '../mvr/mvr.external';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;

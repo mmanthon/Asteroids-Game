@@ -2,7 +2,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { MvrApiException } from '../../../shared/exceptions/mvrApi.exception';
-import { MvrIntegrationService } from '../../../shared/external/mvrIntegration.external';
+import { MvrIntegrationService } from '../../../shared/external/mvr/mvr.external';
 import { CreditScoreQuery } from '../creditScore.query';
 import { CreditScoreService } from '../creditScore.service';
 import { CreditScoreUtil } from '../creditScore.util';

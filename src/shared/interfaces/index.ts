@@ -1,1 +1,2 @@
-export * from './mvrApi.interface';
+export * from './ampDriver.interface';
+export * from './getDriverQueryResult.interface';

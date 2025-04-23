@@ -1,5 +1,5 @@
 import { actionCode1A, appID, color, drivers, lastOrderDate, score, scoreRange, status } from './constants';
-import { MvrApiCreditScoreResponse } from '../../../shared/interfaces';
+import { MvrApiCreditScoreResponse } from '../../../shared/external';
 
 export const mvrApiResponseMock: MvrApiCreditScoreResponse = {
     creditScore: {

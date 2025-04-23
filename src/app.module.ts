@@ -17,6 +17,7 @@ import { envValidationSchema } from '../config/env.validation';
 import { ApplicationModule } from './apis/application/application.module';
 import { AuthModule } from './apis/auth/auth.module';
 import { CreditScoreModule } from './apis/creditScore/creditScore.module';
+import { DriverRiskModule } from './apis/driverRisk/driverRisk.module';
 import { HazardhubModule } from './apis/hazardhub/hazardhub.module';
 import { HealthModule } from './apis/health/health.module';
 import { LanceInsightsModule } from './apis/lanceInsights/lanceInsights.module';
@@ -52,6 +53,7 @@ import { ExternalModule } from './shared/external/external.module';
         ApplicationModule,
         AmpModule,
         CreditScoreModule,
+        DriverRiskModule,
         DynamoDBModule,
         HazardhubModule,
         ExternalModule,

@@ -1,7 +1,7 @@
 import { AuthenticatedRequest, ItemEntity } from '@ignidus/iscx-backend-utils';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { MvrIntegrationService } from '../../../shared/external/mvrIntegration.external';
+import { MvrIntegrationService } from '../../../shared/external/mvr/mvr.external';
 import { AppIDValidator } from '../../../shared/validators/appID.validator';
 import { CreditScoreController } from '../creditScore.controller';
 import { CreditScoreQuery } from '../creditScore.query';
