@@ -26,6 +26,7 @@ describe('ApplicationUtil', () => {
                         getApplicationProducts: jest.fn().mockResolvedValue([mockProductDto]),
                         getLinkedProductsByAppID: jest.fn().mockResolvedValue([]),
                         getEmailsByAppID: jest.fn().mockResolvedValue([mockEmailDto]),
+                        getAdditionalProductDataByAppID: jest.fn().mockResolvedValue([]),
                     },
                 },
                 {

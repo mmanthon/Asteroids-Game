@@ -46,6 +46,12 @@ export class SimplifiedApplicationDto {
     @ApiProperty({ description: 'Effective Date', example: '2021-01-01' })
     effectiveDate: string;
 
+    @ApiProperty({ description: 'Expiration Date', example: '2021-01-01' })
+    expirationDate: string;
+
+    @ApiProperty({ description: 'Policy Number', example: 'AE123456' })
+    boundDate: string;
+
     @ApiProperty({ description: 'Last status updated date', example: '2021-01-01' })
     lastStatusUpdate: string;
 }

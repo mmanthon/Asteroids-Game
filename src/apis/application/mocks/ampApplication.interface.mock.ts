@@ -24,6 +24,7 @@ export const mockAmpApplication: AmpApplication = {
     product_name: 'Product 1',
     carrier_name: 'Carrier 1',
     status_name: 'Active',
-    effective_date: '2025-04-11',
+    effective_date: '',
     last_status_update: '2025-04-11',
+    first_bound_date: '2025-04-11',
 };

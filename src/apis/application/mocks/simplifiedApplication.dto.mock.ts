@@ -30,5 +30,7 @@ export const mockSimplifiedApplicationDto: SimplifiedApplicationDto = {
     isBundle: false,
     totalCost: Number(mockAmpApplication.total_cost),
     effectiveDate: mockAmpApplication.effective_date,
+    expirationDate: mockAmpApplication.effective_date,
+    boundDate: mockAmpApplication.first_bound_date,
     lastStatusUpdate: mockAmpApplication.last_status_update,
 };

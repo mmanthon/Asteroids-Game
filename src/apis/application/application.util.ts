@@ -87,22 +87,14 @@ export class ApplicationUtil {
      * @returns {Promise<ApplicationDto>}
      */
     async formatApplication(application: AmpApplication, user: IJWT): Promise<ApplicationDto> {
-        const { item_id, product_ids, effective_date, project_end_date, last_updated, first_bound_date } = application;
+        const { item_id, last_updated } = application;
 
-        const additionalProductData = await this.applicationQuery.getAdditionalProductDataByAppID(String(item_id));
-        const agent = await this.applicationQuery.getAgentInfoByUserId(String(application.user_id));
-        const policy = await this.applicationQuery.findPolicyByAppID(String(item_id));
+        const [agent, policy] = await Promise.all([
+            this.applicationQuery.getAgentInfoByUserId(String(application.user_id)),
+            this.applicationQuery.findPolicyByAppID(String(item_id)),
+        ]);
 
-        const foundProductData = additionalProductData.find(({ product_id }) => product_id === product_ids);
-        const productData = foundProductData ? JSON.parse(foundProductData.data) : {};
-        const expirationDate = this.determineExpirationDate(
-            effective_date,
-            product_ids as ProductIDEnum,
-            productData,
-            project_end_date,
-        );
         const updatedDate = last_updated ? this.formatDate(application.last_updated) : '';
-        const boundDate = first_bound_date ? this.formatDate(first_bound_date) : '';
         const isMarketplaceApp = application.program_type_id === 22;
         const emails = !isMarketplaceApp ? await this.getAmpEmails(String(item_id)) : [];
         const baseFormattedAppData = await this.getBaseFormattedApplicationData(application);
@@ -112,9 +104,7 @@ export class ApplicationUtil {
 
         return {
             policyNumber: policy?.policy_number || '',
-            expirationDate,
             updatedDate,
-            boundDate,
             ...baseFormattedAppData, // contains values that will override the above values for marketplace apps
             agent,
             createdDate: this.formatDate(application.created),
@@ -130,15 +120,26 @@ export class ApplicationUtil {
      * @returns {Promise<SimplifiedApplicationDto>}
      */
     async getBaseFormattedApplicationData(application: AmpApplication): Promise<SimplifiedApplicationDto> {
+        const { item_id, product_ids, effective_date, project_end_date, first_bound_date } = application;
         const products = await this.getApplicationProducts(application);
+        const additionalProductData = await this.applicationQuery.getAdditionalProductDataByAppID(String(item_id));
         const assignedUsers = await this.getFormattedAssignedUsers(application.item_id);
         const isMarketplaceApp = application.program_type_id === 22;
         const marketplaceAppData = isMarketplaceApp
             ? await this.getMarketplaceAppData(String(application.item_id))
             : {};
 
+        const boundDate = first_bound_date ? this.formatDate(first_bound_date) : '';
         const effectiveDate = application.effective_date ? this.formatDate(application.effective_date) : '';
         const lastStatusUpdate = application.last_status_update ? this.formatDate(application.last_status_update) : '';
+        const foundProductData = additionalProductData.find(({ product_id }) => product_id === product_ids);
+        const productData = foundProductData ? JSON.parse(foundProductData.data) : {};
+        const expirationDate = this.determineExpirationDate(
+            effective_date,
+            product_ids as ProductIDEnum,
+            productData,
+            project_end_date,
+        );
 
         return {
             id: String(application.item_id),
@@ -165,7 +166,9 @@ export class ApplicationUtil {
             isBundle: products.length > 1,
             totalCost: Number(application.total_cost),
             effectiveDate,
+            expirationDate,
             lastStatusUpdate,
+            boundDate,
             ...marketplaceAppData,
         };
     }
