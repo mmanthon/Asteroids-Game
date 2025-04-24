@@ -30,6 +30,9 @@ jobs:
         registry-url: 'https://npm.pkg.github.com/'
         scope: '@ignidus'
 
+    - name: Clean npm cache
+      run: npm cache clean --force
+
     - name: Install dependencies
       run: npm ci
       env:
