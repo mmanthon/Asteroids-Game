@@ -2,7 +2,6 @@ import { DynamoTaskEntity, EmailTrackingEntity, UserEntity } from '@ignidus/iscx
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { SqsService } from '@ssut/nestjs-sqs';
 
 import { mockEnqueueRequest } from '../mocks';
 import { UtmController } from '../utm.controller';
@@ -17,7 +16,6 @@ describe('UtmController', () => {
             controllers: [UtmController],
             providers: [
                 { provide: UtmService, useValue: { findAll: jest.fn(), enqueue: jest.fn() } },
-                { provide: SqsService, useValue: {} },
                 { provide: ConfigService, useValue: {} },
                 { provide: JwtService, useValue: {} },
                 { provide: DynamoTaskEntity, useValue: {} },

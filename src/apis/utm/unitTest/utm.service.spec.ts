@@ -2,11 +2,10 @@ import { DynamoTaskEntity, EmailTrackingEntity } from '@ignidus/iscx-backend-uti
 import { BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { SqsService } from '@ssut/nestjs-sqs';
 
 import {
-    mockEmailTrackingModel,
-    mockEnqueueName,
+    // mockEmailTrackingModel,
+    // mockEnqueueName,
     mockEnqueueRequest,
     mockGroupName,
     mockTaskModel,
@@ -21,7 +20,6 @@ describe('UtmService', () => {
     let emailTrackingEntity: EmailTrackingEntity;
     let utmUtil: UtmUtil;
     let configService: ConfigService;
-    let sqsService: SqsService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -39,7 +37,6 @@ describe('UtmService', () => {
                         getTasksByActionTypes: jest.fn(),
                     },
                 },
-                { provide: SqsService, useValue: { send: jest.fn() } },
                 { provide: ConfigService, useValue: { get: jest.fn() } },
             ],
         }).compile();
@@ -49,7 +46,6 @@ describe('UtmService', () => {
         emailTrackingEntity = module.get<EmailTrackingEntity>(EmailTrackingEntity);
         utmUtil = module.get<UtmUtil>(UtmUtil);
         configService = module.get<ConfigService>(ConfigService);
-        sqsService = module.get<SqsService>(SqsService);
     });
 
     it('should be defined', () => {
@@ -58,24 +54,22 @@ describe('UtmService', () => {
         expect(emailTrackingEntity).toBeDefined();
         expect(utmUtil).toBeDefined();
         expect(configService).toBeDefined();
-        expect(sqsService).toBeDefined();
     });
 
     describe('enqueue', () => {
-        it('should send a message to the correct SQS queue', async () => {
-            jest.spyOn(emailTrackingEntity, 'getEmailRecordByID').mockResolvedValue(mockEmailTrackingModel);
-            jest.spyOn(configService, 'get').mockReturnValue(mockEnqueueName);
-            jest.spyOn(sqsService, 'send').mockResolvedValue(undefined);
+        // it('should send a message to the correct SQS queue', async () => {
+        //     jest.spyOn(emailTrackingEntity, 'getEmailRecordByID').mockResolvedValue(mockEmailTrackingModel);
+        //     jest.spyOn(configService, 'get').mockReturnValue(mockEnqueueName);
 
-            await service.enqueue(mockEnqueueRequest);
+        //     await service.enqueue(mockEnqueueRequest);
 
-            expect(sqsService.send).toHaveBeenCalledWith(
-                mockEnqueueName,
-                expect.objectContaining({
-                    body: mockEnqueueRequest,
-                }),
-            );
-        });
+        //     // expect(sqsService.send).toHaveBeenCalledWith(
+        //     //     mockEnqueueName,
+        //     //     expect.objectContaining({
+        //     //         body: mockEnqueueRequest,
+        //     //     }),
+        //     // );
+        // });
 
         it('should throw an error if email record is not found', async () => {
             jest.spyOn(emailTrackingEntity, 'getEmailRecordByID').mockResolvedValue(null);

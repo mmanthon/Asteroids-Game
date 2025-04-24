@@ -30,14 +30,8 @@ jobs:
         registry-url: 'https://npm.pkg.github.com/'
         scope: '@ignidus'
 
-    - name: Remove package-lock.json
-      run: rm -f package-lock.json
-
-    - name: Clean npm cache
-      run: npm cache clean --force
-
     - name: Install dependencies
-      run: npm i
+      run: npm ci
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -21,11 +21,7 @@ export default () => ({
     ampApiKey: process.env.AMP_API_KEY,
 
     // UTM SQS
-    utmQueue: {
-        name: process.env.TASK_QUEUE_NAME,
-        queueUrl: process.env.TASK_QUEUE_URL,
-        region: process.env.AWS_REGION,
-    },
+    queueUrl: process.env.TASK_QUEUE_URL,
 
     // DynamoDB tables
     dynamodb: {

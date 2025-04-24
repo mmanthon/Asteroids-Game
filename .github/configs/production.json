@@ -43,10 +43,6 @@
             "value": "tracking"
         },
         {
-            "name": "TASK_QUEUE_NAME",
-            "value": "iscx-utm-queue"
-        },
-        {
             "name": "TASK_QUEUE_URL",
             "value": "https://sqs.us-west-2.amazonaws.com/049005703416/iscx-utm-queue"
         }

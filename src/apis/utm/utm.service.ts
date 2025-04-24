@@ -1,21 +1,25 @@
+import { SQS } from '@aws-sdk/client-sqs';
 import { DynamoTaskEntity, EmailTrackingEntity } from '@ignidus/iscx-backend-utils';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SqsService } from '@ssut/nestjs-sqs';
-import { nanoid } from 'nanoid';
 
 import { EnqueueRequestDto, TaskFilters, UtmResponseDto } from './dto';
 import { UtmUtil } from './utm.util';
 
 @Injectable()
 export class UtmService {
+    private sqsClient: SQS;
+
     constructor(
         private readonly utmUtil: UtmUtil,
         private readonly taskEntity: DynamoTaskEntity,
-        private readonly sqsService: SqsService,
         private readonly configService: ConfigService,
         private readonly emailTrackingEntity: EmailTrackingEntity,
-    ) {}
+    ) {
+        this.sqsClient = new SQS({
+            region: this.configService.get<string>('awsRegion'),
+        });
+    }
 
     /**
      * @description Enqueue task
@@ -29,9 +33,9 @@ export class UtmService {
             throw new BadRequestException('Email record not found');
         }
 
-        await this.sqsService.send(this.configService.get<string>('utmQueue.name'), {
-            id: nanoid(11),
-            body: body,
+        await this.sqsClient.sendMessage({
+            QueueUrl: this.configService.get<string>('queueUrl'),
+            MessageBody: JSON.stringify(body),
         });
     }
 
