@@ -12,5 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Clear GitHub Actions cache
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh api -X DELETE /repos/${{ github.repository }}/actions/caches --silent
+        gh cache delete --all
