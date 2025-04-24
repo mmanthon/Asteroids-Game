@@ -8,18 +8,9 @@ concurrency:
   cancel-in-progress: true
   
 jobs:
-  unit-tests-e2e-linting:
+  clear-npm-cache:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Install private GitHub package
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        registry-url: 'https://npm.pkg.github.com/'
-        scope: '@ignidus'
-
-    - name: Clean npm cache
-      run: npm cache clean --force
+    - name: Clear GitHub Actions cache
+      run: |
+        gh api -X DELETE /repos/${{ github.repository }}/actions/caches --silent
