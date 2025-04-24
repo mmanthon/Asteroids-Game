@@ -20,12 +20,21 @@ export default () => ({
     ampApiBaseUrl: process.env.AMP_API_BASE_URL,
     ampApiKey: process.env.AMP_API_KEY,
 
+    // UTM SQS
+    utmQueue: {
+        name: process.env.TASK_QUEUE_NAME,
+        queueUrl: process.env.TASK_QUEUE_URL,
+        region: process.env.AWS_REGION,
+    },
+
     // DynamoDB tables
     dynamodb: {
         accessControlUsersTableName: process.env.DYNAMODB_ACCESS_CONTROL_USERS_TABLE_NAME,
         applicationsTableName: process.env.DYNAMODB_APPLICATIONS_TABLE_NAME,
         claimsTableName: process.env.DYNAMODB_CLAIMS_TABLE_NAME,
         notesTableName: process.env.DYNAMODB_NOTES_TABLE_NAME,
+        tasksTableName: process.env.DYNAMODB_TASK_TABLE_NAME,
+        wsConnectionsTableName: process.env.DYNAMODB_TASK_WS_CONNECTION_TABLE_NAME,
     },
 
     // AMP Database

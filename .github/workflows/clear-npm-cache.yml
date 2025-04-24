@@ -1,9 +1,7 @@
-name: Status Checks
+name: Clear NPM Cache
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,16 +21,5 @@ jobs:
         registry-url: 'https://npm.pkg.github.com/'
         scope: '@ignidus'
 
-    - name: Install dependencies
-      run: npm ci
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Run linting test
-      run: npm run lint
-
-    - name: Run unit tests
-      run: npm run test
-
-    - name: Run validate test coverage script
-      run: bash .github/scripts/validate-test-coverage.sh
+    - name: Clean npm cache
+      run: npm cache clean --force

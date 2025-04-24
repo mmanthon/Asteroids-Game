@@ -27,12 +27,28 @@
             "value": "ISCxQANotes"
         },
         {
+            "name": "DYNAMODB_TASK_TABLE_NAME",
+            "value": "ISCxQATasks"
+        },
+        {
+            "name": "DYNAMODB_TASK_WS_CONNECTION_TABLE_NAME",
+            "value": "ISCxQATaskWSConnections"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "https://qa-mvr.api.isceng.net/api"
         },
         {
             "name": "TRACKING_DB",
             "value": "tracking"
+        },
+        {
+            "name": "TASK_QUEUE_NAME",
+            "value": "iscx-qa-utm-queue"
+        },
+        {
+            "name": "TASK_QUEUE_URL",
+            "value": "https://sqs.us-west-2.amazonaws.com/694679581764/iscx-qa-utm-queue"
         }
     ],
     "secrets": [

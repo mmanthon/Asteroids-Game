@@ -21,6 +21,7 @@ import { DriverRiskModule } from './apis/driverRisk/driverRisk.module';
 import { HazardhubModule } from './apis/hazardhub/hazardhub.module';
 import { HealthModule } from './apis/health/health.module';
 import { LanceInsightsModule } from './apis/lanceInsights/lanceInsights.module';
+import { UtmModule } from './apis/utm/utm.module';
 import { AmpModule } from './shared/databases/amp.module';
 import { DynamoDBModule } from './shared/databases/dynamodb.module';
 import { ExternalModule } from './shared/external/external.module';
@@ -58,6 +59,7 @@ import { ExternalModule } from './shared/external/external.module';
         HazardhubModule,
         ExternalModule,
         LanceInsightsModule,
+        UtmModule,
     ],
     providers: [
         {

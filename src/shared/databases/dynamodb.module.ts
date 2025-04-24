@@ -2,6 +2,8 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import {
     DynamoApplicationEntity,
     DynamoNoteEntity,
+    DynamoTaskEntity,
+    DynamoTaskWebsocketConnectionEntity,
     DynamoUserEntity,
     DynamodbClaimEntity,
     createEntityProviders,
@@ -39,10 +41,26 @@ import { ConfigService } from '@nestjs/config';
                     entityClass: DynamoNoteEntity,
                     metadata: { tableNameKey: 'dynamodb.notesTableName' },
                 },
+                {
+                    entityClass: DynamoTaskWebsocketConnectionEntity,
+                    metadata: { tableNameKey: 'dynamodb.wsConnectionsTableName' },
+                },
+                {
+                    entityClass: DynamoTaskEntity,
+                    metadata: { tableNameKey: 'dynamodb.tasksTableName' },
+                },
             ],
             dynamoEntityFactory,
         ),
     ],
-    exports: [DynamoUserEntity, DynamoApplicationEntity, DynamodbClaimEntity, DynamoNoteEntity, DynamoDB],
+    exports: [
+        DynamoUserEntity,
+        DynamoApplicationEntity,
+        DynamodbClaimEntity,
+        DynamoNoteEntity,
+        DynamoTaskWebsocketConnectionEntity,
+        DynamoTaskEntity,
+        DynamoDB,
+    ],
 })
 export class DynamoDBModule {}

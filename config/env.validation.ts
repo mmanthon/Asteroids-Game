@@ -10,6 +10,8 @@ export const envValidationSchema = Joi.object({
 
     // AWS
     AWS_REGION: Joi.string().required(),
+    TASK_QUEUE_NAME: Joi.string().required(),
+    TASK_QUEUE_URL: Joi.string().required(),
 
     // JWT
     JWT_SECRET: Joi.string().required(),
@@ -19,6 +21,8 @@ export const envValidationSchema = Joi.object({
     DYNAMODB_APPLICATIONS_TABLE_NAME: Joi.string().required(),
     DYNAMODB_CLAIMS_TABLE_NAME: Joi.string().required(),
     DYNAMODB_NOTES_TABLE_NAME: Joi.string().required(),
+    DYNAMODB_TASK_TABLE_NAME: Joi.string().required(),
+    DYNAMODB_TASK_WS_CONNECTION_TABLE_NAME: Joi.string().required(),
 
     // Amp api
     AMP_API_BASE_URL: Joi.string().required(),

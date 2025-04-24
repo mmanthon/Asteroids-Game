@@ -27,12 +27,28 @@
             "value": "ISCxNotes"
         },
         {
+            "name": "DYNAMODB_TASK_TABLE_NAME",
+            "value": "ISCxTasks"
+        },
+        {
+            "name": "DYNAMODB_TASK_WS_CONNECTION_TABLE_NAME",
+            "value": "ISCxTaskWSConnections"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "http://iscx-mvr-api.internal/api"
         },
         {
             "name": "TRACKING_DB",
             "value": "tracking"
+        },
+        {
+            "name": "TASK_QUEUE_NAME",
+            "value": "iscx-utm-queue"
+        },
+        {
+            "name": "TASK_QUEUE_URL",
+            "value": "https://sqs.us-west-2.amazonaws.com/049005703416/iscx-utm-queue"
         }
     ],
     "secrets": [
