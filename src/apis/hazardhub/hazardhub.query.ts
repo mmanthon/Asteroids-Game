@@ -1,19 +1,22 @@
-import { AddressDto } from '@ignidus/iscx-backend-utils';
 import { Inject, Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
+
+import { GetApplicationQueryResult } from './hazardhub.type';
 
 @Injectable()
 export class HazardHubQuery {
     constructor(@Inject('Amp') private readonly ampDB: Knex) {}
 
     /**
-     * @description Get the application address
+     * @description Get the application
      * @param {string} appID
-     * @returns {Promise<any>}
+     * @returns {Promise<GetApplicationQueryResult>}
      */
-    getApplicationAddress(appID: string): Promise<AddressDto> {
+    getApplication(appID: string): Promise<GetApplicationQueryResult> {
         return this.ampDB
             .select(
+                'oi.product_ids as product_id',
+                'op.js_name as identifier',
                 this.ampDB.raw(
                     `CASE 
                        WHEN p.physical_address2 IS NOT NULL 
@@ -26,8 +29,9 @@ export class HazardHubQuery {
                 'p.physical_zip as zip',
             )
             .from('omga_items as oi')
-            .join('omga_insureds as oin', 'oi.insured_id', 'oin.insured_id')
-            .join('people as p', 'oin.person_id', 'p.person_id')
+            .leftJoin('omga_insureds as oin', 'oi.insured_id', 'oin.insured_id')
+            .leftJoin('people as p', 'oin.person_id', 'p.person_id')
+            .leftJoin('omga_products as op', 'oi.product_ids', 'op.product_id')
             .where('oi.item_id', appID)
             .first();
     }

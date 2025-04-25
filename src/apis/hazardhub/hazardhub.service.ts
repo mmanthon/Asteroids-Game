@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { AddressDto } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
 
 import { HazardhubResponseDto } from './dto';
@@ -21,7 +22,20 @@ export class HazardhubService {
      */
     async findOne(appID: string): Promise<HazardhubResponseDto[]> {
         // TODO: In the future, we will add logic to handle multiple addresses
-        const address = await this.hazardhubQuery.getApplicationAddress(appID);
+        const allowedProducts = ['93', '128'];
+
+        const application = await this.hazardhubQuery.getApplication(appID);
+
+        if (!allowedProducts.includes(application.product_id)) {
+            return [];
+        }
+
+        const address: AddressDto = {
+            streetAddress: application.streetAddress,
+            city: application.city,
+            state: application.state,
+            zip: application.zip,
+        };
 
         // validate address before sending it to the API. Throws an error if the address is invalid
         this.hazardhubUtil.validateAddress(address);

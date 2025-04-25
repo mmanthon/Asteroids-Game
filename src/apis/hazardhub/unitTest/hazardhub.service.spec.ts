@@ -4,8 +4,13 @@ import { AmpApiIntegration } from '../../../shared/external';
 import { HazardHubQuery } from '../hazardhub.query';
 import { HazardhubService } from '../hazardhub.service';
 import { HazardHubUtil } from '../hazardhub.util';
-import { appID, mockAddress } from '../mocks/constants';
-import { hazardhubResponseDtoMock, mockHazardhubData } from '../mocks/hazardhubResponse.dto.mock';
+import {
+    appID,
+    hazardhubResponseDtoMock,
+    mockAddress,
+    mockGetApplicationQueryResult,
+    mockHazardhubData,
+} from '../mocks';
 
 describe('HazardhubService', () => {
     let service: HazardhubService;
@@ -26,7 +31,7 @@ describe('HazardhubService', () => {
                 {
                     provide: HazardHubQuery,
                     useValue: {
-                        getApplicationAddress: jest.fn().mockResolvedValue(mockAddress),
+                        getApplication: jest.fn().mockResolvedValue(mockGetApplicationQueryResult),
                     },
                 },
 
@@ -52,7 +57,7 @@ describe('HazardhubService', () => {
     it('should return merged hazardhub data', async () => {
         const result = await service.findOne(appID);
 
-        expect(hazardhubQuery.getApplicationAddress).toHaveBeenLastCalledWith(appID);
+        expect(hazardhubQuery.getApplication).toHaveBeenLastCalledWith(appID);
 
         expect(hazardHubUtil.validateAddress).toHaveBeenCalledWith(mockAddress);
         expect(ampApiIntegration.getHazardhubData).toHaveBeenLastCalledWith(mockAddress);

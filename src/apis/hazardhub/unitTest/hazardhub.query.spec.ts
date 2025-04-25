@@ -13,6 +13,7 @@ describe('HazardhubQuery', () => {
             raw: jest.fn().mockReturnValue('RAM_SQL'),
             from: jest.fn().mockReturnThis(),
             join: jest.fn().mockReturnThis(),
+            leftJoin: jest.fn().mockReturnThis(),
             where: jest.fn().mockReturnThis(),
             first: jest.fn().mockResolvedValue(mockAddress),
         };
@@ -35,7 +36,7 @@ describe('HazardhubQuery', () => {
     });
 
     it('should return address from ampDB', async () => {
-        const result = await query.getApplicationAddress(appID);
+        const result = await query.getApplication(appID);
 
         expect(result).toEqual(mockAddress);
         expect(ampDB.raw).toHaveBeenCalled();
