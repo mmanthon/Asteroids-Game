@@ -3,11 +3,12 @@ import { ApplicationStatusDisplayValueEnum, ApplicationTypeEnum } from '@ignidus
 import { SimplifiedApplicationDto } from '../dto';
 import { mockAmpApplication } from './ampApplication.interface.mock';
 import { mockAssignedUserDto } from './assignedUser.dto.mock';
+import { submissionID } from './constants.mock';
 import { mockProductDto } from './product.dto.mock';
 
 export const mockSimplifiedApplicationDto: SimplifiedApplicationDto = {
     id: String(mockAmpApplication.item_id),
-    submissionID: String(mockAmpApplication.group_id),
+    submissionID: submissionID,
     insured: {
         firstName: mockAmpApplication.insured_first_name,
         lastName: mockAmpApplication.insured_last_name,
@@ -21,16 +22,16 @@ export const mockSimplifiedApplicationDto: SimplifiedApplicationDto = {
             zip: mockAmpApplication.insured_zip,
         },
     },
-    products: [mockProductDto],
+    products: mockProductDto,
     agencyName: mockAmpApplication.agency_name,
     type: ApplicationTypeEnum.NEW,
     assignedUsers: [mockAssignedUserDto],
     status: mockAmpApplication.status_name as ApplicationStatusDisplayValueEnum,
     isMarketplaceApp: false,
-    isBundle: false,
+    isBundle: true,
     totalCost: Number(mockAmpApplication.total_cost),
     effectiveDate: mockAmpApplication.effective_date,
-    expirationDate: mockAmpApplication.effective_date,
+    expirationDate: '2026-04-01',
     boundDate: mockAmpApplication.first_bound_date,
     lastStatusUpdate: mockAmpApplication.last_status_update,
 };

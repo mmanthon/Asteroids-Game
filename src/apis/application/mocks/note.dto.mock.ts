@@ -7,23 +7,30 @@ import {
 
 import { NoteDto } from '../dto';
 import { NoteTypeEnum } from '../enums';
+import { contentNote, createdDate, entityID, noteID, updatedDate, userID } from './constants.mock';
+import { mockAuthor } from './noteAuthor.dto.mock';
 
 export const mockNoteDto: NoteDto = {
-    id: '123456',
+    id: noteID,
     type: NoteTypeEnum.DEFAULT,
-    content: 'This is a test note',
+    content: contentNote,
     entityType: NoteEntityTypeEnum.APPLICATION,
-    entityID: '123',
-    category: NoteCategoryEnum.CANCELLATION_CANCELLED,
+    entityID,
+    category: NoteCategoryEnum.DETAIL_VIEW,
     notify: [NoteNotificationTypeEnum.PRODUCER],
-    createdBy: 'test',
-    updatedDate: '2021-01-02',
-    createdDate: '2021-01-01',
+    createdBy: 'John Doe',
+    updatedDate,
+    createdDate,
     author: {
-        firstName: 'John',
-        lastName: 'Doe',
-        role: NoteAuthorRoleEnum.PRODUCER,
+        firstName: mockAuthor.firstName,
+        lastName: mockAuthor.lastName,
+        role: NoteAuthorRoleEnum.UNDERWRITER,
     },
-    isActive: false,
+    isActive: true,
     isInternal: false,
+};
+
+export const mockNoteMarketplaceDto = {
+    ...mockNoteDto,
+    userID: String(userID),
 };

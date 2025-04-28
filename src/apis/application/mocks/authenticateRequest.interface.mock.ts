@@ -1,9 +1,11 @@
 import { AuthenticatedRequest, IJWT } from '@ignidus/iscx-backend-utils';
 
+import { userFirstName, userID, userLastName } from './constants.mock';
+
 export const mockUser: IJWT = {
-    userID: '1234561',
-    firstName: 'Test',
-    lastName: 'User',
+    userID: String(userID),
+    firstName: userFirstName,
+    lastName: userLastName,
     roles: [],
     groups: [],
 };

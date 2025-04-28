@@ -1,9 +1,19 @@
 import { ApplicationProductDto } from '../dto';
+import { programID, programTypeID } from './constants.mock';
 
-export const mockProductDto: ApplicationProductDto = {
-    id: '123',
-    name: 'Product 1',
-    programID: '100',
-    programTypeID: '200',
-    carrierName: 'Carrier 1',
-};
+export const mockProductDto: ApplicationProductDto[] = [
+    {
+        id: '123',
+        name: 'Product 1',
+        programID: String(programID),
+        programTypeID: String(programTypeID),
+        carrierName: 'Carrier 1',
+    },
+    {
+        id: '321',
+        name: 'Product 2',
+        programID: String(programID),
+        programTypeID: String(programTypeID),
+        carrierName: 'Carrier 2',
+    },
+];

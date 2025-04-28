@@ -1,14 +1,14 @@
 import { ClaimStatusEnum } from '@ignidus/iscx-backend-utils';
 
 import { ClaimDto } from '../dto';
-import { appID } from './constants.mock';
+import { appID, claimID, createdDate, jdiID, updatedDate } from './constants.mock';
 
 export const mockClaimDto: ClaimDto = {
-    id: '123456',
-    jdiID: '123456',
+    id: claimID,
+    jdiID,
     appID,
     status: ClaimStatusEnum.OPEN,
     requestedAmount: 1000,
-    updatedDate: '2021-01-01',
-    createdDate: '2021-01-01',
+    updatedDate: updatedDate,
+    createdDate: createdDate,
 };

@@ -18,7 +18,7 @@ export class EmailDto {
 
     @ApiProperty({
         description: 'Content of the email (may include HTML)',
-        example: '<p>Hi, this is the body email<p>',
+        example: '<p>Hi, this is the body email</p>',
     })
     body: string;
 

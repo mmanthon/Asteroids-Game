@@ -3,8 +3,18 @@ import { ApplicationStatusDisplayValueEnum, ApplicationTypeEnum } from '@ignidus
 import { ApplicationDto } from '../dto';
 import { mockAgentDto } from './agent.dto.mock';
 import { mockAssignedUserDto } from './assignedUser.dto.mock';
-import { mockClaimDto } from './claim.dto.mock';
-import { appID, submissionID } from './constants.mock';
+import {
+    agencyName,
+    appID,
+    boundDate,
+    formattedCreatedDate,
+    formattedDate,
+    lastStatusUpdate,
+    nextYearDate,
+    policyNumber,
+    submissionID,
+    totalCost,
+} from './constants.mock';
 import { mockEmailDto } from './email.dto.mock';
 import { mockInsuredDto } from './insured.dto.mock';
 import { mockNoteDto } from './note.dto.mock';
@@ -14,23 +24,23 @@ export const mockApplicationDto: ApplicationDto = {
     id: appID,
     submissionID,
     insured: mockInsuredDto,
-    products: [mockProductDto],
-    agencyName: 'ISC',
+    products: mockProductDto,
+    agencyName: agencyName,
     agent: mockAgentDto,
-    type: ApplicationTypeEnum.RENEWAL,
+    type: ApplicationTypeEnum.NEW,
     assignedUsers: [mockAssignedUserDto],
     status: ApplicationStatusDisplayValueEnum.IN_PROGRESS,
-    isMarketplaceApp: true,
+    isMarketplaceApp: false,
     isBundle: true,
-    totalCost: 1000,
-    policyNumber: 'AE123456',
-    effectiveDate: '21-01-01',
-    expirationDate: '2021-01-01',
-    boundDate: '2021-01-01',
-    updatedDate: '2021-01-01',
-    lastStatusUpdate: '2021-01-01',
-    claims: [mockClaimDto],
+    totalCost: totalCost,
+    policyNumber: policyNumber,
+    effectiveDate: formattedDate,
+    expirationDate: nextYearDate,
+    boundDate: boundDate,
+    updatedDate: formattedCreatedDate,
+    lastStatusUpdate: lastStatusUpdate,
+    claims: [],
     emails: [mockEmailDto],
     notes: [mockNoteDto],
-    createdDate: '2021-01-1',
+    createdDate: formattedCreatedDate,
 };
