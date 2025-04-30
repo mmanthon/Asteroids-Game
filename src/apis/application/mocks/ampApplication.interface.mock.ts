@@ -61,3 +61,16 @@ export const mockAmpApplicationWithMissingFields: AmpApplication = {
     insured_state: undefined,
     insured_zip: undefined,
 };
+
+export const mockAmpApplications: AmpApplication[] = [
+    {
+        ...mockAmpApplication,
+    },
+    {
+        ...mockAmpApplication,
+        item_id: 1,
+        user_id: 1,
+        product_ids: 1,
+        insured_first_name: 'Alice',
+    },
+];

@@ -23,6 +23,7 @@ export const parentNoteID = '123';
 export const personID = 1234;
 export const policyNumber = '123';
 export const productID = 123;
+export const productIDs = ['1', '2'];
 export const programID = 100;
 export const programTypeID = 200;
 export const submissionID = '123456';

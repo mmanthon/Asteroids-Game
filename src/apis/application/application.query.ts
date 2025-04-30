@@ -41,6 +41,7 @@ export class ApplicationQuery {
 
         // Calculate pagination details
         const totalPages = pageLimit ? Math.ceil(totalCount / pageLimit) : 1;
+
         const calculatedNextPage = nextPage < totalPages ? nextPage + 1 : null;
 
         return {
