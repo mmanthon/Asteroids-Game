@@ -36,5 +36,7 @@ jobs:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_SHA: ${{ github.sha }}
+          FALCON_CID: ${{ secrets.FALCON_CID }}
+          FALCON_ECR: ${{ vars.FALCON_ECR }}
         run: |
           bash .github/scripts/deploy-to-ecs.sh

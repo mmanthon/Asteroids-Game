@@ -22,6 +22,14 @@ if [ -z "$GITHUB_SHA" ]; then
   echo "Error: GITHUB_SHA variable is not set. Please set it and try again."
   exit 1
 fi
+if [ -z "$FALCON_CID" ]; then
+  echo "Error: FALCON_CID variable is not set. Please set it and try again."
+  exit 1
+fi
+if [ -z "$FALCON_ECR" ]; then
+  echo "Error: FALCON_ECR variable is not set. Please set it and try again."
+  exit 1
+fi
 
 echo "Starting deployment for environment: $ENVIRONMENT"
 
@@ -91,14 +99,28 @@ jq --arg IMAGE_URI "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${SERV
    .github/task_definition_template.json > updated_task_definition.json
 echo "Task definition updated successfully."
 
+# Patch task definition with Falcon sensor
+echo "Patching task definition with Falcon sensor..."
+
+RAW_AUTH=$(echo AWS:$(aws ecr get-login-password --region "$AWS_REGION") | base64 -w 0)
+IMAGE_PULL_TOKEN=$(echo "{\"auths\":{\"${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com\":{\"auth\":\"$RAW_AUTH\"}}}" | base64 -w 0)
+
+docker run --rm -v "$(pwd):/mnt" --user 0:0 "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FALCON_ECR}:latest" \
+  --ecs-spec-file /mnt/updated_task_definition.json \
+  --cid "$FALCON_CID" \
+  --image "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FALCON_ECR}:latest" \
+  --pulltoken "$IMAGE_PULL_TOKEN" \
+  > patched_task_definition.json
+echo "Task definition patched successfully."
+
 # Echo the new task definition
 echo "New Task Definition:"
-cat updated_task_definition.json
+cat patched_task_definition.json
 
 # Register the new task definition
 echo "Registering the updated task definition..."
 TASK_DEFINITION=$(aws ecs register-task-definition \
-  --cli-input-json file://updated_task_definition.json)
+  --cli-input-json file://patched_task_definition.json)
 TASK_DEFINITION_ARN=$(echo "$TASK_DEFINITION" | jq -r '.taskDefinition.taskDefinitionArn')
 echo "Task definition registered successfully: $TASK_DEFINITION_ARN"
 
