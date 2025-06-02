@@ -1,5 +1,5 @@
-import { AuthenticatedRequest } from '@ignidus/iscx-backend-utils';
-import { Body, Controller, Get, Param, Patch, Query, Req } from '@nestjs/common';
+import { AmpRolesEnum, AuthenticatedRequest, Roles } from '@ignidus/iscx-backend-utils';
+import { Body, Controller, Get, Param, Patch, Query, Req, UseGuards } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiBody,
@@ -14,10 +14,13 @@ import {
 import { ApplicationService } from './application.service';
 import { ApplicationDto, FilterParamDto, FindAllResponseDto, UpdateApplicationRequestDto } from './dto';
 import { FilterParamValidator, PatchApplicationValidator } from './validators';
+import { RoleGuard } from '../../shared/guards';
 import { AppIDValidator } from '../../shared/validators';
 
 @ApiTags('Application')
 @Controller('applications')
+@Roles(AmpRolesEnum.UNDERWRITER)
+@UseGuards(RoleGuard)
 @ApiBadRequestResponse({ description: 'Bad request' })
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
 @ApiInternalServerErrorResponse({ description: 'Internal server error' })
