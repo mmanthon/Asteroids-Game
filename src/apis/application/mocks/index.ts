@@ -9,6 +9,7 @@ export * from './authenticateRequest.interface.mock';
 export * from './claim.dto.mock';
 export * from './constants.mock';
 export * from './email.dto.mock';
+export * from './emailHistory.model.mock';
 export * from './emailTracking.model.mock';
 export * from './findAllResult.interface.mock';
 export * from './getAmpNotesByAppIDResult.interface.mock';

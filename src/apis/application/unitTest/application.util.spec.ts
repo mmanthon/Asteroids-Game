@@ -5,6 +5,7 @@ import {
     AmpRolesEnum,
     ApplicationTypeEnum,
     DynamoApplicationEntity,
+    DynamoEmailHistoryEntity,
     DynamoNoteEntity,
     EmailTrackingEntity,
     EmailTrackingModel,
@@ -35,6 +36,7 @@ import {
     mockApplicationDto,
     mockApplicationDynamoModel,
     mockEmailDto,
+    mockEmailHistoryModel,
     mockEmailTrackingModel,
     mockGetAmpNotesByIDResult,
     mockGetAmpNotesProducer,
@@ -91,6 +93,7 @@ describe('ApplicationUtil', () => {
                 },
                 { provide: DynamoNoteEntity, useValue: { findAllByEntity: jest.fn() } },
                 { provide: EmailTrackingEntity, useValue: { getByEntityID: jest.fn() } },
+                { provide: DynamoEmailHistoryEntity, useValue: { findAllByEntityID: jest.fn() } },
             ],
         }).compile();
 
@@ -357,6 +360,7 @@ describe('ApplicationUtil', () => {
             jest.spyOn(applicationQuery, 'findPolicyByAppID').mockResolvedValue({ policy_number: policyNumber });
             jest.spyOn(applicationQuery, 'getAdditionalProductDataByAppID').mockResolvedValueOnce([]);
             jest.spyOn(util['emailTrackingEntity'], 'getByEntityID').mockResolvedValue([]);
+            jest.spyOn(util['emailHistoryEntity'], 'findAllByEntityID').mockResolvedValue([]);
             const result = await util.formatApplication({ ...mockAmpApplication, program_type_id: 22 }, mockUser);
 
             expect(result.notes[0].createdBy).toBe('System User');
@@ -379,6 +383,7 @@ describe('ApplicationUtil', () => {
             jest.spyOn(applicationQuery, 'findPolicyByAppID').mockResolvedValue(undefined);
             jest.spyOn(util['noteEntity'], 'findAllByEntity').mockResolvedValueOnce([]).mockResolvedValueOnce([]);
             jest.spyOn(util['emailTrackingEntity'], 'getByEntityID').mockResolvedValue([]);
+            jest.spyOn(util['emailHistoryEntity'], 'findAllByEntityID').mockResolvedValue([]);
 
             const result = await util.formatApplication({ ...mockAmpApplication, program_type_id: 22 }, mockUser);
 
@@ -419,13 +424,23 @@ describe('ApplicationUtil', () => {
             jest.spyOn(util['userEntity'], 'getUserByID').mockResolvedValueOnce(mockUserModel);
             jest.spyOn(util['aclRoleEntity'], 'getRolesForUser').mockResolvedValueOnce([AmpRolesEnum.UNDERWRITER]);
             jest.spyOn(util['emailTrackingEntity'], 'getByEntityID').mockResolvedValueOnce(mockEmailTrackingModel);
+            jest.spyOn(util['emailHistoryEntity'], 'findAllByEntityID').mockResolvedValueOnce([mockEmailHistoryModel]);
 
             const result = await util.formatApplication({ ...mockAmpApplication, program_type_id: 22 }, mockUser);
 
             expect(result).toMatchObject({
                 ...mockApplicationDto,
                 isMarketplaceApp: true,
-                emails: [],
+                emails: [
+                    {
+                        id: mockEmailHistoryModel.id,
+                        sender: mockEmailHistoryModel.sender,
+                        recipients: ['user1@example.com', 'user2@example.com'],
+                        subject: mockEmailHistoryModel.subject,
+                        body: mockEmailHistoryModel.body,
+                        sentAt: mockEmailHistoryModel.sentAt,
+                    },
+                ],
                 products: [
                     {
                         ...mockApplicationDto.products[0],

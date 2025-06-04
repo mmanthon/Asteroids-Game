@@ -35,6 +35,10 @@
             "value": "ISCxQATaskWSConnections"
         },
         {
+            "name": "DYNAMODB_EMAIL_HISTORY_TABLE_NAME",
+            "value": "ISCxQAEmailHistory"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "https://qa-mvr.api.isceng.net/api"
         },

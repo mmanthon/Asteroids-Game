@@ -1,6 +1,7 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import {
     DynamoApplicationEntity,
+    DynamoEmailHistoryEntity,
     DynamoNoteEntity,
     DynamoTaskEntity,
     DynamoTaskWebsocketConnectionEntity,
@@ -49,6 +50,10 @@ import { ConfigService } from '@nestjs/config';
                     entityClass: DynamoTaskEntity,
                     metadata: { tableNameKey: 'dynamodb.tasksTableName' },
                 },
+                {
+                    entityClass: DynamoEmailHistoryEntity,
+                    metadata: { tableNameKey: 'dynamodb.emailHistoryTableName' },
+                },
             ],
             dynamoEntityFactory,
         ),
@@ -61,6 +66,7 @@ import { ConfigService } from '@nestjs/config';
         DynamoTaskWebsocketConnectionEntity,
         DynamoTaskEntity,
         DynamoDB,
+        DynamoEmailHistoryEntity,
     ],
 })
 export class DynamoDBModule {}

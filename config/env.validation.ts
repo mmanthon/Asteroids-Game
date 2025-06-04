@@ -22,6 +22,7 @@ export const envValidationSchema = Joi.object({
     DYNAMODB_NOTES_TABLE_NAME: Joi.string().required(),
     DYNAMODB_TASK_TABLE_NAME: Joi.string().required(),
     DYNAMODB_TASK_WS_CONNECTION_TABLE_NAME: Joi.string().required(),
+    DYNAMODB_EMAIL_HISTORY_TABLE_NAME: Joi.string().required(),
 
     // Amp api
     AMP_API_BASE_URL: Joi.string().required(),

@@ -7,7 +7,9 @@ import {
     ApplicationStatusDisplayValueEnum,
     ApplicationTypeEnum,
     DynamoApplicationEntity,
+    DynamoEmailHistoryEntity,
     DynamoNoteEntity,
+    EmailHistoryDynamoModel,
     EmailTrackingEntity,
     EmailTrackingModel,
     IJWT,
@@ -78,6 +80,7 @@ export class ApplicationUtil {
         private readonly aclRoleEntity: AclRoleEntity,
         private readonly noteEntity: DynamoNoteEntity,
         private readonly emailTrackingEntity: EmailTrackingEntity,
+        private readonly emailHistoryEntity: DynamoEmailHistoryEntity,
     ) {}
 
     /**
@@ -96,7 +99,9 @@ export class ApplicationUtil {
 
         const updatedDate = last_updated ? this.formatDate(application.last_updated) : '';
         const isMarketplaceApp = application.program_type_id === 22;
-        const emails = !isMarketplaceApp ? await this.getAmpEmails(String(item_id)) : [];
+        const emails = isMarketplaceApp
+            ? await this.getMarketplaceEmails(String(item_id))
+            : await this.getAmpEmails(String(item_id));
         const baseFormattedAppData = await this.getBaseFormattedApplicationData(application);
         const notes = isMarketplaceApp
             ? await this.getMarketplaceNotes(String(item_id), baseFormattedAppData.submissionID, user.roles)
@@ -315,6 +320,24 @@ export class ApplicationUtil {
             subject: email.subject || '',
             body: sanitizeHtml(email.body_html || '', this.emailSanitizerOptions),
             sentAt: email.sent_at,
+        }));
+    }
+
+    /**
+     * @description Get history emails for a given appID
+     * @param {string} appID The application ID
+     * @returns {Promise<EmailDto[]>} A list of formatted emails
+     */
+    private async getMarketplaceEmails(appID: string): Promise<EmailDto[]> {
+        const emails = await this.emailHistoryEntity.findAllByEntityID(appID);
+
+        return emails.map((email: EmailHistoryDynamoModel) => ({
+            id: email.id,
+            sender: email.sender,
+            recipients: email?.recipients?.split(',').map((r) => r.trim()) || [],
+            subject: email.subject || '',
+            body: sanitizeHtml(email.body || '', this.emailSanitizerOptions),
+            sentAt: email.sentAt,
         }));
     }
 

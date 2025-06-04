@@ -31,6 +31,7 @@ export default () => ({
         notesTableName: process.env.DYNAMODB_NOTES_TABLE_NAME,
         tasksTableName: process.env.DYNAMODB_TASK_TABLE_NAME,
         wsConnectionsTableName: process.env.DYNAMODB_TASK_WS_CONNECTION_TABLE_NAME,
+        emailHistoryTableName: process.env.DYNAMODB_EMAIL_HISTORY_TABLE_NAME,
     },
 
     // AMP Database

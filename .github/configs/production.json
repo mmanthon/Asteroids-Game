@@ -35,6 +35,10 @@
             "value": "ISCxTaskWSConnections"
         },
         {
+            "name": "DYNAMODB_EMAIL_HISTORY_TABLE_NAME",
+            "value": "ISCxEmailHistory"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "http://iscx-mvr-api.internal/api"
         },
