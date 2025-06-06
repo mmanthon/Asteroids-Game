@@ -1,4 +1,4 @@
-export const agencyID = 123;
+export const agencyID = '123';
 export const agencyName = 'ISC';
 export const agentID = '123456';
 export const appID = '123';
@@ -18,7 +18,7 @@ export const jdiID = '123456';
 export const lastStatusUpdate = '2025-04-11';
 export const nextYearDate = '2026-04-01';
 export const noteID = '123';
-export const parentAgencyID = 12345;
+export const parentAgencyID = '12345';
 export const parentNoteID = '123';
 export const personID = 1234;
 export const policyNumber = '123';
@@ -35,3 +35,10 @@ export const userID = 123456;
 export const userIDs = ['123', '321'];
 export const userLastName = 'Doe';
 export const userTypeID = 1;
+export const validInput = {
+    productIDs: ['p1'],
+    agencyID: 'a1',
+    parentAgencyID: 'a2',
+    agentIDs: ['u1'],
+    assignedUWIDs: ['u2'],
+};

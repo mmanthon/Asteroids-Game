@@ -16,11 +16,11 @@ export const mockEmptyUserModel: UserModel = {
     user_type_id: 0,
 };
 export const mockUserModel: UserModel = {
-    agency_id: agencyID,
+    agency_id: Number(agencyID),
     email: userEmail,
     first_name: userFirstName,
     last_name: userLastName,
-    parent_agency_id: parentAgencyID,
+    parent_agency_id: Number(parentAgencyID),
     person_id: personID,
     user_id: userID,
     user_status_id: 1,
