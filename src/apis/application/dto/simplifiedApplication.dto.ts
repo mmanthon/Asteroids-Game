@@ -4,6 +4,7 @@ import { Type } from 'class-transformer';
 
 import { AssignedUserDto } from './assignedUser.dto';
 import { InsuredDto } from './insured.dto';
+import { PricingDto } from './pricing.dto';
 import { ApplicationProductDto } from './product.dto';
 
 export class SimplifiedApplicationDto {
@@ -40,7 +41,7 @@ export class SimplifiedApplicationDto {
     @ApiProperty({ description: 'Is Bundled App', example: true })
     isBundle: boolean;
 
-    @ApiProperty({ description: 'Total Cost', example: 1000 })
+    @ApiProperty({ description: 'Total Cost', example: 1000, deprecated: true })
     totalCost: number;
 
     @ApiProperty({ description: 'Effective Date', example: '2021-01-01' })
@@ -54,4 +55,7 @@ export class SimplifiedApplicationDto {
 
     @ApiProperty({ description: 'Last status updated date', example: '2021-01-01' })
     lastStatusUpdate: string;
+
+    @ApiProperty({ description: 'Pricing breakdown for a marketplace application', type: PricingDto, example: [] })
+    pricing: PricingDto;
 }

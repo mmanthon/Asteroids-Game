@@ -6,6 +6,7 @@ export * from './email.dto';
 export * from './filterParam.dto';
 export * from './findAllResponse.dto';
 export * from './note.dto';
+export * from './pricing.dto';
 export * from './product.dto';
 export * from './simplifiedApplication.dto';
 export * from './updateApplicationRequest.dto';

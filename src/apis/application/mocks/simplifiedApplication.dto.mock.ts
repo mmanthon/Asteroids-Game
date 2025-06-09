@@ -4,6 +4,7 @@ import { SimplifiedApplicationDto } from '../dto';
 import { mockAmpApplication } from './ampApplication.interface.mock';
 import { mockAssignedUserDto } from './assignedUser.dto.mock';
 import { submissionID } from './constants.mock';
+import { mockPricingDto } from './pricing.dto.mock';
 import { mockProductDto } from './product.dto.mock';
 
 export const mockSimplifiedApplicationDto: SimplifiedApplicationDto = {
@@ -34,4 +35,5 @@ export const mockSimplifiedApplicationDto: SimplifiedApplicationDto = {
     expirationDate: '2026-04-01',
     boundDate: mockAmpApplication.first_bound_date,
     lastStatusUpdate: mockAmpApplication.last_status_update,
+    pricing: mockPricingDto,
 };

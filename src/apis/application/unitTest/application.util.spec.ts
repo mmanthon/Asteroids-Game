@@ -16,6 +16,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { ApplicationQuery } from '../application.query';
 import { ApplicationUtil } from '../application.util';
+import { ApplicationDto } from '../dto';
 import { NoteTypeEnum } from '../enums';
 import { AmpApplication, GetAmpNotesByAppIDResult } from '../interfaces';
 import {
@@ -102,6 +103,17 @@ describe('ApplicationUtil', () => {
     });
 
     describe('getBaseFormattedApplicationData', () => {
+        it('should include pricing.premium from selectedCarrier when source key is uwpp_base_premiunm', async () => {
+            jest.spyOn(applicationQuery, 'getAdditionalProductDataByAppID').mockResolvedValueOnce([]);
+            jest.spyOn(util['applicationEntity'], 'findOne').mockResolvedValueOnce(mockApplicationDynamoModel);
+            const result = await util.getBaseFormattedApplicationData({
+                ...mockAmpApplication,
+                program_type_id: 22,
+            });
+
+            expect(result.pricing?.premium).toBe(1234);
+        });
+
         it('should set submissionID to empty string when group:id is undefined', async () => {
             jest.spyOn(applicationQuery, 'getAdditionalProductDataByAppID').mockResolvedValueOnce([]);
 
@@ -118,7 +130,10 @@ describe('ApplicationUtil', () => {
 
             const result = await util.getBaseFormattedApplicationData(mockAmpApplication);
 
-            expect(result).toEqual(mockSimplifiedApplicationDto);
+            expect(result).toEqual({
+                ...mockSimplifiedApplicationDto,
+                pricing: { premium: 0, totalCost: mockSimplifiedApplicationDto.pricing.totalCost },
+            });
         });
 
         it('should include only the base product if no linked products are found', async () => {
@@ -321,6 +336,11 @@ describe('ApplicationUtil', () => {
         });
 
         it('should format a non-marketplace application correctly with base data', async () => {
+            const application: ApplicationDto = {
+                ...mockApplicationDto,
+                pricing: { premium: 0, totalCost: mockApplicationDto.pricing.totalCost },
+            };
+
             jest.spyOn(applicationQuery, 'findPolicyByAppID').mockResolvedValue({ policy_number: policyNumber });
             jest.spyOn(applicationQuery, 'getAdditionalProductDataByAppID').mockResolvedValue([
                 mockAdditionalProductData,
@@ -328,7 +348,7 @@ describe('ApplicationUtil', () => {
             jest.spyOn(util['emailTrackingEntity'], 'getByEntityID').mockResolvedValue(mockEmailTrackingModel);
             const result = await util.formatApplication(mockAmpApplication, mockUser);
 
-            expect(result).toMatchObject(mockApplicationDto);
+            expect(result).toMatchObject({ ...application });
         });
 
         it('should handle missing email recipients and body gracefully', async () => {
@@ -471,6 +491,10 @@ describe('ApplicationUtil', () => {
 
             expect(result).toMatchObject({
                 ...mockApplicationDto,
+                pricing: {
+                    premium: 0,
+                    totalCost: mockApplicationDto.pricing.totalCost,
+                },
                 createdDate: formattedCreatedDate,
                 isMarketplaceApp: false,
             });

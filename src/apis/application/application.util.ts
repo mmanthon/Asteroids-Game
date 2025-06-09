@@ -4,6 +4,7 @@
 import {
     AclRoleEntity,
     AmpRolesEnum,
+    ApplicationDynamoModel,
     ApplicationStatusDisplayValueEnum,
     ApplicationTypeEnum,
     DynamoApplicationEntity,
@@ -174,6 +175,10 @@ export class ApplicationUtil {
             expirationDate,
             lastStatusUpdate,
             boundDate,
+            pricing: {
+                premium: 0,
+                totalCost: application.total_cost,
+            },
             ...marketplaceAppData,
         };
     }
@@ -370,6 +375,7 @@ export class ApplicationUtil {
         const expirationDate = application?.expirationDate ? this.formatDate(application?.expirationDate) : '';
         const boundDate = application?.boundDate ? this.formatDate(application?.boundDate) : '';
         const policyNumber = application?.policyNo || '';
+        const premium = this.extractPremiumFromApplication(application);
 
         return {
             submissionID: application?.submissionID || '',
@@ -377,7 +383,39 @@ export class ApplicationUtil {
             effectiveDate,
             expirationDate,
             policyNumber,
+            pricing: {
+                premium,
+                totalCost: application?.totalCost || 0,
+            },
         };
+    }
+
+    /**
+     * @description  Extracts the premium value from the application's selected carrier pricing
+     * @param {ApplicationDynamoModel} application - The application containing carrier information
+     * @returns {number}
+     */
+    private extractPremiumFromApplication(application: ApplicationDynamoModel): number {
+        if (
+            !application?.carriers ||
+            !application.carriers.selectedCarrierID ||
+            !application.carriers.options?.length
+        ) {
+            return 0;
+        }
+
+        const selectedCarrierID = application.carriers.selectedCarrierID;
+        const selectedCarrier = application.carriers.options.find((o) => o.id === selectedCarrierID);
+
+        if (!selectedCarrier || !selectedCarrier.pricing?.length) {
+            return 0;
+        }
+
+        const premiumAnswer = selectedCarrier.pricing
+            ?.flatMap((p) => p.questions)
+            ?.find((q) => q.source === 'uwpp_base_premium');
+
+        return premiumAnswer ? Number(premiumAnswer.answer) : 0;
     }
 
     /**

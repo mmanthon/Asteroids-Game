@@ -19,6 +19,7 @@ export * from './note.dto.mock';
 export * from './noteAuthor.dto.mock';
 export * from './noteDynamo.model.mock';
 export * from './pagination.dto.mock';
+export * from './pricing.dto.mock';
 export * from './product.dto.mock';
 export * from './simplifiedApplication.dto.mock';
 export * from './updateApplicationRequest.dto.mock';

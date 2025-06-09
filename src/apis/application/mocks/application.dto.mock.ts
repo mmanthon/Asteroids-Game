@@ -18,6 +18,7 @@ import {
 import { mockEmailDto } from './email.dto.mock';
 import { mockInsuredDto } from './insured.dto.mock';
 import { mockNoteDto } from './note.dto.mock';
+import { mockPricingDto } from './pricing.dto.mock';
 import { mockProductDto } from './product.dto.mock';
 
 export const mockApplicationDto: ApplicationDto = {
@@ -43,4 +44,5 @@ export const mockApplicationDto: ApplicationDto = {
     emails: [mockEmailDto],
     notes: [mockNoteDto],
     createdDate: formattedCreatedDate,
+    pricing: mockPricingDto,
 };

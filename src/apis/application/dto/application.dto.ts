@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 
 import { InsuredDto } from './insured.dto';
 
-import { AgentDto, ApplicationProductDto, AssignedUserDto, ClaimDto, EmailDto, NoteDto } from './index';
+import { AgentDto, ApplicationProductDto, AssignedUserDto, ClaimDto, EmailDto, NoteDto, PricingDto } from './index';
 
 export class ApplicationDto {
     @ApiProperty({ description: 'Application ID', example: '123456' })
@@ -44,7 +44,7 @@ export class ApplicationDto {
     @ApiProperty({ description: 'Is Bundled App', example: true })
     isBundle: boolean;
 
-    @ApiProperty({ description: 'Total Cost', example: 1000 })
+    @ApiProperty({ description: 'Total Cost', example: 1000, deprecated: true })
     totalCost: number;
 
     @ApiProperty({ description: 'Policy Number', example: 'AE123456' })
@@ -76,4 +76,8 @@ export class ApplicationDto {
 
     @ApiProperty({ description: 'Created Date', example: '2021-01-01' })
     createdDate: string;
+
+    @ApiProperty({ description: 'Pricing breakdown for a marketplace application', type: () => PricingDto })
+    @Type(() => PricingDto)
+    pricing: PricingDto;
 }

@@ -2,6 +2,7 @@ import {
     ApplicationDynamoModel,
     ApplicationStatusIDEnum,
     ApplicationStatusNameEnum,
+    QuestionDataTypeEnum,
 } from '@ignidus/iscx-backend-utils';
 
 import { appID, dateToFormat, policyNumber, productID, submissionID, totalCost } from './constants.mock';
@@ -31,6 +32,37 @@ export const mockApplicationDynamoModel: ApplicationDynamoModel = {
             ],
         },
     ],
+    carriers: {
+        selectedCarrierID: '1234',
+        options: [
+            {
+                id: '1234',
+                name: '',
+                pricing: [
+                    {
+                        id: '123',
+                        label: 'Mock Label',
+                        questions: [
+                            {
+                                source: 'uwpp_base_premium',
+                                answer: 1234,
+                                isFullyEarned: false,
+                                id: '',
+                                key: '',
+                                label: '',
+                                type: QuestionDataTypeEnum.ADDRESS,
+                                defaultValue: '',
+                                helperText: '',
+                                section: '',
+                                required: false,
+                                sequence: 0,
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
 };
 
 export const mockIncompleteApplicationDynamoModel: ApplicationDynamoModel = {
