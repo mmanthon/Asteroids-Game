@@ -177,7 +177,7 @@ export class ApplicationUtil {
             boundDate,
             pricing: {
                 premium: 0,
-                totalCost: application.total_cost,
+                totalCost: Number(application.total_cost),
             },
             ...marketplaceAppData,
         };
