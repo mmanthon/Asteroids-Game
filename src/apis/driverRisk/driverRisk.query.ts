@@ -27,7 +27,7 @@ export class DriverRiskQuery {
         return this.amp
             .select('license')
             .from('omga_auto_driver_schedules')
-            .where('license', licenseNumber)
+            .whereRaw('TRIM(license) = ?', [licenseNumber])
             .andWhere('entry_status', 'active')
             .first()
             .then((result) => !!result);
@@ -46,7 +46,7 @@ export class DriverRiskQuery {
                 'ads.lastname',
                 'ads.state',
                 'ads.dob',
-                'ads.license',
+                this.amp.raw('TRIM(ads.license) as license'),
             )
             .from('omga_auto_driver_schedules as ads')
             .where('ads.item_id', appID)
@@ -60,9 +60,15 @@ export class DriverRiskQuery {
      */
     getDriverByLicenseNumber(licenseNumber: string): Promise<GetDriverQueryResult> {
         return this.amp
-            .select('ads.firstname', 'ads.lastname', 'ads.state', 'ads.dob', 'ads.license')
+            .select(
+                'ads.firstname',
+                'ads.lastname',
+                'ads.state',
+                'ads.dob',
+                this.amp.raw('TRIM(ads.license) as license'),
+            )
             .from('omga_auto_driver_schedules as ads')
-            .where('ads.license', licenseNumber)
+            .whereRaw('TRIM(ads.license) = ?', [licenseNumber])
             .orderBy('ads.auto_driver_schedule_id', 'desc')
             .first();
     }
