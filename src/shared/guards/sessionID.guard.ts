@@ -24,7 +24,7 @@ export class SessionIDGuard implements CanActivate {
             // Check if the sessionID is valid
             const user = await this.userEntity.getUserBySessionID(sessionID);
 
-            if (!user) throw new UnauthorizedException(`User not found for the provided session ID. ${sessionID}`);
+            if (!user) throw new UnauthorizedException(`User not found for the provided session ID`);
 
             // Store the sessionID in the request object for future use
             request.sessionID = sessionID;
