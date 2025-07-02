@@ -19,12 +19,12 @@ export class SessionIDGuard implements CanActivate {
             const authHeader = request.headers.authorization;
             const sessionID = extractToken(authHeader);
 
-            if (!sessionID) throw new UnauthorizedException();
+            if (!sessionID) throw new UnauthorizedException('Session ID not provided');
 
             // Check if the sessionID is valid
             const user = await this.userEntity.getUserBySessionID(sessionID);
 
-            if (!user) throw new UnauthorizedException();
+            if (!user) throw new UnauthorizedException(`User not found for the provided session ID. ${sessionID}`);
 
             // Store the sessionID in the request object for future use
             request.sessionID = sessionID;
