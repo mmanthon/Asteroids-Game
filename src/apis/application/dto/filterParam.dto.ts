@@ -192,15 +192,39 @@ export class FilterParamDto {
     @IsEnum(ApplicationTypeEnum)
     type?: ApplicationTypeEnum;
 
-    @ApiPropertyOptional({ description: 'Start date (effective date) (YYYY-MM-DD)', type: String })
+    @ApiPropertyOptional({ description: 'Start date (effective date) (YYYY-MM-DD)', type: String, deprecated: true })
     @IsOptional()
     @IsString()
     @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'startDate must be in the format YYYY-MM-DD' })
     startDate?: string;
 
-    @ApiPropertyOptional({ description: 'End date (effective date) (YYYY-MM-DD)', type: String })
+    @ApiPropertyOptional({ description: 'End date (effective date) (YYYY-MM-DD)', type: String, deprecated: true })
     @IsOptional()
     @IsString()
     @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'endDate must be in the format YYYY-MM-DD' })
     endDate?: string;
+
+    @ApiPropertyOptional({ description: 'Start of effective date range (YYYY-MM-DD)', type: String })
+    @IsOptional()
+    @IsString()
+    @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'effectiveDateStart must be in the format YYYY-MM-DD' })
+    effectiveDateStart?: string;
+
+    @ApiPropertyOptional({ description: 'End of effective date range (YYYY-MM-DD)', type: String })
+    @IsOptional()
+    @IsString()
+    @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'effectiveDateEnd must be in the format YYYY-MM-DD' })
+    effectiveDateEnd?: string;
+
+    @ApiPropertyOptional({ description: 'Start of updatedAt range (YYYY-MM-DD)', type: String })
+    @IsOptional()
+    @IsString()
+    @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'updatedAtStart must be in the format YYYY-MM-DD' })
+    updatedAtStart?: string;
+
+    @ApiPropertyOptional({ description: 'End of updatedAt range (YYYY-MM-DD)', type: String })
+    @IsOptional()
+    @IsString()
+    @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'updatedAtEnd must be in the format YYYY-MM-DD' })
+    updatedAtEnd?: string;
 }

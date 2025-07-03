@@ -435,8 +435,10 @@ export class ApplicationQuery {
             assignedUWIDs,
             searchTerm,
             type,
-            startDate,
-            endDate,
+            effectiveDateStart,
+            effectiveDateEnd,
+            updatedAtStart,
+            updatedAtEnd,
             states,
         } = filters;
 
@@ -465,11 +467,19 @@ export class ApplicationQuery {
         if (type) query.where('oi.created_from_renewal', type === ApplicationTypeEnum.NEW ? 0 : 1);
 
         // Apply date filters
-        if (startDate && endDate) {
-            query.whereRaw('DATE(oi.effective_date) BETWEEN ? AND ?', [startDate, endDate]);
+        if (effectiveDateStart && effectiveDateEnd) {
+            query.whereRaw('DATE(oi.effective_date) BETWEEN ? AND ?', [effectiveDateStart, effectiveDateEnd]);
         } else {
-            if (startDate) query.whereRaw('DATE(oi.effective_date) >= ?', [startDate]);
-            if (endDate) query.whereRaw('DATE(oi.effective_date) <= ?', [endDate]);
+            if (effectiveDateStart) query.whereRaw('DATE(oi.effective_date) >= ?', [effectiveDateStart]);
+            if (effectiveDateEnd) query.whereRaw('DATE(oi.effective_date) <= ?', [effectiveDateEnd]);
+        }
+
+        // Apply updated at filters
+        if (updatedAtStart && updatedAtEnd) {
+            query.whereRaw('DATE(oi.last_updated) BETWEEN ? AND ?', [updatedAtStart, updatedAtEnd]);
+        } else {
+            if (updatedAtStart) query.whereRaw('DATE(oi.last_updated) >= ?', [updatedAtStart]);
+            if (updatedAtEnd) query.whereRaw('DATE(oi.last_updated) <= ?', [updatedAtEnd]);
         }
 
         // Map statuses to IDs and apply filter

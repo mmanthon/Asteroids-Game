@@ -557,12 +557,12 @@ describe('ApplicationQuery', () => {
         });
     });
 
-    it('should apply effective_date filter when startDate and endDate are provided', async () => {
+    it('should apply effective_date filter when effectiveDateStart and effectiveDateEnd are provided', async () => {
         const filters: FilterParamDto = {
             nextPage: 1,
             pageLimit: 10,
-            startDate: '2024-01-01',
-            endDate: '2024-12-31',
+            effectiveDateStart: '2024-01-01',
+            effectiveDateEnd: '2024-12-31',
         };
 
         knexStub.select.mockReturnThis();
@@ -681,11 +681,11 @@ describe('ApplicationQuery', () => {
         expect(result).toEqual(mockAmpApplication);
     });
 
-    it('should apply startDate filter when only startDate is provided', async () => {
+    it('should apply effectiveDateStart filter when only effectiveDateStart is provided', async () => {
         const filters: FilterParamDto = {
             nextPage: 1,
             pageLimit: 10,
-            startDate: '2024-01-01',
+            effectiveDateStart: '2024-01-01',
         };
 
         knexStub.select.mockReturnThis();
@@ -699,7 +699,7 @@ describe('ApplicationQuery', () => {
 
         const result = await query.findAll(filters);
 
-        expect(knexStub.whereRaw).toHaveBeenCalledWith('DATE(oi.effective_date) >= ?', [filters.startDate]);
+        expect(knexStub.whereRaw).toHaveBeenCalledWith('DATE(oi.effective_date) >= ?', [filters.effectiveDateStart]);
         expect(result).toEqual({
             applications: [],
             currentPage: 1,
@@ -708,11 +708,11 @@ describe('ApplicationQuery', () => {
         });
     });
 
-    it('should apply endDate filter when only endDate is provided', async () => {
+    it('should apply effectiveDateEnd filter when only effectiveDateEnd is provided', async () => {
         const filters: FilterParamDto = {
             nextPage: 1,
             pageLimit: 10,
-            endDate: '2024-12-31',
+            effectiveDateEnd: '2024-12-31',
         };
 
         knexStub.select.mockReturnThis();
@@ -726,7 +726,61 @@ describe('ApplicationQuery', () => {
 
         const result = await query.findAll(filters);
 
-        expect(knexStub.whereRaw).toHaveBeenCalledWith('DATE(oi.effective_date) <= ?', [filters.endDate]);
+        expect(knexStub.whereRaw).toHaveBeenCalledWith('DATE(oi.effective_date) <= ?', [filters.effectiveDateEnd]);
+        expect(result).toEqual({
+            applications: [],
+            currentPage: 1,
+            nextPage: null,
+            totalPages: 1,
+        });
+    });
+
+    it('should apply updatedAtStart filter when only updatedAtStart is provided', async () => {
+        const filters: FilterParamDto = {
+            nextPage: 1,
+            pageLimit: 10,
+            updatedAtStart: '2024-01-01',
+        };
+
+        knexStub.select.mockReturnThis();
+        knexStub.whereRaw.mockReturnThis();
+        knexStub.orderBy.mockReturnThis();
+        knexStub.limit.mockReturnThis();
+        knexStub.offset.mockReturnThis();
+        knexStub.then
+            .mockImplementationOnce((cb) => Promise.resolve([]).then(cb))
+            .mockImplementationOnce((cb) => Promise.resolve([{ count: 1 }]).then(cb));
+
+        const result = await query.findAll(filters);
+
+        expect(knexStub.whereRaw).toHaveBeenCalledWith('DATE(oi.last_updated) >= ?', [filters.updatedAtStart]);
+        expect(result).toEqual({
+            applications: [],
+            currentPage: 1,
+            nextPage: null,
+            totalPages: 1,
+        });
+    });
+
+    it('should apply updatedAtEnd filter when only updatedAtEnd is provided', async () => {
+        const filters: FilterParamDto = {
+            nextPage: 1,
+            pageLimit: 10,
+            updatedAtEnd: '2024-02-01',
+        };
+
+        knexStub.select.mockReturnThis();
+        knexStub.whereRaw.mockReturnThis();
+        knexStub.orderBy.mockReturnThis();
+        knexStub.limit.mockReturnThis();
+        knexStub.offset.mockReturnThis();
+        knexStub.then
+            .mockImplementationOnce((cb) => Promise.resolve([]).then(cb))
+            .mockImplementationOnce((cb) => Promise.resolve([{ count: 1 }]).then(cb));
+
+        const result = await query.findAll(filters);
+
+        expect(knexStub.whereRaw).toHaveBeenCalledWith('DATE(oi.last_updated) <= ?', [filters.updatedAtEnd]);
         expect(result).toEqual({
             applications: [],
             currentPage: 1,
