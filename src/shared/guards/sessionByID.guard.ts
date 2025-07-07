@@ -26,10 +26,6 @@ export class SessionByIDGuard implements CanActivate {
 
             if (!session) throw new UnauthorizedException(`Session not found for the provided session ID`);
 
-            const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000; // milliseconds
-
-            if (Number(session.created) * 1000 < oneWeekAgo) throw new UnauthorizedException(`Session expired`);
-
             // Store the sessionID in the request object for future use
             request.sessionID = sessionID;
 
