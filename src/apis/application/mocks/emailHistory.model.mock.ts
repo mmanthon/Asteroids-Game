@@ -7,7 +7,7 @@ export const mockEmailHistoryModel = {
     subject: 'Test Subject',
     body: 'This is a body',
     sentAt: '2025-01-01T00:00:00Z',
-    status: EmailStatusEnum.SENT,
+    status: EmailStatusEnum.DELIVERED,
     entityType: EmailEntityEnum.APPLICATION,
     entityID: '1234',
     mailService: EmailProviderEnum.AWS_SES,

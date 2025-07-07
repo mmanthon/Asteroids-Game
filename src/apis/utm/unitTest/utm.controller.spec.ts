@@ -1,8 +1,9 @@
-import { DynamoTaskEntity, EmailTrackingEntity, UserEntity } from '@ignidus/iscx-backend-utils';
+import { DynamoTaskEntity, EmailTrackingEntity, SessionEntity, UserEntity } from '@ignidus/iscx-backend-utils';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { SessionByIDGuard } from '../../../shared/guards';
 import { mockEnqueueRequest } from '../mocks';
 import { UtmController } from '../utm.controller';
 import { UtmService } from '../utm.service';
@@ -21,6 +22,8 @@ describe('UtmController', () => {
                 { provide: DynamoTaskEntity, useValue: {} },
                 { provide: EmailTrackingEntity, useValue: {} },
                 { provide: UserEntity, useValue: {} },
+                { provide: SessionEntity, useValue: {} },
+                { provide: SessionByIDGuard, useValue: {} },
             ],
         }).compile();
 

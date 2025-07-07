@@ -1,21 +1,21 @@
-import { UserEntity, UserModel } from '@ignidus/iscx-backend-utils';
+import { SessionEntity, SessionModel } from '@ignidus/iscx-backend-utils';
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
 import { authHeader, sessionID } from '../mocks';
-import { SessionIDGuard } from '../sessionID.guard';
+import { SessionByIDGuard } from '../sessionByID.guard';
 
-describe('SessionIDGuard', () => {
-    let guard: SessionIDGuard;
-    let userEntity: UserEntity;
+describe('SessionByIDGuard', () => {
+    let guard: SessionByIDGuard;
+    let sessionEntity: SessionEntity;
 
     beforeAll(async () => {
         const module = await Test.createTestingModule({
-            providers: [SessionIDGuard, { provide: UserEntity, useValue: { getUserBySessionID: jest.fn() } }],
+            providers: [SessionByIDGuard, { provide: SessionEntity, useValue: { getSessionByID: jest.fn() } }],
         }).compile();
 
-        guard = module.get<SessionIDGuard>(SessionIDGuard);
-        userEntity = module.get<UserEntity>(UserEntity);
+        guard = module.get<SessionByIDGuard>(SessionByIDGuard);
+        sessionEntity = module.get<SessionEntity>(SessionEntity);
     });
 
     afterEach(() => jest.resetAllMocks());
@@ -38,7 +38,7 @@ describe('SessionIDGuard', () => {
         });
 
         it('should reject for invalid sessionID', async () => {
-            jest.spyOn(userEntity, 'getUserBySessionID').mockResolvedValue(null);
+            jest.spyOn(sessionEntity, 'getSessionByID').mockResolvedValue(null);
 
             const executionContext = mockExecutionContext(authHeader);
             const canActivate = guard.canActivate(executionContext);
@@ -48,15 +48,15 @@ describe('SessionIDGuard', () => {
 
         it('should resolve true for a valid sessionID', async () => {
             // none of the properties are accessed, just needs to be truthy
-            jest.spyOn(userEntity, 'getUserBySessionID').mockResolvedValue({} as UserModel);
+            jest.spyOn(sessionEntity, 'getSessionByID').mockResolvedValue({} as SessionModel);
 
             const executionContext = mockExecutionContext(authHeader);
             const request = executionContext.switchToHttp().getRequest();
             const canActivate = await guard.canActivate(executionContext);
 
             expect(canActivate).toEqual(true);
-            expect(userEntity.getUserBySessionID).toBeCalledTimes(1);
-            expect(userEntity.getUserBySessionID).toBeCalledWith(sessionID);
+            expect(sessionEntity.getSessionByID).toBeCalledTimes(1);
+            expect(sessionEntity.getSessionByID).toBeCalledWith(sessionID);
             expect(request.sessionID).toEqual(sessionID);
         });
     });

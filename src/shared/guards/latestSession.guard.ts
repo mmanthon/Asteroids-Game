@@ -2,8 +2,8 @@ import { UserEntity, extractToken } from '@ignidus/iscx-backend-utils';
 import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
-export class SessionIDGuard implements CanActivate {
-    private readonly logger = new Logger(SessionIDGuard.name);
+export class LatestSessionGuard implements CanActivate {
+    private readonly logger = new Logger(LatestSessionGuard.name);
 
     constructor(private readonly userEntity: UserEntity) {}
 

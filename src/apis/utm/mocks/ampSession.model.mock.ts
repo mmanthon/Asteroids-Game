@@ -6,4 +6,5 @@ import { mockSessionID } from './constants.mock';
 export const mockAmpSession: SessionModel = {
     session_id: mockSessionID,
     data: 'testData',
+    created: '1715136000',
 };

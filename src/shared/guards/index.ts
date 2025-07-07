@@ -1,2 +1,3 @@
+export * from './latestSession.guard';
 export * from './role.guard';
-export * from './sessionID.guard';
+export * from './sessionByID.guard';

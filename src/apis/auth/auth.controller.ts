@@ -10,7 +10,7 @@ import {
 
 import { AuthService } from './auth.service';
 import { UserResponse } from './dto';
-import { SessionIDGuard } from '../../shared/guards';
+import { LatestSessionGuard } from '../../shared/guards';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -20,7 +20,7 @@ export class AuthController {
 
     @Get('/user')
     @Public() // Bypass JWT authentication which is not needed for this endpoint
-    @UseGuards(SessionIDGuard) // Use the SessionIDGuard to check if the user has a valid sessionID
+    @UseGuards(LatestSessionGuard) // Use the SessionIDGuard to check if the user has a valid sessionID
     @ApiOperation({ summary: 'Get a signed token and user info for the amp sessionID' })
     @ApiOkResponse({
         description: 'Session validated and user info returned',

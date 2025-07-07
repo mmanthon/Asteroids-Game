@@ -11,7 +11,7 @@ import {
 
 import { EnqueueRequestDto, TaskFilters, UtmResponseDto } from './dto';
 import { UtmService } from './utm.service';
-import { SessionIDGuard } from '../../shared/guards';
+import { SessionByIDGuard } from '../../shared/guards';
 
 @ApiTags('UTM')
 @Controller('utm')
@@ -22,7 +22,7 @@ export class UtmController {
 
     @Post('enqueue')
     @Public() // override the global guard then use the sessionID guard
-    @UseGuards(SessionIDGuard)
+    @UseGuards(SessionByIDGuard)
     @ApiOperation({ summary: 'Enqueue task' })
     @ApiCreatedResponse({ description: 'The task has been successfully enqueued.' })
     enqueue(@Body() body: EnqueueRequestDto): Promise<void> {
