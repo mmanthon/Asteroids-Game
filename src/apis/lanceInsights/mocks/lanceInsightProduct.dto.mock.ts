@@ -1,6 +1,6 @@
 import { LanceInsightProductDto } from '../dto';
 import { LanceStatusEnum } from '../enums';
-import { mockLanceInsightRulesDto } from './lanceInsightRules.dto.mock';
+import { mockLanceInsightRulesDto, mockLanceInsightRulesDtoFail } from './lanceInsightRules.dto.mock';
 
 export const mockLanceInsightProductDto: LanceInsightProductDto = {
     productID: '83',
@@ -13,5 +13,5 @@ export const mockLanceInsightProductDtoFail: LanceInsightProductDto = {
     productID: '84',
     status: LanceStatusEnum.FAIL,
     carrierName: 'Trinity',
-    rules: mockLanceInsightRulesDto,
+    rules: mockLanceInsightRulesDtoFail,
 };
