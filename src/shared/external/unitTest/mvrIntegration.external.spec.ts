@@ -95,4 +95,40 @@ describe('MvrIntegrationService', () => {
             await expect(service.pullCreditScoreData('12345', mockDriverQueryResult)).rejects.toThrow(mvrApiException);
         });
     });
+
+    describe('fetchDriverData', () => {
+        it('should fetch driver data successfully', async () => {
+            mockedAxios.post.mockResolvedValue({ data: mvrApiResponseMock });
+
+            const result = await service.fetchDriverData(mockDriverQueryResult);
+
+            expect(result).toEqual(mvrApiResponseMock);
+        });
+
+        it('should throw MvrApiException on fetch error', async () => {
+            const error = new Error('Fetch driver error');
+
+            mockedAxios.post.mockRejectedValue(error);
+
+            await expect(service.fetchDriverData(mockDriverQueryResult)).rejects.toThrow(MvrApiException);
+        });
+    });
+
+    describe('populateDriverData', () => {
+        it('should populate drivcer data successfully', async () => {
+            mockedAxios.post.mockResolvedValue({ data: mvrApiResponseMock });
+
+            const result = await service.populateDriverData(mockDriverQueryResult);
+
+            expect(result).toEqual(mvrApiResponseMock);
+        });
+
+        it('should throw MvrApiException on populate error', async () => {
+            const error = new Error('Populate driver error');
+
+            mockedAxios.post.mockRejectedValue(error);
+
+            await expect(service.populateDriverData(mockDriverQueryResult)).rejects.toThrow(MvrApiException);
+        });
+    });
 });
