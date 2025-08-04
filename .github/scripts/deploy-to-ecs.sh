@@ -113,14 +113,28 @@ docker run --rm -v "$(pwd):/mnt" --user 0:0 "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REG
   > patched_task_definition.json
 echo "Task definition patched successfully."
 
+echo "Adding logConfiguration to crowdstrike container..."
+jq --arg group "$LOG_GROUP" \
+   --arg region "$AWS_REGION" \
+   --arg prefix "ecs-init" \
+   '(.containerDefinitions[] | select(.name == "crowdstrike-falcon-init-container") | .logConfiguration) = {
+     logDriver: "awslogs",
+     options: {
+       "awslogs-group": $group,
+       "awslogs-create-group": "true",
+       "awslogs-region": $region,
+       "awslogs-stream-prefix": $prefix
+     }
+   }' patched_task_definition.json > final_task_definition.json
+
 # Echo the new task definition
 echo "New Task Definition:"
-cat patched_task_definition.json
+cat final_task_definition.json
 
 # Register the new task definition
 echo "Registering the updated task definition..."
 TASK_DEFINITION=$(aws ecs register-task-definition \
-  --cli-input-json file://patched_task_definition.json)
+  --cli-input-json file://final_task_definition.json)
 TASK_DEFINITION_ARN=$(echo "$TASK_DEFINITION" | jq -r '.taskDefinition.taskDefinitionArn')
 echo "Task definition registered successfully: $TASK_DEFINITION_ARN"
 
