@@ -1,13 +1,13 @@
-import { HttpExceptionFilter } from '@ignidus/iscx-backend-utils';
+import { HttpExceptionFilter, initializeSwaggerUI } from '@ignidus/iscx-backend-utils';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 import { AppModule } from './app.module';
+import { swaggerConfig } from '../config/swagger';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -30,19 +30,8 @@ async function bootstrap() {
 
     app.setGlobalPrefix(configService.get<string>('globalApiPrefix'));
     app.useGlobalFilters(httpExceptionFilter);
-    const config = new DocumentBuilder()
-        .setTitle('ISCx Underwriter Workbench APIs')
-        .addBearerAuth({ name: 'Authorization', type: 'http' })
-        .addSecurityRequirements('bearer')
-        .build();
-    const document = SwaggerModule.createDocument(app, config);
 
-    SwaggerModule.setup(configService.get<string>('swaggerUrl'), app, document, {
-        swaggerOptions: {
-            tagsSorter: 'alpha',
-            operationsSorter: 'alpha',
-        },
-    });
+    initializeSwaggerUI(app, swaggerConfig);
 
     app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
@@ -51,7 +40,6 @@ async function bootstrap() {
 
     await app.listen(configService.get<number>('port'), () => {
         logger.log(`Server up and running on port ${configService.get<number>('port')}`);
-        logger.log(`Swagger UI url ${configService.get<string>('swaggerUrl')}`);
     });
 }
 bootstrap();

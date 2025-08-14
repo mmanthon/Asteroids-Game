@@ -22,12 +22,24 @@ if [ -z "$GITHUB_SHA" ]; then
   echo "Error: GITHUB_SHA variable is not set. Please set it and try again."
   exit 1
 fi
+
+# Fetch Falcon details from AWS Secrets Manager
+echo "Fetching Falcon values from AWS Secrets Manager..."
+FALCON_JSON=$(aws secretsmanager get-secret-value \
+  --secret-id crowdstrike/falcon/config \
+  --region "$AWS_REGION" \
+  --query SecretString \
+  --output text)
+
+export FALCON_CID=$(echo "$FALCON_JSON" | jq -r '.FALCON_CID')
+export FALCON_ECR=$(echo "$FALCON_JSON" | jq -r '.ECR_REPO')
+
 if [ -z "$FALCON_CID" ]; then
-  echo "Error: FALCON_CID variable is not set. Please set it and try again."
+  echo "Error: FALCON_CID not found in Secrets Manager."
   exit 1
 fi
 if [ -z "$FALCON_ECR" ]; then
-  echo "Error: FALCON_ECR variable is not set. Please set it and try again."
+  echo "Error: FALCON_ECR not found in Secrets Manager."
   exit 1
 fi
 
@@ -53,7 +65,7 @@ SERVICENAME=$(echo "$CONFIG" | jq -r '.serviceName')
 LOG_GROUP=$(echo "$CONFIG" | jq -r '.logGroup')
 CPU=$(echo "$CONFIG" | jq -r '.cpu')
 MEMORY=$(echo "$CONFIG" | jq -r '.memory')
-ENVIRONMENT=$(echo "$CONFIG" | jq -r '.environment')
+CONFIG_ENVIRONMENT=$(echo "$CONFIG" | jq -r '.environment')
 SECRETS=$(echo "$CONFIG" | jq -r '.secrets')
 ROLE_ARN=$(echo "$CONFIG" | jq -r '.role')
 echo "Configuration loaded for service: $SERVICENAME"
@@ -84,7 +96,7 @@ jq --arg IMAGE_URI "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${SERV
    --arg CPU "$CPU" \
    --arg MEMORY "$MEMORY" \
    --arg ROLE_ARN "$ROLE_ARN" \
-   --argjson NEW_ENVIRONMENT "$ENVIRONMENT" \
+   --argjson NEW_ENVIRONMENT "$CONFIG_ENVIRONMENT" \
    --argjson NEW_SECRETS "$SECRETS" \
    '.containerDefinitions[0].image = $IMAGE_URI |
     .containerDefinitions[0].logConfiguration.options."awslogs-group" = $LOG_GROUP |
@@ -153,6 +165,47 @@ if aws ecs wait services-stable --cluster "$CLUSTER" --services "$SERVICENAME"; 
 else
   echo "Service stabilization failed. Please check the ECS service logs for details."
   exit 1
+fi
+
+# Deploy swagger documentation
+if [ "$ENVIRONMENT" == "development" ]; then
+  echo "Generating and uploading Swagger documentation to S3..."
+  
+  # Ensure we have dependencies installed
+  if [ ! -d "node_modules" ]; then
+    echo "Installing npm dependencies for swagger generation..."
+    npm ci
+  fi
+  
+  # Create .env file with environment variables from task definition
+  echo "Creating .env file with task definition environment variables..."
+  echo "$CONFIG_ENVIRONMENT" | jq -r '.[] | select(.value != null) | "\(.name)=\(.value)"' > .env
+  
+  # Also add any secrets to .env as placeholders
+  if [ "$SECRETS" != "null" ] && [ "$SECRETS" != "" ]; then
+    echo "$SECRETS" | jq -r '.[] | .name' | while read -r var_name; do
+      if [ "$var_name" = "AMP_DB_PORT" ]; then
+        echo "${var_name}=1234" >> .env
+      else
+        echo "${var_name}=PLACEHOLDER_FOR_${var_name}" >> .env
+      fi
+    done
+  fi
+  
+  echo ".env file created with $(wc -l < .env) environment variables"
+  
+  # Generate and upload swagger documentation
+  npm run generate-swagger
+  
+  if [ $? -eq 0 ]; then
+    echo "Swagger documentation generated and uploaded successfully."
+  else
+    echo "Warning: Swagger documentation generation failed, but deployment continues."
+  fi
+  
+  # Clean up .env file
+  rm -f .env
+  echo ".env file removed."
 fi
 
 # Cleanup

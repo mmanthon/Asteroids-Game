@@ -1,6 +1,6 @@
 {
     "cluster": "iscx-underwriter-workbench-cluster",
-    "serviceName": "dev-uwb-api",
+    "serviceName": "dev-underwriter-workbench-api",
     "logGroup": "/ecs/dev-uwb-api",
     "role": "arn:aws:iam::<account-id>:role/iscx-ecs-marketplace-execution-role",
     "cpu": "512",

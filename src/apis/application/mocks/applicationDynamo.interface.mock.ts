@@ -56,6 +56,7 @@ export const mockApplicationDynamoModel: ApplicationDynamoModel = {
                                 section: '',
                                 required: false,
                                 sequence: 0,
+                                isPartOfPremiumBreakdown: false,
                             },
                         ],
                     },
