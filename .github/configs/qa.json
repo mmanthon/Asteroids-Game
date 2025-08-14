@@ -1,7 +1,7 @@
 {
     "cluster": "iscx-underwriter-workbench-cluster",
     "serviceName": "qa-underwriter-workbench-api",
-    "logGroup": "/ecs/qa-uwb-api",
+    "logGroup": "/ecs/qa-underwriter-workbench-api",
     "role": "arn:aws:iam::<account-id>:role/iscx-ecs-marketplace-execution-role",
     "cpu": "512",
     "memory": "1024",
