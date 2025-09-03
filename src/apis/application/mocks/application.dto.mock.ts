@@ -33,7 +33,7 @@ export const mockApplicationDto: ApplicationDto = {
     status: ApplicationStatusDisplayValueEnum.IN_PROGRESS,
     isMarketplaceApp: false,
     isBundle: true,
-    totalCost: String(totalCost),
+    totalCost: totalCost,
     policyNumber: policyNumber,
     effectiveDate: formattedDate,
     expirationDate: nextYearDate,

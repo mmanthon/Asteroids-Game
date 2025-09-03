@@ -41,8 +41,8 @@ export class SimplifiedApplicationDto {
     @ApiProperty({ description: 'Is Bundled App', example: true })
     isBundle: boolean;
 
-    @ApiProperty({ description: 'Total Cost', example: '1000', deprecated: true })
-    totalCost: string;
+    @ApiProperty({ description: 'Total Cost', example: 1000, deprecated: true })
+    totalCost: number;
 
     @ApiProperty({ description: 'Effective Date', example: '2021-01-01' })
     effectiveDate: string;

@@ -119,7 +119,7 @@ describe('ApplicationUtil', () => {
                 program_type_id: 22,
             });
 
-            expect(result.pricing?.premium).toBe('1234.00');
+            expect(result.pricing?.premium).toBe(1234);
         });
 
         it('should set submissionID to empty string when group:id is undefined', async () => {
@@ -140,7 +140,6 @@ describe('ApplicationUtil', () => {
 
             expect(result).toEqual({
                 ...mockSimplifiedApplicationDto,
-                pricing: { premium: '0', totalCost: '1000' },
             });
         });
 
@@ -346,7 +345,6 @@ describe('ApplicationUtil', () => {
         it('should format a non-marketplace application correctly with base data', async () => {
             const application: ApplicationDto = {
                 ...mockApplicationDto,
-                pricing: { premium: '0', totalCost: '1000' },
             };
 
             jest.spyOn(applicationQuery, 'findPolicyByAppID').mockResolvedValue({ policy_number: policyNumber });
@@ -485,6 +483,7 @@ describe('ApplicationUtil', () => {
             expect(result).toMatchObject({
                 ...mockApplicationDto,
                 isMarketplaceApp: true,
+                pricing: { premium: 1234, totalCost: 1000 },
                 emails: [
                     {
                         id: mockEmailHistoryModel.id,
@@ -525,10 +524,6 @@ describe('ApplicationUtil', () => {
 
             expect(result).toMatchObject({
                 ...mockApplicationDto,
-                pricing: {
-                    premium: '0',
-                    totalCost: '1000',
-                },
                 createdDate: formattedCreatedDate,
                 isMarketplaceApp: false,
             });

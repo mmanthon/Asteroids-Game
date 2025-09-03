@@ -155,6 +155,7 @@ export class ApplicationUtil {
             productData,
             project_end_date,
         );
+        const totalCost = application.total_cost ? Number(application.total_cost) : 0;
 
         return {
             id: String(application.item_id),
@@ -179,14 +180,14 @@ export class ApplicationUtil {
             status: application.status_name as ApplicationStatusDisplayValueEnum,
             isMarketplaceApp,
             isBundle: products.length > 1,
-            totalCost: String(application.total_cost),
+            totalCost,
             effectiveDate,
             expirationDate,
             lastStatusUpdate,
             boundDate,
             pricing: {
-                premium: '0',
-                totalCost: String(application.total_cost),
+                premium: 0,
+                totalCost,
             },
             ...marketplaceAppData,
         };
@@ -402,14 +403,14 @@ export class ApplicationUtil {
         }
 
         return {
-            submissionID: application.submissionID || '',
+            submissionID: application.submissionID,
             boundDate,
             effectiveDate,
             expirationDate,
             policyNumber,
             pricing: {
                 premium,
-                totalCost: application.totalCost ? roundToPrecision(application.totalCost, 2) : '0.00',
+                totalCost: application.totalCost || 0,
             },
             autoDeclinationHistory,
         };
@@ -418,29 +419,29 @@ export class ApplicationUtil {
     /**
      * @description  Extracts the premium value from the application's selected carrier pricing
      * @param {ApplicationDynamoModel} application - The application containing carrier information
-     * @returns {string}
+     * @returns {number}
      */
-    private extractPremiumFromApplication(application: ApplicationDynamoModel): string {
+    private extractPremiumFromApplication(application: ApplicationDynamoModel): number {
         if (
             !application?.carriers ||
             !application.carriers.selectedCarrierID ||
             !application.carriers.options?.length
         ) {
-            return '0.00';
+            return 0;
         }
 
         const selectedCarrierID = application.carriers.selectedCarrierID;
         const selectedCarrier = application.carriers.options.find((o) => o.id === selectedCarrierID);
 
         if (!selectedCarrier || !selectedCarrier.pricing?.length) {
-            return '0.00';
+            return 0;
         }
 
         const premiumAnswer = selectedCarrier.pricing
             ?.flatMap((p) => p.questions)
             ?.find((q) => q.source === 'uwpp_base_premium');
 
-        return premiumAnswer ? roundToPrecision(premiumAnswer.answer, 2) : '0.00';
+        return premiumAnswer ? Number(premiumAnswer.answer) : 0;
     }
 
     /**

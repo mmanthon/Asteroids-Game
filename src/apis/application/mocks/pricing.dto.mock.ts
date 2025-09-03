@@ -1,6 +1,6 @@
 import { PricingDto } from '../dto';
 
 export const mockPricingDto: PricingDto = {
-    premium: '1234.00',
-    totalCost: '1000.00',
+    premium: 0,
+    totalCost: 1000,
 };
