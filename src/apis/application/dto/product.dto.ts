@@ -13,6 +13,9 @@ export class ApplicationProductDto {
     @ApiProperty({ description: 'Program Type ID', example: '3456' })
     programTypeID: string;
 
+    @ApiProperty({ description: 'Is Direct To Consumer', example: true })
+    isDirectToConsumer: boolean;
+
     @ApiProperty({ description: 'Carrier Name', example: 'Carrier' })
     carrierName: string;
 }

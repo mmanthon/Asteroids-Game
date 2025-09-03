@@ -30,7 +30,7 @@ export const mockSimplifiedApplicationDto: SimplifiedApplicationDto = {
     status: mockAmpApplication.status_name as ApplicationStatusDisplayValueEnum,
     isMarketplaceApp: false,
     isBundle: true,
-    totalCost: Number(mockAmpApplication.total_cost),
+    totalCost: String(mockAmpApplication.total_cost),
     effectiveDate: mockAmpApplication.effective_date,
     expirationDate: '2026-04-01',
     boundDate: mockAmpApplication.first_bound_date,

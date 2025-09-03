@@ -8,6 +8,7 @@ export const mockProductDto: ApplicationProductDto[] = [
         programID: String(programID),
         programTypeID: String(programTypeID),
         carrierName: 'Carrier 1',
+        isDirectToConsumer: false,
     },
     {
         id: '321',
@@ -15,5 +16,6 @@ export const mockProductDto: ApplicationProductDto[] = [
         programID: String(programID),
         programTypeID: String(programTypeID),
         carrierName: 'Carrier 2',
+        isDirectToConsumer: false,
     },
 ];

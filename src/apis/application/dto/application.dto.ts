@@ -45,8 +45,8 @@ export class ApplicationDto {
     @ApiProperty({ description: 'Is Bundled App', example: true })
     isBundle: boolean;
 
-    @ApiProperty({ description: 'Total Cost', example: 1000, deprecated: true })
-    totalCost: number;
+    @ApiProperty({ description: 'Total Cost', example: '1000', deprecated: true })
+    totalCost: string;
 
     @ApiProperty({ description: 'Policy Number', example: 'AE123456' })
     policyNumber: string;

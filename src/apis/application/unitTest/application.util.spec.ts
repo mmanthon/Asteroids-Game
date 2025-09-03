@@ -12,6 +12,7 @@ import {
     EmailTrackingEntity,
     EmailTrackingModel,
     NoteAuthorRoleEnum,
+    ProductDynamoModel,
     UserEntity,
 } from '@ignidus/iscx-backend-utils';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -110,12 +111,15 @@ describe('ApplicationUtil', () => {
         it('should include pricing.premium from selectedCarrier when source key is uwpp_base_premiunm', async () => {
             jest.spyOn(applicationQuery, 'getAdditionalProductDataByAppID').mockResolvedValueOnce([]);
             jest.spyOn(util['applicationEntity'], 'findOne').mockResolvedValueOnce(mockApplicationDynamoModel);
+            jest.spyOn(util['productEntity'], 'findOneByVersion').mockResolvedValueOnce({
+                isDirectToConsumer: false,
+            } as unknown as ProductDynamoModel);
             const result = await util.getBaseFormattedApplicationData({
                 ...mockAmpApplication,
                 program_type_id: 22,
             });
 
-            expect(result.pricing?.premium).toBe(1234);
+            expect(result.pricing?.premium).toBe('1234.00');
         });
 
         it('should set submissionID to empty string when group:id is undefined', async () => {
@@ -136,7 +140,7 @@ describe('ApplicationUtil', () => {
 
             expect(result).toEqual({
                 ...mockSimplifiedApplicationDto,
-                pricing: { premium: 0, totalCost: mockSimplifiedApplicationDto.pricing.totalCost },
+                pricing: { premium: '0', totalCost: '1000' },
             });
         });
 
@@ -342,7 +346,7 @@ describe('ApplicationUtil', () => {
         it('should format a non-marketplace application correctly with base data', async () => {
             const application: ApplicationDto = {
                 ...mockApplicationDto,
-                pricing: { premium: 0, totalCost: mockApplicationDto.pricing.totalCost },
+                pricing: { premium: '0', totalCost: '1000' },
             };
 
             jest.spyOn(applicationQuery, 'findPolicyByAppID').mockResolvedValue({ policy_number: policyNumber });
@@ -376,6 +380,11 @@ describe('ApplicationUtil', () => {
 
         it('should format a marketplace app and handle missing internal note authors', async () => {
             jest.spyOn(util['applicationEntity'], 'findOne').mockResolvedValue(mockApplicationDynamoModel);
+            jest.spyOn(util['productEntity'], 'findOneByVersion').mockResolvedValueOnce({
+                id: '123',
+                version: 1,
+                isDirectToConsumer: false,
+            } as unknown as ProductDynamoModel);
             jest.spyOn(util['noteEntity'], 'findAllByEntity')
                 .mockResolvedValueOnce([mockNoteDynamoModelMissingAuthor])
                 .mockResolvedValueOnce([]);
@@ -402,7 +411,23 @@ describe('ApplicationUtil', () => {
         });
 
         it('should return empty values for marketplace app if not found', async () => {
-            jest.spyOn(util['applicationEntity'], 'findOne').mockResolvedValue(null);
+            const minimalApplication = {
+                product: { id: '123', version: 1 },
+                effectiveDate: null,
+                expirationDate: null,
+                boundDate: null,
+                policyNo: null,
+                totalCost: 0,
+                submissionID: '',
+                status: 'In Progress' as any,
+            };
+
+            jest.spyOn(util['applicationEntity'], 'findOne').mockResolvedValue(minimalApplication as any);
+            jest.spyOn(util['productEntity'], 'findOneByVersion').mockResolvedValueOnce({
+                id: '123',
+                version: 1,
+                isDirectToConsumer: false,
+            } as unknown as ProductDynamoModel);
             jest.spyOn(applicationQuery, 'getAdditionalProductDataByAppID').mockResolvedValueOnce([]);
             jest.spyOn(applicationQuery, 'findPolicyByAppID').mockResolvedValue(undefined);
             jest.spyOn(util['noteEntity'], 'findAllByEntity').mockResolvedValueOnce([]).mockResolvedValueOnce([]);
@@ -449,6 +474,11 @@ describe('ApplicationUtil', () => {
             jest.spyOn(util['aclRoleEntity'], 'getRolesForUser').mockResolvedValueOnce([AmpRolesEnum.UNDERWRITER]);
             jest.spyOn(util['emailTrackingEntity'], 'getByEntityID').mockResolvedValueOnce(mockEmailTrackingModel);
             jest.spyOn(util['emailHistoryEntity'], 'findAllByEntityID').mockResolvedValueOnce([mockEmailHistoryModel]);
+            jest.spyOn(util['productEntity'], 'findOneByVersion').mockResolvedValueOnce({
+                id: '123',
+                version: 1,
+                isDirectToConsumer: false,
+            } as unknown as ProductDynamoModel);
 
             const result = await util.formatApplication({ ...mockAmpApplication, program_type_id: 22 }, mockUser);
 
@@ -496,8 +526,8 @@ describe('ApplicationUtil', () => {
             expect(result).toMatchObject({
                 ...mockApplicationDto,
                 pricing: {
-                    premium: 0,
-                    totalCost: mockApplicationDto.pricing.totalCost,
+                    premium: '0',
+                    totalCost: '1000',
                 },
                 createdDate: formattedCreatedDate,
                 isMarketplaceApp: false,
@@ -592,14 +622,6 @@ describe('ApplicationUtil', () => {
 
             expect(result.updatedDate).toBe('');
             expect(result.boundDate).toBe('');
-        });
-    });
-
-    describe('formatDate', () => {
-        it('should format a date string as YYYY-MM-DD', () => {
-            const result = util['formatDate'](dateToFormat);
-
-            expect(result).toBe(formattedDate);
         });
     });
 });

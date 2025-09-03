@@ -26,6 +26,7 @@ import {
     ProductDynamoModel,
     SanitizeOptions,
     UserEntity,
+    roundToPrecision,
     sanitizeHtml,
 } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
@@ -135,11 +136,12 @@ export class ApplicationUtil {
     async getBaseFormattedApplicationData(application: AmpApplication): Promise<SimplifiedApplicationDto> {
         const { item_id, product_ids, effective_date, project_end_date, first_bound_date } = application;
         const isMarketplaceApp = application.program_type_id === 22;
-        const [products, additionalProductData, assignedUsers, marketplaceAppData] = await Promise.all([
-            this.getApplicationProducts(application),
+        const products = await this.getApplicationProducts(application);
+
+        const [additionalProductData, assignedUsers, marketplaceAppData] = await Promise.all([
             this.applicationQuery.getAdditionalProductDataByAppID(String(item_id)),
             this.getFormattedAssignedUsers(application.item_id),
-            isMarketplaceApp ? this.getMarketplaceAppData(String(application.item_id)) : Promise.resolve({}),
+            isMarketplaceApp ? this.getMarketplaceAppData(String(application.item_id), products) : Promise.resolve({}),
         ]);
 
         const boundDate = first_bound_date ? this.formatDate(first_bound_date) : '';
@@ -177,14 +179,14 @@ export class ApplicationUtil {
             status: application.status_name as ApplicationStatusDisplayValueEnum,
             isMarketplaceApp,
             isBundle: products.length > 1,
-            totalCost: Number(application.total_cost),
+            totalCost: String(application.total_cost),
             effectiveDate,
             expirationDate,
             lastStatusUpdate,
             boundDate,
             pricing: {
-                premium: 0,
-                totalCost: Number(application.total_cost),
+                premium: '0',
+                totalCost: String(application.total_cost),
             },
             ...marketplaceAppData,
         };
@@ -375,23 +377,14 @@ export class ApplicationUtil {
     /**
      * @description Get marketplace application data
      * @param {string} id
+     * @param {ApplicationProductDto[]} ampProductData
      * @returns {Promise<Partial<ApplicationDto>>}
      */
-    private async getMarketplaceAppData(id: string): Promise<Partial<ApplicationDto>> {
+    private async getMarketplaceAppData(
+        id: string,
+        ampProductData: ApplicationProductDto[],
+    ): Promise<Partial<ApplicationDto>> {
         const application = await this.applicationEntity.findOne(id);
-
-        if (!application) {
-            return {
-                submissionID: '',
-                boundDate: '',
-                effectiveDate: '',
-                expirationDate: '',
-                policyNumber: '',
-                pricing: { premium: 0, totalCost: 0 },
-                autoDeclinationHistory: [],
-            };
-        }
-
         const product = await this.productEntity.findOneByVersion(application.product.id, application.product.version);
         const autoDeclinationHistory = await this.getAutoDeclinationHistory(id, application.status, product);
 
@@ -401,6 +394,13 @@ export class ApplicationUtil {
         const policyNumber = application.policyNo ?? '';
         const premium = this.extractPremiumFromApplication(application);
 
+        // Set isDirectToConsumer based on the marketplace product data
+        const marketplaceProduct = ampProductData.find((ampProduct) => String(product.id) === ampProduct.id);
+
+        if (marketplaceProduct) {
+            marketplaceProduct.isDirectToConsumer = product?.isDirectToConsumer ?? false;
+        }
+
         return {
             submissionID: application.submissionID || '',
             boundDate,
@@ -409,7 +409,7 @@ export class ApplicationUtil {
             policyNumber,
             pricing: {
                 premium,
-                totalCost: application.totalCost || 0,
+                totalCost: application.totalCost ? roundToPrecision(application.totalCost, 2) : '0.00',
             },
             autoDeclinationHistory,
         };
@@ -418,29 +418,29 @@ export class ApplicationUtil {
     /**
      * @description  Extracts the premium value from the application's selected carrier pricing
      * @param {ApplicationDynamoModel} application - The application containing carrier information
-     * @returns {number}
+     * @returns {string}
      */
-    private extractPremiumFromApplication(application: ApplicationDynamoModel): number {
+    private extractPremiumFromApplication(application: ApplicationDynamoModel): string {
         if (
             !application?.carriers ||
             !application.carriers.selectedCarrierID ||
             !application.carriers.options?.length
         ) {
-            return 0;
+            return '0.00';
         }
 
         const selectedCarrierID = application.carriers.selectedCarrierID;
         const selectedCarrier = application.carriers.options.find((o) => o.id === selectedCarrierID);
 
         if (!selectedCarrier || !selectedCarrier.pricing?.length) {
-            return 0;
+            return '0.00';
         }
 
         const premiumAnswer = selectedCarrier.pricing
             ?.flatMap((p) => p.questions)
             ?.find((q) => q.source === 'uwpp_base_premium');
 
-        return premiumAnswer ? Number(premiumAnswer.answer) : 0;
+        return premiumAnswer ? roundToPrecision(premiumAnswer.answer, 2) : '0.00';
     }
 
     /**
@@ -474,22 +474,31 @@ export class ApplicationUtil {
                 programID: String(program_id),
                 programTypeID: String(program_type_id),
                 carrierName: carrier_name,
+                isDirectToConsumer: false,
             },
         ];
 
         const linkedProducts = await this.applicationQuery.getLinkedProductsByAppID(String(item_id));
 
         return products.concat(
-            linkedProducts.map(({ product_id, product_name, program_id, program_type_id, carrier_name }) => ({
-                id: String(product_id),
-                name: product_name,
-                programID: String(program_id),
-                programTypeID: String(program_type_id),
-                carrierName: carrier_name,
+            linkedProducts.map((product) => ({
+                id: String(product.product_id),
+                name: product.product_name,
+                programID: String(product.program_id),
+                programTypeID: String(product.program_type_id),
+                carrierName: product.carrier_name,
+                isDirectToConsumer: false,
             })),
         );
     }
 
+    /**
+     * @description Get auto declination history
+     * @param {string} appID
+     * @param {ApplicationStatusNameEnum} statusName
+     * @param {ProductDynamoModel} product
+     * @returns {Promise<AutoDeclinationHistoryDto[]>}
+     */
     private async getAutoDeclinationHistory(
         appID: string,
         statusName: ApplicationStatusNameEnum,
