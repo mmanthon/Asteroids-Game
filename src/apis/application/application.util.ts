@@ -386,6 +386,10 @@ export class ApplicationUtil {
         ampProductData: ApplicationProductDto[],
     ): Promise<Partial<ApplicationDto>> {
         const application = await this.applicationEntity.findOne(id);
+
+        // if application is not found, return an empty object
+        if (!application) return {};
+
         const product = await this.productEntity.findOneByVersion(application.product.id, application.product.version);
         const autoDeclinationHistory = await this.getAutoDeclinationHistory(id, application.status, product);
 
