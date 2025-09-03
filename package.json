@@ -109,7 +109,8 @@
       "/queries",
       "/models",
       "mocks",
-      "index.ts"
+      "index.ts",
+      "generate-swagger.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

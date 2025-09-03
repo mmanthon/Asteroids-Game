@@ -39,6 +39,14 @@
             "value": "ISCxEmailHistory"
         },
         {
+            "name": "DYNAMODB_AUTO_DECLINATION_HISTORY_TABLE_NAME",
+            "value": "ISCxAutoDeclinationHistory"
+        },
+        {
+            "name": "DYNAMODB_PRODUCTS_TABLE_NAME",
+            "value": "ISCxProducts"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "http://iscx-mvr-api.internal/api"
         },

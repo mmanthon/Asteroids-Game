@@ -26,8 +26,10 @@ export default () => ({
     dynamodb: {
         accessControlUsersTableName: process.env.DYNAMODB_ACCESS_CONTROL_USERS_TABLE_NAME,
         applicationsTableName: process.env.DYNAMODB_APPLICATIONS_TABLE_NAME,
+        autoDeclinationHistoryTableName: process.env.DYNAMODB_AUTO_DECLINATION_HISTORY_TABLE_NAME,
         claimsTableName: process.env.DYNAMODB_CLAIMS_TABLE_NAME,
         notesTableName: process.env.DYNAMODB_NOTES_TABLE_NAME,
+        productsTableName: process.env.DYNAMODB_PRODUCTS_TABLE_NAME,
         tasksTableName: process.env.DYNAMODB_TASK_TABLE_NAME,
         wsConnectionsTableName: process.env.DYNAMODB_TASK_WS_CONNECTION_TABLE_NAME,
         emailHistoryTableName: process.env.DYNAMODB_EMAIL_HISTORY_TABLE_NAME,

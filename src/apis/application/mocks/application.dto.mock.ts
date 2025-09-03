@@ -45,4 +45,5 @@ export const mockApplicationDto: ApplicationDto = {
     notes: [mockNoteDto],
     createdDate: formattedCreatedDate,
     pricing: mockPricingDto,
+    autoDeclinationHistory: [],
 };

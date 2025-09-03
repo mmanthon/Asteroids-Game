@@ -1,6 +1,7 @@
 export * from './agent.dto';
 export * from './application.dto';
 export * from './assignedUser.dto';
+export * from './autoDeclinationHistory.dto';
 export * from './claim.dto';
 export * from './email.dto';
 export * from './filterParam.dto';

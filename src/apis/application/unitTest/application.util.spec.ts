@@ -5,8 +5,10 @@ import {
     AmpRolesEnum,
     ApplicationTypeEnum,
     DynamoApplicationEntity,
+    DynamoAutoDeclinationHistoryEntity,
     DynamoEmailHistoryEntity,
     DynamoNoteEntity,
+    DynamoProductEntity,
     EmailTrackingEntity,
     EmailTrackingModel,
     NoteAuthorRoleEnum,
@@ -95,6 +97,8 @@ describe('ApplicationUtil', () => {
                 { provide: DynamoNoteEntity, useValue: { findAllByEntity: jest.fn() } },
                 { provide: EmailTrackingEntity, useValue: { getByEntityID: jest.fn() } },
                 { provide: DynamoEmailHistoryEntity, useValue: { findAllByEntityID: jest.fn() } },
+                { provide: DynamoProductEntity, useValue: { findOneByVersion: jest.fn() } },
+                { provide: DynamoAutoDeclinationHistoryEntity, useValue: { findOneByAppID: jest.fn() } },
             ],
         }).compile();
 

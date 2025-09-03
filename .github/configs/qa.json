@@ -39,6 +39,14 @@
             "value": "ISCxQAEmailHistory"
         },
         {
+            "name": "DYNAMODB_AUTO_DECLINATION_HISTORY_TABLE_NAME",
+            "value": "ISCxQAAutoDeclinationHistory"
+        },
+        {
+            "name": "DYNAMODB_PRODUCTS_TABLE_NAME",
+            "value": "ISCxQAProducts"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "https://qa-mvr.api.isceng.net/api"
         },

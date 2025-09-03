@@ -6,10 +6,14 @@ import {
     AmpRolesEnum,
     ApplicationDynamoModel,
     ApplicationStatusDisplayValueEnum,
+    ApplicationStatusNameEnum,
     ApplicationTypeEnum,
+    AutoDeclineConditionTypeEnum,
     DynamoApplicationEntity,
+    DynamoAutoDeclinationHistoryEntity,
     DynamoEmailHistoryEntity,
     DynamoNoteEntity,
+    DynamoProductEntity,
     EmailHistoryDynamoModel,
     EmailTrackingEntity,
     EmailTrackingModel,
@@ -19,6 +23,7 @@ import {
     NoteCategoryEnum,
     NoteEntityTypeEnum,
     NoteNotificationTypeEnum,
+    ProductDynamoModel,
     SanitizeOptions,
     UserEntity,
     sanitizeHtml,
@@ -30,6 +35,7 @@ import {
     ApplicationDto,
     ApplicationProductDto,
     AssignedUserDto,
+    AutoDeclinationHistoryDto,
     EmailDto,
     NoteDto,
     SimplifiedApplicationDto,
@@ -82,6 +88,8 @@ export class ApplicationUtil {
         private readonly noteEntity: DynamoNoteEntity,
         private readonly emailTrackingEntity: EmailTrackingEntity,
         private readonly emailHistoryEntity: DynamoEmailHistoryEntity,
+        private readonly autoDeclinationHistoryEntity: DynamoAutoDeclinationHistoryEntity,
+        private readonly productEntity: DynamoProductEntity,
     ) {}
 
     /**
@@ -92,25 +100,24 @@ export class ApplicationUtil {
      */
     async formatApplication(application: AmpApplication, user: IJWT): Promise<ApplicationDto> {
         const { item_id, last_updated } = application;
-
-        const [agent, policy] = await Promise.all([
-            this.applicationQuery.getAgentInfoByUserId(String(application.user_id)),
-            this.applicationQuery.findPolicyByAppID(String(item_id)),
-        ]);
-
         const updatedDate = last_updated ? this.formatDate(application.last_updated) : '';
         const isMarketplaceApp = application.program_type_id === 22;
-        const emails = isMarketplaceApp
-            ? await this.getMarketplaceEmails(String(item_id))
-            : await this.getAmpEmails(String(item_id));
-        const baseFormattedAppData = await this.getBaseFormattedApplicationData(application);
+
+        const [agent, policy, baseFormattedAppData, emails] = await Promise.all([
+            this.applicationQuery.getAgentInfoByUserId(String(application.user_id)),
+            this.applicationQuery.findPolicyByAppID(String(item_id)),
+            this.getBaseFormattedApplicationData(application),
+            isMarketplaceApp ? this.getMarketplaceEmails(String(item_id)) : this.getAmpEmails(String(item_id)),
+        ]);
+
         const notes = isMarketplaceApp
             ? await this.getMarketplaceNotes(String(item_id), baseFormattedAppData.submissionID, user.roles)
             : await this.getAmpNotes(String(item_id));
 
         return {
-            policyNumber: policy?.policy_number || '',
+            policyNumber: policy?.policy_number ?? '',
             updatedDate,
+            autoDeclinationHistory: [],
             ...baseFormattedAppData, // contains values that will override the above values for marketplace apps
             agent,
             createdDate: this.formatDate(application.created),
@@ -127,13 +134,13 @@ export class ApplicationUtil {
      */
     async getBaseFormattedApplicationData(application: AmpApplication): Promise<SimplifiedApplicationDto> {
         const { item_id, product_ids, effective_date, project_end_date, first_bound_date } = application;
-        const products = await this.getApplicationProducts(application);
-        const additionalProductData = await this.applicationQuery.getAdditionalProductDataByAppID(String(item_id));
-        const assignedUsers = await this.getFormattedAssignedUsers(application.item_id);
         const isMarketplaceApp = application.program_type_id === 22;
-        const marketplaceAppData = isMarketplaceApp
-            ? await this.getMarketplaceAppData(String(application.item_id))
-            : {};
+        const [products, additionalProductData, assignedUsers, marketplaceAppData] = await Promise.all([
+            this.getApplicationProducts(application),
+            this.applicationQuery.getAdditionalProductDataByAppID(String(item_id)),
+            this.getFormattedAssignedUsers(application.item_id),
+            isMarketplaceApp ? this.getMarketplaceAppData(String(application.item_id)) : Promise.resolve({}),
+        ]);
 
         const boundDate = first_bound_date ? this.formatDate(first_bound_date) : '';
         const effectiveDate = application.effective_date ? this.formatDate(application.effective_date) : '';
@@ -233,6 +240,7 @@ export class ApplicationUtil {
     ): Promise<NoteDto[]> {
         const authorCache: { [userID: string]: Promise<NoteAuthorDto> } = {};
         const includeInternal = userRoles.includes(AmpRolesEnum.UNDERWRITER);
+
         const appNotes = await this.noteEntity.findAllByEntity(appID, NoteEntityTypeEnum.APPLICATION, includeInternal);
         const submissionNotes = await this.noteEntity.findAllByEntity(
             submissionID,
@@ -371,22 +379,39 @@ export class ApplicationUtil {
      */
     private async getMarketplaceAppData(id: string): Promise<Partial<ApplicationDto>> {
         const application = await this.applicationEntity.findOne(id);
-        const effectiveDate = application?.effectiveDate ? this.formatDate(application?.effectiveDate) : '';
-        const expirationDate = application?.expirationDate ? this.formatDate(application?.expirationDate) : '';
-        const boundDate = application?.boundDate ? this.formatDate(application?.boundDate) : '';
-        const policyNumber = application?.policyNo || '';
+
+        if (!application) {
+            return {
+                submissionID: '',
+                boundDate: '',
+                effectiveDate: '',
+                expirationDate: '',
+                policyNumber: '',
+                pricing: { premium: 0, totalCost: 0 },
+                autoDeclinationHistory: [],
+            };
+        }
+
+        const product = await this.productEntity.findOneByVersion(application.product.id, application.product.version);
+        const autoDeclinationHistory = await this.getAutoDeclinationHistory(id, application.status, product);
+
+        const effectiveDate = application.effectiveDate ? this.formatDate(application.effectiveDate) : '';
+        const expirationDate = application.expirationDate ? this.formatDate(application.expirationDate) : '';
+        const boundDate = application.boundDate ? this.formatDate(application.boundDate) : '';
+        const policyNumber = application.policyNo ?? '';
         const premium = this.extractPremiumFromApplication(application);
 
         return {
-            submissionID: application?.submissionID || '',
+            submissionID: application.submissionID || '',
             boundDate,
             effectiveDate,
             expirationDate,
             policyNumber,
             pricing: {
                 premium,
-                totalCost: application?.totalCost || 0,
+                totalCost: application.totalCost || 0,
             },
+            autoDeclinationHistory,
         };
     }
 
@@ -463,6 +488,45 @@ export class ApplicationUtil {
                 carrierName: carrier_name,
             })),
         );
+    }
+
+    private async getAutoDeclinationHistory(
+        appID: string,
+        statusName: ApplicationStatusNameEnum,
+        product: ProductDynamoModel,
+    ): Promise<AutoDeclinationHistoryDto[]> {
+        const declinedStatus = [ApplicationStatusNameEnum.DECLINED, ApplicationStatusNameEnum.UNDERWRITING_DECLINED];
+        const isDeclined = declinedStatus.includes(statusName);
+
+        if (!isDeclined) return [];
+
+        const declinationRecord = await this.autoDeclinationHistoryEntity.findOneByAppID(appID);
+
+        if (!declinationRecord) return [];
+
+        // Create a lookup map for product questions for efficient section lookup
+        const questionSectionMap = new Map<string, string>();
+
+        product.questions.forEach((question) => {
+            questionSectionMap.set(question.source_key, question.section_group);
+        });
+
+        return declinationRecord.history.map(({ failureDetails, timestamp }) => ({
+            timestamp,
+            rules: failureDetails.map(({ rule }) => {
+                const section =
+                    rule.type === AutoDeclineConditionTypeEnum.APPLICATION_ANSWER
+                        ? questionSectionMap.get(rule.sourceKey) || ''
+                        : '';
+
+                return {
+                    displayLabel: rule.displayLabel || '',
+                    type: rule.type,
+                    sourceKey: rule.sourceKey,
+                    section,
+                };
+            }),
+        }));
     }
 
     /**

@@ -1,8 +1,10 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import {
     DynamoApplicationEntity,
+    DynamoAutoDeclinationHistoryEntity,
     DynamoEmailHistoryEntity,
     DynamoNoteEntity,
+    DynamoProductEntity,
     DynamoTaskEntity,
     DynamoTaskWebsocketConnectionEntity,
     DynamoUserEntity,
@@ -31,6 +33,10 @@ import { ConfigService } from '@nestjs/config';
                     metadata: { tableNameKey: 'dynamodb.accessControlUsersTableName' },
                 },
                 {
+                    entityClass: DynamoAutoDeclinationHistoryEntity,
+                    metadata: { tableNameKey: 'dynamodb.autoDeclinationHistoryTableName' },
+                },
+                {
                     entityClass: DynamoApplicationEntity,
                     metadata: { tableNameKey: 'dynamodb.applicationsTableName' },
                 },
@@ -54,6 +60,10 @@ import { ConfigService } from '@nestjs/config';
                     entityClass: DynamoEmailHistoryEntity,
                     metadata: { tableNameKey: 'dynamodb.emailHistoryTableName' },
                 },
+                {
+                    entityClass: DynamoProductEntity,
+                    metadata: { tableNameKey: 'dynamodb.productsTableName' },
+                },
             ],
             dynamoEntityFactory,
         ),
@@ -61,12 +71,14 @@ import { ConfigService } from '@nestjs/config';
     exports: [
         DynamoUserEntity,
         DynamoApplicationEntity,
+        DynamoAutoDeclinationHistoryEntity,
         DynamodbClaimEntity,
         DynamoNoteEntity,
         DynamoTaskWebsocketConnectionEntity,
         DynamoTaskEntity,
         DynamoDB,
         DynamoEmailHistoryEntity,
+        DynamoProductEntity,
     ],
 })
 export class DynamoDBModule {}
