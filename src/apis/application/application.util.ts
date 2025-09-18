@@ -26,7 +26,6 @@ import {
     ProductDynamoModel,
     SanitizeOptions,
     UserEntity,
-    roundToPrecision,
     sanitizeHtml,
 } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';

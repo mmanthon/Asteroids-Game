@@ -6,6 +6,7 @@ import {
     ArrayNotEmpty,
     ArrayUnique,
     IsArray,
+    IsBoolean,
     IsEnum,
     IsNumber,
     IsOptional,
@@ -150,6 +151,22 @@ export class FilterParamDto {
     @ArrayUnique({ message: 'assignedUWIDs array should contain unique values' })
     @Validate(NoEmptyStringsConstraint)
     assignedUWIDs?: string[];
+
+    @ApiPropertyOptional({
+        description: 'Filter for unassigned applications only',
+        example: true,
+        type: Boolean,
+    })
+    @IsOptional()
+    @Transform(({ value }) => {
+        if (value === 'true' || value === 'false') {
+            return value === 'true';
+        }
+
+        return value;
+    })
+    @IsBoolean()
+    unassignedOnly?: boolean;
 
     @ApiPropertyOptional({
         description: 'Application status (comma separated)',

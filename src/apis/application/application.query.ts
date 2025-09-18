@@ -219,6 +219,24 @@ export class ApplicationQuery {
     }
 
     /**
+     * @description Get unassigned applications
+     * @returns {Promise<string[]>}
+     */
+    getUnassignedApplications(): Promise<string[]> {
+        return this.amp('omga_items as oi')
+            .select('oi.item_id')
+            .whereNotExists(function () {
+                this.select(1)
+                    .from('tasks as t')
+                    .whereRaw('t.entity_id = oi.item_id')
+                    .where('t.entity', 'omga_items')
+                    .where('t.task_type_id', 3)
+                    .where('t.task_status_id', 1);
+            })
+            .pluck('oi.item_id');
+    }
+
+    /**
      * @description Get additional product data by appID
      * @param {string} id
      * @returns {Promise<{ product_id: number; item_id: number; data: string }[]>}
@@ -433,6 +451,7 @@ export class ApplicationQuery {
             agentIDs,
             statuses,
             assignedUWIDs,
+            unassignedOnly,
             searchTerm,
             type,
             effectiveDateStart,
@@ -492,13 +511,22 @@ export class ApplicationQuery {
         }
 
         // Fetch task items if assignedUWIDs are provided
-        if (assignedUWIDs) {
+        if (assignedUWIDs && !unassignedOnly) {
             asyncOperations.push(
                 this.getTaskByUserIDs(assignedUWIDs).then((taskItemIDs) => {
                     query.whereIn(
                         'oi.item_id',
                         taskItemIDs.map((task) => task.item_id),
                     );
+                }),
+            );
+        }
+
+        // Fetch unassigned applications if unassignedOnly is true
+        if (unassignedOnly) {
+            asyncOperations.push(
+                this.getUnassignedApplications().then((unassignedItemIDs) => {
+                    query.whereIn('oi.item_id', unassignedItemIDs);
                 }),
             );
         }
