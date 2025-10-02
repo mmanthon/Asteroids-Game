@@ -43,9 +43,7 @@ import { ExternalModule } from './shared/external/external.module';
         ThrottlerModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
-            useFactory: (config: ConfigService) => ({
-                ...config.get<object>('rateLimit'),
-            }),
+            useFactory: (config: ConfigService) => [config.get('rateLimit')],
         }),
         WinstonModule.forRoot({
             transports: [...winstonTransports],
