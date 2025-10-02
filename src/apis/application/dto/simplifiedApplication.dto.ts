@@ -44,6 +44,9 @@ export class SimplifiedApplicationDto {
     @ApiProperty({ description: 'Total Cost', example: 1000, deprecated: true })
     totalCost: number;
 
+    @ApiProperty({ description: 'Created Date', example: '2021-01-01' })
+    createdDate: string;
+
     @ApiProperty({ description: 'Effective Date', example: '2021-01-01' })
     effectiveDate: string;
 

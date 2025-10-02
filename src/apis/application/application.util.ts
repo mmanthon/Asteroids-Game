@@ -120,7 +120,6 @@ export class ApplicationUtil {
             autoDeclinationHistory: [],
             ...baseFormattedAppData, // contains values that will override the above values for marketplace apps
             agent,
-            createdDate: this.formatDate(application.created),
             claims: [],
             emails,
             notes,
@@ -145,6 +144,7 @@ export class ApplicationUtil {
 
         const boundDate = first_bound_date ? this.formatDate(first_bound_date) : '';
         const effectiveDate = application.effective_date ? this.formatDate(application.effective_date) : '';
+        const createdDate = this.formatDate(application.created);
         const lastStatusUpdate = application.last_status_update ? this.formatDate(application.last_status_update) : '';
         const foundProductData = additionalProductData.find(({ product_id }) => product_id === product_ids);
         const productData = foundProductData ? JSON.parse(foundProductData.data) : {};
@@ -180,6 +180,7 @@ export class ApplicationUtil {
             isMarketplaceApp,
             isBundle: products.length > 1,
             totalCost,
+            createdDate,
             effectiveDate,
             expirationDate,
             lastStatusUpdate,
