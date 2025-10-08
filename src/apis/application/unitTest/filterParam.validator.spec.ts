@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 import { ApplicationQuery } from '../application.query';
 import { FilterParamDto } from '../dto';
@@ -61,5 +61,23 @@ describe('FilterParamValidator', () => {
         await expect(validator.transform({ agentIDs: ['valid'], assignedUWIDs: ['bad'] })).rejects.toThrow(
             NotFoundException,
         );
+    });
+
+    it('should throw BadRequestException when createdDateEnd < createdDateStart', async () => {
+        await expect(
+            validator.transform({
+                createdDateStart: '2025-03-10',
+                createdDateEnd: '2025-03-09',
+            }),
+        ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should pass when createdDate range is valid', async () => {
+        const input = {
+            createdDateStart: '2025-03-09',
+            createdDateEnd: '2025-03-10',
+        };
+
+        await expect(validator.transform(input)).resolves.toEqual(input);
     });
 });

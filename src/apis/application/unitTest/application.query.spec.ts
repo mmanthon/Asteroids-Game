@@ -839,4 +839,57 @@ describe('ApplicationQuery', () => {
         expect(knexStub.whereIn).toHaveBeenCalledWith('p.state', filters.states);
         expect(result.currentPage).toBe(1);
     });
+
+    it('should apply createdDate BETWEEN when createdDateStart and createdDateEnd are provided', async () => {
+        const filters: FilterParamDto = {
+            nextPage: 1,
+            pageLimit: 10,
+            createdDateStart: '2025-03-01',
+            createdDateEnd: '2025-03-31',
+        };
+
+        knexStub.select.mockReturnThis();
+        knexStub.leftJoin.mockReturnThis();
+        knexStub.orderBy.mockReturnThis();
+        knexStub.limit.mockReturnThis();
+        knexStub.offset.mockReturnThis();
+        knexStub.whereNot.mockReturnThis();
+        knexStub.whereRaw.mockReturnThis();
+        knexStub.raw.mockReturnValue('mockRaw');
+
+        knexStub.then
+            .mockImplementationOnce((cb) => Promise.resolve([]).then(cb))
+            .mockImplementationOnce((cb) => Promise.resolve([{ count: 1 }]).then(cb));
+
+        const result = await query.findAll(filters);
+
+        expect(knexStub.whereRaw).toHaveBeenCalledWith('DATE(oi.created) BETWEEN ? AND ?', [
+            '2025-03-01',
+            '2025-03-31',
+        ]);
+        expect(knexStub.raw).not.toHaveBeenCalledWith(expect.stringContaining('YEAR(oi.created)'));
+        expect(result).toEqual({ applications: [], currentPage: 1, nextPage: null, totalPages: 1 });
+    });
+
+    it('should apply temporal window when NO createdDate filters are provided (list & count)', async () => {
+        const filters: FilterParamDto = { nextPage: 1, pageLimit: 10 };
+
+        knexStub.select.mockReturnThis();
+        knexStub.leftJoin.mockReturnThis();
+        knexStub.orderBy.mockReturnThis();
+        knexStub.limit.mockReturnThis();
+        knexStub.offset.mockReturnThis();
+        knexStub.whereNot.mockReturnThis();
+        knexStub.where.mockReturnThis();
+        knexStub.raw.mockReturnValue('mockRaw');
+
+        knexStub.then
+            .mockImplementationOnce((cb) => Promise.resolve([]).then(cb))
+            .mockImplementationOnce((cb) => Promise.resolve([{ count: 1 }]).then(cb));
+
+        await query.findAll(filters);
+
+        expect(knexStub.raw).toHaveBeenCalledWith(expect.stringContaining('YEAR(oi.created)'));
+        expect(knexStub.raw).toHaveBeenCalledWith(expect.stringContaining('MONTH(oi.created) BETWEEN 7 AND 12'));
+    });
 });

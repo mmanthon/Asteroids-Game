@@ -350,13 +350,7 @@ export class ApplicationQuery {
             .count('oi.item_id as count')
             .leftJoin('omga_insureds as ois', 'oi.insured_id', 'ois.insured_id')
             .leftJoin('people as p', 'ois.person_id', 'p.person_id')
-            .whereNot('oi.product_ids', null)
-            .where(
-                this.amp.raw(`
-                (YEAR(oi.created) = YEAR(CURDATE()) 
-                OR (YEAR(oi.created) = YEAR(CURDATE()) - 1 AND MONTH(oi.created) BETWEEN 7 AND 12))
-              `),
-            );
+            .whereNot('oi.product_ids', null);
 
         await this.applyFilters(query, filters);
 
@@ -392,13 +386,7 @@ export class ApplicationQuery {
                 'oi.item_id',
                 'ish.item_id',
             )
-            .whereNot('oi.product_ids', null)
-            .where(
-                this.amp.raw(`
-                (YEAR(oi.created) = YEAR(CURDATE()) 
-                OR (YEAR(oi.created) = YEAR(CURDATE()) - 1 AND MONTH(oi.created) BETWEEN 7 AND 12))
-              `),
-            );
+            .whereNot('oi.product_ids', null);
     }
 
     /**
@@ -459,6 +447,8 @@ export class ApplicationQuery {
             updatedAtStart,
             updatedAtEnd,
             states,
+            createdDateStart,
+            createdDateEnd,
         } = filters;
 
         // Apply simple filters directly
@@ -499,6 +489,22 @@ export class ApplicationQuery {
         } else {
             if (updatedAtStart) query.whereRaw('DATE(oi.last_updated) >= ?', [updatedAtStart]);
             if (updatedAtEnd) query.whereRaw('DATE(oi.last_updated) <= ?', [updatedAtEnd]);
+        }
+
+        // Apply created date filters
+        if (createdDateStart && createdDateEnd) {
+            query.whereRaw('DATE(oi.created) BETWEEN ? AND ?', [createdDateStart, createdDateEnd]);
+        } else if (createdDateStart) {
+            query.whereRaw('DATE(oi.created) >= ?', [createdDateStart]);
+        } else if (createdDateEnd) {
+            query.whereRaw('DATE(oi.created) <= ?', [createdDateEnd]);
+        } else {
+            query.where(
+                this.amp.raw(`
+                (YEAR(oi.created) = YEAR(CURDATE())
+                OR (YEAR(oi.created) = YEAR(CURDATE()) - 1 AND MONTH(oi.created) BETWEEN 7 AND 12))
+              `),
+            );
         }
 
         // Map statuses to IDs and apply filter

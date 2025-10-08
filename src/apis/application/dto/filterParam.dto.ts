@@ -244,4 +244,16 @@ export class FilterParamDto {
     @IsString()
     @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'updatedAtEnd must be in the format YYYY-MM-DD' })
     updatedAtEnd?: string;
+
+    @ApiPropertyOptional({ description: 'Start of createdDate range (YYYY-MM-DD)', type: String })
+    @IsOptional()
+    @IsString()
+    @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'createdDateStart must be in the format YYYY-MM-DD' })
+    createdDateStart?: string;
+
+    @ApiPropertyOptional({ description: 'End of createdDate range (YYYY-MM-DD)', type: String })
+    @IsOptional()
+    @IsString()
+    @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'createdDateEnd must be in the format YYYY-MM-DD' })
+    createdDateEnd?: string;
 }

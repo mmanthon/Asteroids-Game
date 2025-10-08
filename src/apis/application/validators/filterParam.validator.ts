@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, PipeTransform } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, PipeTransform } from '@nestjs/common';
 
 import { ApplicationQuery } from '../application.query';
 
@@ -8,6 +8,8 @@ type Target = {
     parentAgencyID?: string;
     agentIDs?: string[];
     assignedUWIDs?: string[];
+    createdDateStart?: string;
+    createdDateEnd?: string;
 };
 
 @Injectable()
@@ -22,8 +24,10 @@ export class FilterParamValidator<T extends Target> implements PipeTransform<Tar
      * @returns {Promise<T>}
      */
     async transform(target: T): Promise<T> {
-        const { productIDs, agencyID, parentAgencyID, agentIDs, assignedUWIDs } = target;
+        const { productIDs, agencyID, parentAgencyID, agentIDs, assignedUWIDs, createdDateStart, createdDateEnd } =
+            target;
 
+        this.validateCreatedDateRange(createdDateStart, createdDateEnd);
         if (productIDs) await this.validateProducts(productIDs);
         if (agencyID) await this.valdiateAgency(agencyID);
         if (parentAgencyID) await this.valdiateAgency(parentAgencyID);
@@ -31,6 +35,17 @@ export class FilterParamValidator<T extends Target> implements PipeTransform<Tar
         if (assignedUWIDs) await this.validateAgent(assignedUWIDs);
 
         return target;
+    }
+
+    /**
+     * @description Validates the created date range
+     * @param {string} start
+     * @param {string} end
+     */
+    private validateCreatedDateRange(start?: string, end?: string): void {
+        if (start && end && end < start) {
+            throw new BadRequestException('createdDateEnd must be >= createdDateStart');
+        }
     }
 
     /**
