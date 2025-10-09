@@ -5,6 +5,7 @@ import { Knex } from 'knex';
 
 import { ApplicationQuery } from '../application.query';
 import { FilterParamDto } from '../dto';
+import { SortByEnum, SortOrderEnum } from '../enums';
 import {
     agencyID,
     agentID,
@@ -891,5 +892,57 @@ describe('ApplicationQuery', () => {
 
         expect(knexStub.raw).toHaveBeenCalledWith(expect.stringContaining('YEAR(oi.created)'));
         expect(knexStub.raw).toHaveBeenCalledWith(expect.stringContaining('MONTH(oi.created) BETWEEN 7 AND 12'));
+    });
+
+    it('should order by created date ASC when sortBy=createdDate', async () => {
+        const filters: FilterParamDto = {
+            nextPage: 1,
+            pageLimit: 10,
+            sortBy: SortByEnum.CREATED_DATE,
+            sortOrder: SortOrderEnum.ASC,
+        };
+
+        knexStub.select.mockReturnThis();
+        knexStub.leftJoin.mockReturnThis();
+        knexStub.whereNot.mockReturnThis();
+        knexStub.where.mockReturnThis();
+        knexStub.orderBy.mockReturnThis();
+        knexStub.limit.mockReturnThis();
+        knexStub.offset.mockReturnThis();
+        knexStub.raw.mockReturnValue('mockRaw');
+
+        knexStub.then
+            .mockImplementationOnce((cb: any) => Promise.resolve([]).then(cb))
+            .mockImplementationOnce((cb: any) => Promise.resolve([{ count: 1 }]).then(cb));
+
+        await query.findAll(filters);
+
+        expect(knexStub.orderBy).toHaveBeenCalledWith('oi.created', SortOrderEnum.ASC);
+    });
+
+    it('should order by created date DESC when sortBy=createdDate', async () => {
+        const filters: FilterParamDto = {
+            nextPage: 1,
+            pageLimit: 10,
+            sortBy: SortByEnum.CREATED_DATE,
+            sortOrder: SortOrderEnum.DESC,
+        };
+
+        knexStub.select.mockReturnThis();
+        knexStub.leftJoin.mockReturnThis();
+        knexStub.whereNot.mockReturnThis();
+        knexStub.where.mockReturnThis();
+        knexStub.orderBy.mockReturnThis();
+        knexStub.limit.mockReturnThis();
+        knexStub.offset.mockReturnThis();
+        knexStub.raw.mockReturnValue('mockRaw');
+
+        knexStub.then
+            .mockImplementationOnce((cb: any) => Promise.resolve([]).then(cb))
+            .mockImplementationOnce((cb: any) => Promise.resolve([{ count: 1 }]).then(cb));
+
+        await query.findAll(filters);
+
+        expect(knexStub.orderBy).toHaveBeenCalledWith('oi.created', SortOrderEnum.DESC);
     });
 });

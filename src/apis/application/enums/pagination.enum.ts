@@ -4,6 +4,7 @@ export enum SortByEnum {
     EFFECTIVE_DATE = 'effectiveDate',
     LAST_STATUS_UPDATE = 'lastStatusUpdate',
     STATUS = 'status',
+    CREATED_DATE = 'createdDate',
 }
 
 export enum SortByMapToDBEnum {
@@ -12,6 +13,7 @@ export enum SortByMapToDBEnum {
     EFFECTIVE_DATE = 'oi.effective_date',
     LAST_STATUS_UPDATE = 'ish.changed',
     STATUS = 'oi.status_id',
+    CREATED_DATE = 'oi.created',
 }
 
 export enum SortOrderEnum {
