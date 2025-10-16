@@ -57,6 +57,10 @@
         {
             "name": "TASK_QUEUE_URL",
             "value": "https://sqs.us-west-2.amazonaws.com/694679581764/iscx-qa-utm-queue"
+        },
+        {
+            "name": "DYNAMODB_RISK_SUMMARIZATIONS_TABLE_NAME",
+            "value": "ISCxQARiskSummarizations"
         }
     ],
     "secrets": [

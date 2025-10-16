@@ -9,6 +9,7 @@ import {
     DynamoTaskWebsocketConnectionEntity,
     DynamoUserEntity,
     DynamodbClaimEntity,
+    RiskSummarizationEntity,
     createEntityProviders,
     dynamoEntityFactory,
 } from '@ignidus/iscx-backend-utils';
@@ -64,6 +65,10 @@ import { ConfigService } from '@nestjs/config';
                     entityClass: DynamoProductEntity,
                     metadata: { tableNameKey: 'dynamodb.productsTableName' },
                 },
+                {
+                    entityClass: RiskSummarizationEntity,
+                    metadata: { tableNameKey: 'dynamodb.riskSummarizationTableName' },
+                },
             ],
             dynamoEntityFactory,
         ),
@@ -79,6 +84,7 @@ import { ConfigService } from '@nestjs/config';
         DynamoDB,
         DynamoEmailHistoryEntity,
         DynamoProductEntity,
+        RiskSummarizationEntity,
     ],
 })
 export class DynamoDBModule {}
