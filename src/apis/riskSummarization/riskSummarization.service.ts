@@ -30,8 +30,12 @@ export class RiskSummarizationService {
         const existing = await this.riskSummarizationValidationUtil.validateExisting(id);
 
         if (userFeedback) {
-            const updateParams = this.riskSummarizationUtil.buildUserFeedbackUpdate(userFeedback, user.userID);
-            const updated = await this.riskSummarizationEntity.updateOne(id, updateParams, user.userID);
+            const userFeedbackUpdate = this.riskSummarizationUtil.buildUserFeedbackUpdate(userFeedback, user.userID);
+            const updated = await this.riskSummarizationEntity.updateOne(
+                id,
+                { userFeedbacks: [...(existing.userFeedbacks || []), userFeedbackUpdate] },
+                user.userID,
+            );
 
             return this.riskSummarizationUtil.formatRiskSummarization(updated);
         }

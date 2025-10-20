@@ -3,7 +3,6 @@ import {
     RiskSummarizationEntity,
     RiskSummarizationModel,
     RiskSummarizationStatusEnum,
-    UpdateRiskSummarizationParams,
 } from '@ignidus/iscx-backend-utils';
 import { Test, TestingModule } from '@nestjs/testing';
 
@@ -74,18 +73,14 @@ describe('RiskSummarizationService', () => {
             },
         };
 
-        entity.findOne.mockResolvedValue(mockRiskSummarizationModel);
-        const updateParams: UpdateRiskSummarizationParams = {
-            userFeedbacks: [
-                {
-                    isHelpful: true,
-                    userID: userID,
-                    timestamp: expect.any(String),
-                },
-            ],
+        validation.validateExisting.mockResolvedValue(mockRiskSummarizationModel);
+        const userFeedbackUpdate = {
+            isHelpful: true,
+            userID: userID,
+            timestamp: expect.any(String),
         };
 
-        util.buildUserFeedbackUpdate.mockReturnValue(updateParams);
+        util.buildUserFeedbackUpdate.mockReturnValue(userFeedbackUpdate);
         entity.updateOne.mockResolvedValue(updatedModel);
 
         const formatted: RiskSummarizationResponseDto = {
@@ -105,11 +100,15 @@ describe('RiskSummarizationService', () => {
 
         const result = await service.update('rs-1', dto, user);
 
-        expect(validation.validateExisting).toHaveBeenCalledWith(mockRiskSummarizationModel.id);
+        expect(validation.validateExisting).toHaveBeenCalledWith('rs-1');
         expect(validation.validateUserFeedback).toHaveBeenCalledWith(dto);
 
         expect(util.buildUserFeedbackUpdate).toHaveBeenCalledWith(dto.userFeedback, userID);
-        expect(entity.updateOne).toHaveBeenCalledWith('rs-1', updateParams, userID);
+        expect(entity.updateOne).toHaveBeenCalledWith(
+            'rs-1',
+            { userFeedbacks: [...(mockRiskSummarizationModel.userFeedbacks || []), userFeedbackUpdate] },
+            userID,
+        );
         expect(util.formatRiskSummarization).toHaveBeenCalledWith(updatedModel);
         expect(result).toEqual(formatted);
     });
@@ -136,16 +135,12 @@ describe('RiskSummarizationService', () => {
             ],
         };
 
-        const updateParams: UpdateRiskSummarizationParams = {
-            userFeedbacks: [
-                {
-                    isHelpful: false,
-                    categories: ['Incomplete'],
-                    additionalDetail: 'Missing docs',
-                    userID: userID,
-                    timestamp: '',
-                },
-            ],
+        const userFeedbackUpdate = {
+            isHelpful: false,
+            categories: ['Incomplete'],
+            additionalDetail: 'Missing docs',
+            userID: userID,
+            timestamp: '',
         };
 
         const formatted: RiskSummarizationResponseDto = {
@@ -162,9 +157,9 @@ describe('RiskSummarizationService', () => {
             ],
         };
 
-        util.buildUserFeedbackUpdate.mockReturnValue(updateParams);
+        util.buildUserFeedbackUpdate.mockReturnValue(userFeedbackUpdate);
 
-        entity.findOne.mockResolvedValue(mockRiskSummarizationModel);
+        validation.validateExisting.mockResolvedValue(mockRiskSummarizationModel);
         entity.updateOne.mockResolvedValue(updatedWithReason);
 
         util.formatRiskSummarization.mockReturnValue(formatted);
@@ -173,7 +168,11 @@ describe('RiskSummarizationService', () => {
 
         expect(validation.validateUserFeedback).toHaveBeenCalledWith(dto);
         expect(util.buildUserFeedbackUpdate).toHaveBeenCalledWith(dto.userFeedback, userID);
-        expect(entity.updateOne).toHaveBeenCalledWith('rs-1', updateParams, userID);
+        expect(entity.updateOne).toHaveBeenCalledWith(
+            'rs-1',
+            { userFeedbacks: [...(mockRiskSummarizationModel.userFeedbacks || []), userFeedbackUpdate] },
+            userID,
+        );
         expect(result).toEqual(formatted);
     });
 

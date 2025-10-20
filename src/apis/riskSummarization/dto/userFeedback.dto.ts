@@ -1,24 +1,27 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsBoolean, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class UserFeedbackDto {
     @ApiProperty({ description: 'Indicates if the feedback is helpful', example: true })
     @IsBoolean()
     isHelpful: boolean;
 
-    @ApiProperty({
+    @ApiPropertyOptional({
         description: 'Categories when not helpful',
-        example: 'The feature is not working as expected',
+        example: ['Missing information', 'Outdated information'],
+        type: String,
         isArray: true,
     })
+    @IsOptional()
     @IsArray()
     @IsString({ each: true })
-    categories: string[];
+    categories?: string[];
 
-    @ApiProperty({
+    @ApiPropertyOptional({
         description: 'Additional details about the feedback',
         example: 'The feature crashes when I try to use it',
     })
+    @IsOptional()
     @IsString()
     additionalDetail?: string;
 }

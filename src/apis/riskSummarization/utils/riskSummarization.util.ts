@@ -1,7 +1,7 @@
 import {
     RiskSummarizationEntity,
     RiskSummarizationModel,
-    UpdateRiskSummarizationParams,
+    UserFeedback,
     getCurrentDate,
 } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
@@ -48,17 +48,13 @@ export class RiskSummarizationUtil {
      * @param {string} userID - user ID
      * @returns {UpdateRiskSummarizationParams}
      */
-    buildUserFeedbackUpdate(userFeedback: UserFeedbackDto, userID: string): UpdateRiskSummarizationParams {
+    buildUserFeedbackUpdate(userFeedback: UserFeedbackDto, userID: string): UserFeedback {
         return {
-            userFeedbacks: [
-                {
-                    isHelpful: userFeedback.isHelpful,
-                    categories: userFeedback.categories || [],
-                    additionalDetail: userFeedback.additionalDetail || '',
-                    userID,
-                    timestamp: getCurrentDate(),
-                },
-            ],
+            isHelpful: userFeedback.isHelpful,
+            categories: userFeedback.categories || [],
+            additionalDetail: userFeedback.additionalDetail || '',
+            userID,
+            timestamp: getCurrentDate(),
         };
     }
 
