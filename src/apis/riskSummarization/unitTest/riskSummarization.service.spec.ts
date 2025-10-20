@@ -2,12 +2,13 @@ import {
     IJWT,
     RiskSummarizationEntity,
     RiskSummarizationModel,
+    RiskSummarizationStatusEnum,
     UpdateRiskSummarizationParams,
 } from '@ignidus/iscx-backend-utils';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { userID } from '../../../apis/auth/mocks';
-import { RiskSummarizationResponseDto, UpdateRiskSummarizationRequestDto } from '../dto';
+import { FilterParamsDto, RiskSummarizationResponseDto, UpdateRiskSummarizationRequestDto } from '../dto';
 import { mockRiskSummarizationModel } from '../mocks';
 import { RiskSummarizationService } from '../riskSummarization.service';
 import { RiskSummarizationValidationUtil } from '../utils';
@@ -42,6 +43,7 @@ describe('RiskSummarizationService', () => {
         const utilMock: Partial<jest.Mocked<RiskSummarizationUtil>> = {
             formatRiskSummarization: jest.fn(),
             buildUserFeedbackUpdate: jest.fn(),
+            fetchRiskSummarizations: jest.fn(),
         };
 
         const validateMock = {
@@ -194,5 +196,68 @@ describe('RiskSummarizationService', () => {
 
         expect(entity.updateOne).not.toHaveBeenCalled();
         expect(result).toEqual(formattedExisting);
+    });
+
+    it('should delegate to util.fetchRiskSummarizations and format each item', async () => {
+        const filter: FilterParamsDto = { appID: '3730781' };
+        const mockRiskSummarizationModels: RiskSummarizationModel[] = [
+            {
+                ...mockRiskSummarizationModel,
+                id: 'a',
+                appID: '3730781',
+                status: RiskSummarizationStatusEnum.COMPLETED,
+                createdDate: '2025-10-15',
+                userFeedbacks: [],
+            },
+            {
+                ...mockRiskSummarizationModel,
+                id: 'b',
+                appID: '3730781',
+                status: RiskSummarizationStatusEnum.COMPLETED,
+                createdDate: '2025-10-16',
+                userFeedbacks: [],
+            },
+        ];
+
+        const formatted: RiskSummarizationResponseDto[] = [
+            {
+                id: 'a',
+                appID: '3730781',
+                status: RiskSummarizationStatusEnum.COMPLETED,
+                createdDate: '2025-10-15',
+                userFeedbacks: [],
+            },
+            {
+                id: 'b',
+                appID: '3730781',
+                status: RiskSummarizationStatusEnum.COMPLETED,
+                createdDate: '2025-10-16',
+                userFeedbacks: [],
+            },
+        ];
+
+        util.fetchRiskSummarizations.mockResolvedValue(mockRiskSummarizationModels);
+        util.formatRiskSummarization.mockReturnValueOnce(formatted[0]).mockReturnValueOnce(formatted[1]);
+
+        const result = await service.findAll(filter);
+
+        expect(util.fetchRiskSummarizations).toHaveBeenCalledTimes(1);
+        expect(util.fetchRiskSummarizations).toHaveBeenCalledWith(filter);
+
+        expect(util.formatRiskSummarization).toHaveBeenCalledTimes(mockRiskSummarizationModels.length);
+        expect(util.formatRiskSummarization).toHaveBeenNthCalledWith(1, mockRiskSummarizationModels[0]);
+        expect(util.formatRiskSummarization).toHaveBeenNthCalledWith(2, mockRiskSummarizationModels[1]);
+
+        expect(result).toEqual(formatted);
+        expect(result).toEqual(formatted);
+    });
+
+    it('should return empty array when util returns no items', async () => {
+        util.fetchRiskSummarizations.mockResolvedValue([]);
+        const result = await service.findAll({} as FilterParamsDto);
+
+        expect(util.fetchRiskSummarizations).toHaveBeenCalledWith({});
+        expect(util.formatRiskSummarization).not.toHaveBeenCalled();
+        expect(result).toEqual([]);
     });
 });

@@ -1,10 +1,17 @@
-import { RiskSummarizationModel, UpdateRiskSummarizationParams, getCurrentDate } from '@ignidus/iscx-backend-utils';
+import {
+    RiskSummarizationEntity,
+    RiskSummarizationModel,
+    UpdateRiskSummarizationParams,
+    getCurrentDate,
+} from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
 
-import { RiskSummarizationResponseDto, UserFeedbackDto } from '../dto';
+import { FilterParamsDto, RiskSummarizationResponseDto, UserFeedbackDto } from '../dto';
 
 @Injectable()
 export class RiskSummarizationUtil {
+    constructor(private readonly riskSummarizationEntity: RiskSummarizationEntity) {}
+
     /**
      * @description Format risk summarization
      * @param {RiskSummarizationModel} riskSummarization - risk summarization to format
@@ -53,5 +60,18 @@ export class RiskSummarizationUtil {
                 },
             ],
         };
+    }
+
+    /**
+     * @description Fetch risk summarizations based on filter
+     * @param {FilterParamsDto} filter - filter parameters
+     * @returns {Promise<RiskSummarizationModel[]>}
+     */
+    async fetchRiskSummarizations(filter: FilterParamsDto): Promise<RiskSummarizationModel[]> {
+        const data = filter.appID
+            ? await this.riskSummarizationEntity.findAllByAppID(filter.appID)
+            : await this.riskSummarizationEntity.findAll();
+
+        return data.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
     }
 }

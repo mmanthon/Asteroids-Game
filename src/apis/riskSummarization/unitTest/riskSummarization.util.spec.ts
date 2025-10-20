@@ -1,14 +1,33 @@
 /* eslint-disable camelcase */
-import { RiskSummarizationModel } from '@ignidus/iscx-backend-utils';
+import { RiskSummarizationEntity, RiskSummarizationModel } from '@ignidus/iscx-backend-utils';
+import { Test, TestingModule } from '@nestjs/testing';
 
+import { FilterParamsDto } from '../dto';
 import { mockRiskSummarizationModel } from '../mocks';
 import { RiskSummarizationUtil } from '../utils/riskSummarization.util';
 
 describe('RiskSummarizationUtil', () => {
     let util: RiskSummarizationUtil;
+    let riskSummarizationEntity: jest.Mocked<RiskSummarizationEntity>;
 
-    beforeEach(() => {
-        util = new RiskSummarizationUtil();
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            controllers: [RiskSummarizationUtil],
+            providers: [
+                {
+                    provide: RiskSummarizationEntity,
+                    useValue: {
+                        findAll: jest.fn(),
+                        findAllByAppID: jest.fn(),
+                    },
+                },
+            ],
+        }).compile();
+
+        util = module.get<RiskSummarizationUtil>(RiskSummarizationUtil);
+        riskSummarizationEntity = module.get<RiskSummarizationEntity>(
+            RiskSummarizationEntity,
+        ) as jest.Mocked<RiskSummarizationEntity>;
     });
 
     it('should format without isHelpful/reason/details when isHelpful is undefined and summary is undefined', () => {
@@ -105,5 +124,38 @@ describe('RiskSummarizationUtil', () => {
         const result = util.formatRiskSummarization(model);
 
         expect(result.failureReason).toBe('TIMEOUT');
+    });
+
+    it('should call findAllByAppID when filter.appID is provided', async () => {
+        riskSummarizationEntity.findAllByAppID.mockResolvedValue([mockRiskSummarizationModel]);
+
+        const filter: FilterParamsDto = { appID: '3730781' };
+        const result = await util.fetchRiskSummarizations(filter);
+
+        expect(riskSummarizationEntity.findAllByAppID).toHaveBeenCalledTimes(1);
+        expect(riskSummarizationEntity.findAllByAppID).toHaveBeenCalledWith('3730781');
+        expect(riskSummarizationEntity.findAll).not.toHaveBeenCalled();
+        expect(result).toEqual([mockRiskSummarizationModel]);
+    });
+
+    it('should call findAll when filter.appID is undefined', async () => {
+        riskSummarizationEntity.findAll.mockResolvedValue([mockRiskSummarizationModel]);
+
+        const filter = {} as FilterParamsDto;
+        const result = await util.fetchRiskSummarizations(filter);
+
+        expect(riskSummarizationEntity.findAll).toHaveBeenCalledTimes(1);
+        expect(riskSummarizationEntity.findAllByAppID).not.toHaveBeenCalled();
+        expect(result).toEqual([mockRiskSummarizationModel]);
+    });
+
+    it('should call findAll when filter.appID is an empty string', async () => {
+        riskSummarizationEntity.findAll.mockResolvedValue([mockRiskSummarizationModel]);
+
+        const result = await util.fetchRiskSummarizations({ appID: '' });
+
+        expect(riskSummarizationEntity.findAll).toHaveBeenCalledTimes(1);
+        expect(riskSummarizationEntity.findAllByAppID).not.toHaveBeenCalled();
+        expect(result).toEqual([mockRiskSummarizationModel]);
     });
 });

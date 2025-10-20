@@ -1,9 +1,8 @@
 import { IJWT, RiskSummarizationEntity } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
 
-import { RiskSummarizationResponseDto, UpdateRiskSummarizationRequestDto } from './dto';
-import { RiskSummarizationValidationUtil } from './utils';
-import { RiskSummarizationUtil } from './utils/riskSummarization.util';
+import { FilterParamsDto, RiskSummarizationResponseDto, UpdateRiskSummarizationRequestDto } from './dto';
+import { RiskSummarizationUtil, RiskSummarizationValidationUtil } from './utils';
 
 @Injectable()
 export class RiskSummarizationService {
@@ -38,5 +37,16 @@ export class RiskSummarizationService {
         }
 
         return this.riskSummarizationUtil.formatRiskSummarization(existing);
+    }
+
+    /**
+     * @description Find all risk summarizations
+     * @param {FilterParamsDto} filter - filter parameters
+     * @returns {Promise<RiskSummarizationResponseDto[]>} list of risk summarizations
+     */
+    async findAll(filter: FilterParamsDto): Promise<RiskSummarizationResponseDto[]> {
+        const items = await this.riskSummarizationUtil.fetchRiskSummarizations(filter);
+
+        return items.map((item) => this.riskSummarizationUtil.formatRiskSummarization(item));
     }
 }

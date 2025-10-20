@@ -16,6 +16,7 @@ describe('RiskSummarizationController', () => {
     beforeEach(async () => {
         const serviceMock: Partial<jest.Mocked<RiskSummarizationService>> = {
             update: jest.fn(),
+            findAll: jest.fn(),
         };
 
         const module: TestingModule = await Test.createTestingModule({
@@ -41,6 +42,19 @@ describe('RiskSummarizationController', () => {
             req.user,
         );
         expect(result).toEqual(mockRiskSummarizationResponseDto);
+    });
+
+    it('should call service.findAll with correct args and return its result', async () => {
+        service.findAll.mockResolvedValue([mockRiskSummarizationResponseDto]);
+
+        const result = await controller.findAll({ appID: riskSummarizationId });
+
+        expect(service.findAll).toHaveBeenCalledTimes(1);
+        expect(result).toEqual([mockRiskSummarizationResponseDto]);
+
+        expect(service.findAll).toHaveBeenCalledTimes(1);
+        expect(service.findAll).toHaveBeenCalledWith({ appID: riskSummarizationId });
+        expect(result).toEqual([mockRiskSummarizationResponseDto]);
     });
 
     it('should propagate NotFoundException from service', async () => {

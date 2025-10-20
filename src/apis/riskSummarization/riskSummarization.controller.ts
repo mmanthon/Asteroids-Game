@@ -1,5 +1,5 @@
 import { AuthenticatedRequest } from '@ignidus/iscx-backend-utils';
-import { Body, Controller, Param, Patch, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Query, Req } from '@nestjs/common';
 import {
     ApiInternalServerErrorResponse,
     ApiNotFoundResponse,
@@ -9,7 +9,7 @@ import {
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { RiskSummarizationResponseDto, UpdateRiskSummarizationRequestDto } from './dto';
+import { FilterParamsDto, RiskSummarizationResponseDto, UpdateRiskSummarizationRequestDto } from './dto';
 import { RiskSummarizationService } from './riskSummarization.service';
 
 @ApiTags('Risk Summarizations')
@@ -29,5 +29,12 @@ export class RiskSummarizationController {
         @Req() { user }: AuthenticatedRequest,
     ): Promise<RiskSummarizationResponseDto> {
         return this.service.update(id, body, user);
+    }
+
+    @Get()
+    @ApiOperation({ summary: 'List Risk Summarizations' })
+    @ApiOkResponse({ type: RiskSummarizationResponseDto, isArray: true, description: 'List of Risk Summarizations' })
+    async findAll(@Query() filters: FilterParamsDto): Promise<RiskSummarizationResponseDto[]> {
+        return this.service.findAll(filters);
     }
 }
