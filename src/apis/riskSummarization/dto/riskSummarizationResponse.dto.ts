@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { RiskSummarizationStatusEnum } from '@ignidus/iscx-backend-utils';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -23,6 +24,30 @@ export class RiskSummarizationResponseDto {
 
     @ApiPropertyOptional({ description: 'Machine Learning Response Timestamp', example: '2025-01-01T00:00:00Z' })
     mlResponseTimestamp?: string;
+
+    @ApiPropertyOptional({
+        description: 'Machine Learning Request',
+        type: Object,
+        example: {
+            company_info: {
+                company_name: 'test company name',
+                insured_first_name: 'test first name',
+                insured_last_name: 'test last name',
+                physical_address: {
+                    street_address: 'test street address',
+                    apt_suite: 'test apt suite',
+                    city: 'test city',
+                    state: 'test state',
+                    zip: 'test zip',
+                    country: 'test country',
+                },
+            },
+            application_answers: {
+                ins_eff_date: ' 2025-01-01',
+            },
+        },
+    })
+    mlRequest?: Record<string, unknown>;
 
     @ApiPropertyOptional({ description: 'Failure Reason', example: 'Some error occurred' })
     failureReason?: string;

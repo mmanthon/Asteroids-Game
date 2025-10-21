@@ -31,6 +31,7 @@ export class RiskSummarizationUtil {
                   }
                 : undefined,
             mlResponseTimestamp: riskSummarization.mlResponseTimestamp,
+            mlRequest: riskSummarization.mlRequest,
             failureReason: riskSummarization.failureReason,
             userFeedbacks: riskSummarization.userFeedbacks
                 ? riskSummarization.userFeedbacks.map((feedback) => ({

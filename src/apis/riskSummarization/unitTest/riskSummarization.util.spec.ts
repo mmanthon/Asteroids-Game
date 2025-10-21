@@ -3,7 +3,18 @@ import { RiskSummarizationEntity, RiskSummarizationModel } from '@ignidus/iscx-b
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { FilterParamsDto } from '../dto';
-import { mockRiskSummarizationModel } from '../mocks';
+import {
+    mockRiskSummarizationModel,
+    mockUserFeedbackUpdateResult,
+    mockUserFeedbackUpdateResultWithDefaults,
+    mockUserFeedbackUpdateResultWithUndefined,
+    mockUserFeedbackWithAllFields,
+    mockUserFeedbackWithDefaults,
+    mockUserFeedbackWithUndefined,
+    testEmptyAppID,
+    testFilterAppID,
+    testUserID,
+} from '../mocks';
 import { RiskSummarizationUtil } from '../utils/riskSummarization.util';
 
 describe('RiskSummarizationUtil', () => {
@@ -43,6 +54,7 @@ describe('RiskSummarizationUtil', () => {
             mlResponseTimestamp: undefined,
             userFeedbacks: [],
             failureReason: undefined,
+            mlRequest: mockRiskSummarizationModel.mlRequest,
             createdDate: mockRiskSummarizationModel.createdDate,
         });
 
@@ -126,14 +138,36 @@ describe('RiskSummarizationUtil', () => {
         expect(result.failureReason).toBe('TIMEOUT');
     });
 
+    it('should handle undefined userFeedbacks', () => {
+        const model: RiskSummarizationModel = {
+            ...mockRiskSummarizationModel,
+            userFeedbacks: undefined,
+        };
+
+        const result = util.formatRiskSummarization(model);
+
+        expect(result.userFeedbacks).toEqual([]);
+    });
+
+    it('should handle null userFeedbacks', () => {
+        const model: RiskSummarizationModel = {
+            ...mockRiskSummarizationModel,
+            userFeedbacks: null,
+        };
+
+        const result = util.formatRiskSummarization(model);
+
+        expect(result.userFeedbacks).toEqual([]);
+    });
+
     it('should call findAllByAppID when filter.appID is provided', async () => {
         riskSummarizationEntity.findAllByAppID.mockResolvedValue([mockRiskSummarizationModel]);
 
-        const filter: FilterParamsDto = { appID: '3730781' };
+        const filter: FilterParamsDto = { appID: testFilterAppID };
         const result = await util.fetchRiskSummarizations(filter);
 
         expect(riskSummarizationEntity.findAllByAppID).toHaveBeenCalledTimes(1);
-        expect(riskSummarizationEntity.findAllByAppID).toHaveBeenCalledWith('3730781');
+        expect(riskSummarizationEntity.findAllByAppID).toHaveBeenCalledWith(testFilterAppID);
         expect(riskSummarizationEntity.findAll).not.toHaveBeenCalled();
         expect(result).toEqual([mockRiskSummarizationModel]);
     });
@@ -152,10 +186,28 @@ describe('RiskSummarizationUtil', () => {
     it('should call findAll when filter.appID is an empty string', async () => {
         riskSummarizationEntity.findAll.mockResolvedValue([mockRiskSummarizationModel]);
 
-        const result = await util.fetchRiskSummarizations({ appID: '' });
+        const result = await util.fetchRiskSummarizations({ appID: testEmptyAppID });
 
         expect(riskSummarizationEntity.findAll).toHaveBeenCalledTimes(1);
         expect(riskSummarizationEntity.findAllByAppID).not.toHaveBeenCalled();
         expect(result).toEqual([mockRiskSummarizationModel]);
+    });
+
+    it('should build user feedback update with all fields', () => {
+        const result = util.buildUserFeedbackUpdate(mockUserFeedbackWithAllFields, testUserID);
+
+        expect(result).toEqual(mockUserFeedbackUpdateResult);
+    });
+
+    it('should build user feedback update with default values', () => {
+        const result = util.buildUserFeedbackUpdate(mockUserFeedbackWithDefaults, testUserID);
+
+        expect(result).toEqual(mockUserFeedbackUpdateResultWithDefaults);
+    });
+
+    it('should build user feedback update with undefined categories and additionalDetail', () => {
+        const result = util.buildUserFeedbackUpdate(mockUserFeedbackWithUndefined, testUserID);
+
+        expect(result).toEqual(mockUserFeedbackUpdateResultWithUndefined);
     });
 });
