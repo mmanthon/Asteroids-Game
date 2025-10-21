@@ -14,7 +14,7 @@ export class RiskSummarizationResponseDto {
 
     @ApiProperty({
         description: 'Risk Summarization Status',
-        example: RiskSummarizationStatusEnum,
+        example: RiskSummarizationStatusEnum.IN_PROGRESS,
         enum: RiskSummarizationStatusEnum,
     })
     status: RiskSummarizationStatusEnum;
