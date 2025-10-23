@@ -9,6 +9,7 @@ import {
     DynamoEmailHistoryEntity,
     DynamoNoteEntity,
     DynamoProductEntity,
+    DynamoProductVersionEntity,
     EmailTrackingEntity,
     EmailTrackingModel,
     NoteAuthorRoleEnum,
@@ -65,6 +66,12 @@ import { mockEmptyUserModel, mockUserModel } from '../mocks/userModel.dto.mock';
 describe('ApplicationUtil', () => {
     let util: ApplicationUtil;
     let applicationQuery: ApplicationQuery;
+    let dynamoApplicationEntity: jest.Mocked<DynamoApplicationEntity>;
+    let productVersionEntity: jest.Mocked<DynamoProductVersionEntity>;
+    let productEntity: jest.Mocked<DynamoProductEntity>;
+    let emailHistoryEntity: jest.Mocked<DynamoEmailHistoryEntity>;
+    let emailTrackingEntity: jest.Mocked<EmailTrackingEntity>;
+    let noteEntity: jest.Mocked<DynamoNoteEntity>;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -99,12 +106,19 @@ describe('ApplicationUtil', () => {
                 { provide: EmailTrackingEntity, useValue: { getByEntityID: jest.fn() } },
                 { provide: DynamoEmailHistoryEntity, useValue: { findAllByEntityID: jest.fn() } },
                 { provide: DynamoProductEntity, useValue: { findOneByVersion: jest.fn() } },
+                { provide: DynamoProductVersionEntity, useValue: { findLatestVersionNumber: jest.fn() } },
                 { provide: DynamoAutoDeclinationHistoryEntity, useValue: { findOneByAppID: jest.fn() } },
             ],
         }).compile();
 
         util = module.get(ApplicationUtil);
         applicationQuery = module.get(ApplicationQuery);
+        dynamoApplicationEntity = module.get(DynamoApplicationEntity);
+        productVersionEntity = module.get(DynamoProductVersionEntity);
+        productEntity = module.get(DynamoProductEntity);
+        emailHistoryEntity = module.get(DynamoEmailHistoryEntity);
+        emailTrackingEntity = module.get(EmailTrackingEntity);
+        noteEntity = module.get(DynamoNoteEntity);
     });
 
     describe('getBaseFormattedApplicationData', () => {
@@ -618,5 +632,43 @@ describe('ApplicationUtil', () => {
             expect(result.updatedDate).toBe('');
             expect(result.boundDate).toBe('');
         });
+    });
+
+    it('should set isAutoRiskSummarizationEnabled to false by default for AMP apps', async () => {
+        jest.spyOn(applicationQuery, 'getLinkedProductsByAppID').mockResolvedValueOnce([]);
+        jest.spyOn(applicationQuery, 'getTaskUserIDsByAppID').mockResolvedValueOnce([]);
+        jest.spyOn(applicationQuery, 'getAdditionalProductDataByAppID').mockResolvedValueOnce([]);
+
+        const ampApp = { ...mockAmpApplication, program_type_id: 0 };
+        const result = await util.getBaseFormattedApplicationData(ampApp);
+
+        expect(result.products.length).toBeGreaterThan(0);
+        expect(result.products.every((p) => p.isAutoRiskSummarizationEnabled === false)).toBe(true);
+    });
+
+    it('should set isAutoRiskSummarizationEnabled=true for marketplace when latest product version has the flag', async () => {
+        const app = { ...mockAmpApplication, program_type_id: 22 };
+
+        dynamoApplicationEntity.findOne.mockResolvedValueOnce(mockApplicationDynamoModel);
+        productVersionEntity.findLatestVersionNumber.mockResolvedValueOnce(7);
+
+        const productID = String(app.product_ids);
+
+        productEntity.findOneByVersion.mockResolvedValueOnce({
+            id: productID,
+            version: 7,
+            isDirectToConsumer: false,
+            isAutoRiskSummarizationEnabled: true,
+        } as unknown as ProductDynamoModel);
+
+        jest.spyOn(applicationQuery, 'getAdditionalProductDataByAppID').mockResolvedValueOnce([]);
+        emailHistoryEntity.findAllByEntityID.mockResolvedValueOnce([]);
+        emailTrackingEntity.getByEntityID.mockResolvedValueOnce([]);
+        noteEntity.findAllByEntity.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
+
+        const result = await util.formatApplication(app, mockUser);
+        const prod = result.products.find((p) => p.id === productID);
+
+        expect(prod?.isAutoRiskSummarizationEnabled).toBe(true);
     });
 });

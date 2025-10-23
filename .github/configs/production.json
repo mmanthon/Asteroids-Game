@@ -61,6 +61,10 @@
         {
             "name": "DYNAMODB_RISK_SUMMARIZATIONS_TABLE_NAME",
             "value": "ISCxRiskSummarizations"
+        },
+        {
+            "name": "DYNAMODB_PRODUCT_VERSIONS_TABLE_NAME",
+            "value": "ISCxProductVersions"
         }
     ],
     "secrets": [

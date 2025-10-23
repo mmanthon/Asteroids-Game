@@ -14,6 +14,7 @@ import {
     DynamoEmailHistoryEntity,
     DynamoNoteEntity,
     DynamoProductEntity,
+    DynamoProductVersionEntity,
     EmailHistoryDynamoModel,
     EmailTrackingEntity,
     EmailTrackingModel,
@@ -29,6 +30,7 @@ import {
     sanitizeHtml,
 } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
+import { isDefined } from 'class-validator';
 
 import { ApplicationQuery } from './application.query';
 import {
@@ -90,6 +92,7 @@ export class ApplicationUtil {
         private readonly emailHistoryEntity: DynamoEmailHistoryEntity,
         private readonly autoDeclinationHistoryEntity: DynamoAutoDeclinationHistoryEntity,
         private readonly productEntity: DynamoProductEntity,
+        private readonly productVersionEntity: DynamoProductVersionEntity,
     ) {}
 
     /**
@@ -390,8 +393,9 @@ export class ApplicationUtil {
         // if application is not found, return an empty object
         if (!application) return {};
 
-        const product = await this.productEntity.findOneByVersion(application.product.id, application.product.version);
-        const autoDeclinationHistory = await this.getAutoDeclinationHistory(id, application.status, product);
+        const latestVersionNum = await this.productVersionEntity.findLatestVersionNumber(application.product.id);
+        const latestProduct = await this.productEntity.findOneByVersion(application.product.id, latestVersionNum);
+        const autoDeclinationHistory = await this.getAutoDeclinationHistory(id, application.status, latestProduct);
 
         const effectiveDate = application.effectiveDate ? this.formatDate(application.effectiveDate) : '';
         const expirationDate = application.expirationDate ? this.formatDate(application.expirationDate) : '';
@@ -400,10 +404,15 @@ export class ApplicationUtil {
         const premium = this.extractPremiumFromApplication(application);
 
         // Set isDirectToConsumer based on the marketplace product data
-        const marketplaceProduct = ampProductData.find((ampProduct) => String(product.id) === ampProduct.id);
+        const marketplaceProduct = ampProductData.find((ampProduct) => latestProduct.id === ampProduct.id);
 
         if (marketplaceProduct) {
-            marketplaceProduct.isDirectToConsumer = product?.isDirectToConsumer ?? false;
+            marketplaceProduct.isDirectToConsumer = isDefined(latestProduct?.isDirectToConsumer)
+                ? latestProduct?.isDirectToConsumer
+                : false;
+            marketplaceProduct.isAutoRiskSummarizationEnabled = isDefined(latestProduct?.isAutoRiskSummarizationEnabled)
+                ? latestProduct?.isAutoRiskSummarizationEnabled
+                : false;
         }
 
         return {
@@ -480,6 +489,7 @@ export class ApplicationUtil {
                 programTypeID: String(program_type_id),
                 carrierName: carrier_name,
                 isDirectToConsumer: false,
+                isAutoRiskSummarizationEnabled: false,
             },
         ];
 
@@ -493,6 +503,7 @@ export class ApplicationUtil {
                 programTypeID: String(product.program_type_id),
                 carrierName: product.carrier_name,
                 isDirectToConsumer: false,
+                isAutoRiskSummarizationEnabled: false,
             })),
         );
     }

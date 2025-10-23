@@ -18,4 +18,7 @@ export class ApplicationProductDto {
 
     @ApiProperty({ description: 'Carrier Name', example: 'Carrier' })
     carrierName: string;
+
+    @ApiProperty({ description: 'Is Auto Risk Summarization Enabled', example: true })
+    isAutoRiskSummarizationEnabled: boolean;
 }

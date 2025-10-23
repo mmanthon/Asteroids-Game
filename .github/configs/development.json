@@ -47,6 +47,10 @@
             "value": "ISCxDevProducts"
         },
         {
+            "name": "DYNAMODB_PRODUCT_VERSIONS_TABLE_NAME",
+            "value": "ISCxDevProductVersions"
+        },
+        {
             "name": "MVR_API_URL",
             "value": "https://dev-mvr.api.isceng.net/api"
         },

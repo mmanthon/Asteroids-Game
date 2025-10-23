@@ -34,6 +34,7 @@ export default () => ({
         wsConnectionsTableName: process.env.DYNAMODB_TASK_WS_CONNECTION_TABLE_NAME,
         emailHistoryTableName: process.env.DYNAMODB_EMAIL_HISTORY_TABLE_NAME,
         riskSummarizationTableName: process.env.DYNAMODB_RISK_SUMMARIZATIONS_TABLE_NAME,
+        productVersionsTableName: process.env.DYNAMODB_PRODUCT_VERSIONS_TABLE_NAME,
     },
 
     // AMP Database

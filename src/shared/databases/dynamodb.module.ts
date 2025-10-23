@@ -5,6 +5,7 @@ import {
     DynamoEmailHistoryEntity,
     DynamoNoteEntity,
     DynamoProductEntity,
+    DynamoProductVersionEntity,
     DynamoTaskEntity,
     DynamoTaskWebsocketConnectionEntity,
     DynamoUserEntity,
@@ -62,6 +63,10 @@ import { ConfigService } from '@nestjs/config';
                     metadata: { tableNameKey: 'dynamodb.emailHistoryTableName' },
                 },
                 {
+                    entityClass: DynamoProductVersionEntity,
+                    metadata: { tableNameKey: 'dynamodb.productVersionsTableName' },
+                },
+                {
                     entityClass: DynamoProductEntity,
                     metadata: { tableNameKey: 'dynamodb.productsTableName' },
                 },
@@ -84,6 +89,7 @@ import { ConfigService } from '@nestjs/config';
         DynamoDB,
         DynamoEmailHistoryEntity,
         DynamoProductEntity,
+        DynamoProductVersionEntity,
         RiskSummarizationEntity,
     ],
 })

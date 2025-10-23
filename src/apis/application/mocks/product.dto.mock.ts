@@ -9,6 +9,7 @@ export const mockProductDto: ApplicationProductDto[] = [
         programTypeID: String(programTypeID),
         carrierName: 'Carrier 1',
         isDirectToConsumer: false,
+        isAutoRiskSummarizationEnabled: false,
     },
     {
         id: '321',
@@ -17,5 +18,6 @@ export const mockProductDto: ApplicationProductDto[] = [
         programTypeID: String(programTypeID),
         carrierName: 'Carrier 2',
         isDirectToConsumer: false,
+        isAutoRiskSummarizationEnabled: false,
     },
 ];
