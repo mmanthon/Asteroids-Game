@@ -47,6 +47,7 @@ import { AdditionalProductData, AmpApplication } from './interfaces';
 
 @Injectable()
 export class ApplicationUtil {
+    private readonly productCache: { [key: string]: ProductDynamoModel } = {};
     private readonly emailSanitizerOptions: SanitizeOptions = {
         allowedAttributes: {
             '*': ['style'],
@@ -137,12 +138,15 @@ export class ApplicationUtil {
     async getBaseFormattedApplicationData(application: AmpApplication): Promise<SimplifiedApplicationDto> {
         const { item_id, product_ids, effective_date, project_end_date, first_bound_date } = application;
         const isMarketplaceApp = application.program_type_id === 22;
-        const products = await this.getApplicationProducts(application);
+        const dynamoApplication = isMarketplaceApp
+            ? await this.applicationEntity.findOne(String(application.item_id))
+            : undefined;
+        const products = await this.getApplicationProducts(application, dynamoApplication);
 
         const [additionalProductData, assignedUsers, marketplaceAppData] = await Promise.all([
             this.applicationQuery.getAdditionalProductDataByAppID(String(item_id)),
             this.getFormattedAssignedUsers(application.item_id),
-            isMarketplaceApp ? this.getMarketplaceAppData(String(application.item_id), products) : Promise.resolve({}),
+            isMarketplaceApp ? this.getMarketplaceAppData(dynamoApplication) : Promise.resolve({}),
         ]);
 
         const boundDate = first_bound_date ? this.formatDate(first_bound_date) : '';
@@ -380,40 +384,25 @@ export class ApplicationUtil {
 
     /**
      * @description Get marketplace application data
-     * @param {string} id
-     * @param {ApplicationProductDto[]} ampProductData
+     * @param {ApplicationDynamoModel} application
      * @returns {Promise<Partial<ApplicationDto>>}
      */
-    private async getMarketplaceAppData(
-        id: string,
-        ampProductData: ApplicationProductDto[],
-    ): Promise<Partial<ApplicationDto>> {
-        const application = await this.applicationEntity.findOne(id);
-
+    private async getMarketplaceAppData(application: ApplicationDynamoModel): Promise<Partial<ApplicationDto>> {
         // if application is not found, return an empty object
         if (!application) return {};
 
-        const latestVersionNum = await this.productVersionEntity.findLatestVersionNumber(application.product.id);
-        const latestProduct = await this.productEntity.findOneByVersion(application.product.id, latestVersionNum);
-        const autoDeclinationHistory = await this.getAutoDeclinationHistory(id, application.status, latestProduct);
+        const product = await this.getCachedProduct(application.product.id, application.product.version);
+        const autoDeclinationHistory = await this.getAutoDeclinationHistory(
+            application.id,
+            application.status,
+            product,
+        );
 
         const effectiveDate = application.effectiveDate ? this.formatDate(application.effectiveDate) : '';
         const expirationDate = application.expirationDate ? this.formatDate(application.expirationDate) : '';
         const boundDate = application.boundDate ? this.formatDate(application.boundDate) : '';
         const policyNumber = application.policyNo ?? '';
         const premium = this.extractPremiumFromApplication(application);
-
-        // Set isDirectToConsumer based on the marketplace product data
-        const marketplaceProduct = ampProductData.find((ampProduct) => latestProduct.id === ampProduct.id);
-
-        if (marketplaceProduct) {
-            marketplaceProduct.isDirectToConsumer = isDefined(latestProduct?.isDirectToConsumer)
-                ? latestProduct?.isDirectToConsumer
-                : false;
-            marketplaceProduct.isAutoRiskSummarizationEnabled = isDefined(latestProduct?.isAutoRiskSummarizationEnabled)
-                ? latestProduct?.isAutoRiskSummarizationEnabled
-                : false;
-        }
 
         return {
             submissionID: application.submissionID,
@@ -476,36 +465,78 @@ export class ApplicationUtil {
 
     /**
      * @description Get application products
-     * @param {AmpApplication} application
+     * @param {AmpApplication} ampApplication
+     * @param {ApplicationDynamoModel} [dynamoApplication] - The dynamo application object (optional)
      * @returns {Promise<ApplicationProductDto[]>}
      */
-    private async getApplicationProducts(application: AmpApplication): Promise<ApplicationProductDto[]> {
-        const { item_id, product_ids, product_name, program_id, program_type_id, carrier_name } = application;
-        const products = [
-            {
-                id: String(product_ids),
-                name: product_name,
-                programID: String(program_id),
-                programTypeID: String(program_type_id),
-                carrierName: carrier_name,
-                isDirectToConsumer: false,
-                isAutoRiskSummarizationEnabled: false,
-            },
-        ];
+    private async getApplicationProducts(
+        ampApplication: AmpApplication,
+        dynamoApplication?: ApplicationDynamoModel,
+    ): Promise<ApplicationProductDto[]> {
+        const { item_id, product_ids, product_name, program_id, program_type_id, carrier_name } = ampApplication;
 
-        const linkedProducts = await this.applicationQuery.getLinkedProductsByAppID(String(item_id));
+        const [product, linkedProducts] = await Promise.all([
+            dynamoApplication
+                ? this.getCachedProduct(dynamoApplication.product.id, dynamoApplication.product.version)
+                : Promise.resolve(null),
+            this.applicationQuery.getLinkedProductsByAppID(String(item_id)),
+        ]);
 
-        return products.concat(
-            linkedProducts.map((product) => ({
-                id: String(product.product_id),
-                name: product.product_name,
-                programID: String(product.program_id),
-                programTypeID: String(product.program_type_id),
-                carrierName: product.carrier_name,
-                isDirectToConsumer: false,
-                isAutoRiskSummarizationEnabled: false,
-            })),
-        );
+        // Build shared product info
+        const sharedProductInfo = {
+            isDirectToConsumer: product?.isDirectToConsumer ?? false,
+            isAutoRiskSummarizationEnabled: product?.isAutoRiskSummarizationEnabled ?? false,
+        };
+
+        // Create main product
+        const mainProduct: ApplicationProductDto = {
+            id: String(product_ids),
+            name: product_name,
+            programID: String(program_id),
+            programTypeID: String(program_type_id),
+            carrierName: carrier_name,
+            ...sharedProductInfo,
+        };
+
+        // Early return if no linked products
+        if (linkedProducts.length === 0) {
+            return [mainProduct];
+        }
+
+        // Create linked products with optimized mapping
+        const linkedProductsDto: ApplicationProductDto[] = linkedProducts.map((product) => ({
+            id: String(product.product_id),
+            name: product.product_name,
+            programID: String(product.program_id),
+            programTypeID: String(product.program_type_id),
+            carrierName: product.carrier_name,
+            isDirectToConsumer: false,
+            isAutoRiskSummarizationEnabled: false,
+        }));
+
+        return [mainProduct, ...linkedProductsDto];
+    }
+
+    /**
+     * @description Get cached product data to avoid repeated database calls
+     * @param {string} productID
+     * @param {string} version
+     * @returns {Promise<ProductDynamoModel>}
+     */
+    private async getCachedProduct(productID: string, version: number): Promise<ProductDynamoModel> {
+        const cacheKey = `${productID}-${version}`;
+
+        // If we already have the resolved data in cache, return it immediately
+        if (this.productCache[cacheKey]) {
+            return this.productCache[cacheKey];
+        }
+
+        // Fetch the product and store the resolved data in cache
+        const product = await this.productEntity.findOneByVersion(productID, version);
+
+        this.productCache[cacheKey] = product;
+
+        return product;
     }
 
     /**
