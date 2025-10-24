@@ -4,6 +4,7 @@ import {
     CompanyEntity,
     EmailTrackingEntity,
     ItemEntity,
+    ItemLinkedProductEntity,
     PersonEntity,
     SessionEntity,
     UserEntity,
@@ -67,6 +68,7 @@ import knex, { Knex } from 'knex';
                 { entityClass: UserEntity },
                 { entityClass: EmailTrackingEntity },
                 { entityClass: SessionEntity },
+                { entityClass: ItemLinkedProductEntity },
             ],
             mysqlEntityFactory,
         ),
@@ -82,6 +84,7 @@ import knex, { Knex } from 'knex';
         UserEntity,
         EmailTrackingEntity,
         SessionEntity,
+        ItemLinkedProductEntity,
     ],
 })
 export class AmpModule {}

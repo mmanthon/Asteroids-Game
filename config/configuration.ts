@@ -8,6 +8,7 @@ export default () => ({
 
     // AWS
     awsRegion: process.env.AWS_REGION,
+    sendTasksToWSFunctionName: process.env.SEND_TASKS_TO_WS_FUNCTION_NAME,
 
     // JWT
     jwt: {
@@ -18,9 +19,6 @@ export default () => ({
     // Amp api
     ampApiBaseUrl: process.env.AMP_API_BASE_URL,
     ampApiKey: process.env.AMP_API_KEY,
-
-    // UTM SQS
-    queueUrl: process.env.TASK_QUEUE_URL,
 
     // DynamoDB tables
     dynamodb: {

@@ -10,7 +10,7 @@ export const envValidationSchema = Joi.object({
 
     // AWS
     AWS_REGION: Joi.string().required(),
-    TASK_QUEUE_URL: Joi.string().required(),
+    SEND_TASKS_TO_WS_FUNCTION_NAME: Joi.string().required(),
 
     // JWT
     JWT_SECRET: Joi.string().required(),

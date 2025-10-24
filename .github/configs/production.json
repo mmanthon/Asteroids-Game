@@ -55,16 +55,16 @@
             "value": "tracking"
         },
         {
-            "name": "TASK_QUEUE_URL",
-            "value": "https://sqs.us-west-2.amazonaws.com/049005703416/iscx-utm-queue"
-        },
-        {
             "name": "DYNAMODB_RISK_SUMMARIZATIONS_TABLE_NAME",
             "value": "ISCxRiskSummarizations"
         },
         {
             "name": "DYNAMODB_PRODUCT_VERSIONS_TABLE_NAME",
             "value": "ISCxProductVersions"
+        },
+        {
+            "name": "SEND_TASKS_TO_WS_FUNCTION_NAME",
+            "value": "iscx-utm-send-tasks-to-ws-clients-production"
         }
     ],
     "secrets": [

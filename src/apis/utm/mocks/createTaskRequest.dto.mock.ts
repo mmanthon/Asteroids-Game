@@ -1,7 +1,7 @@
 import { mockActionType, mockEmailID } from './constants.mock';
-import { EnqueueRequestDto } from '../dto';
+import { CreateTaskRequestDto } from '../dto';
 
-export const mockEnqueueRequest: EnqueueRequestDto = {
+export const mockCreateTaskRequest: CreateTaskRequestDto = {
     emailID: mockEmailID,
     actionType: mockActionType,
 };

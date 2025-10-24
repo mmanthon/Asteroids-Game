@@ -1,7 +1,7 @@
-import { TaskDynamoModel, TaskStatusEnum } from '@ignidus/iscx-backend-utils';
+import { AmpEmailActionTypeLabelEnum, TaskStatusEnum } from '@ignidus/iscx-backend-utils';
 
 import {
-    mockActionTypeLabel,
+    mockAgencyID,
     mockAppID,
     mockCompanyName,
     mockCreatedDate,
@@ -9,22 +9,21 @@ import {
     mockUpdatedDate,
     mockUserID,
 } from './constants.mock';
-import { testAgency, testAssignedUser, testProgramTypes } from './utmResponse.dto.mock';
 
-export const mockTaskModel: TaskDynamoModel = {
+export const mockWebsocketTask = {
     id: mockTaskID,
     status: TaskStatusEnum.NOT_STARTED,
     appID: mockAppID,
     isNew: true,
-    assignedUser: testAssignedUser,
+    assignedUser: { id: mockUserID, fname: 'Test', lname: 'User' },
     products: [],
-    agency: testAgency,
-    programTypes: [testProgramTypes],
+    agency: { id: mockAgencyID, label: 'Test Agency' },
+    programTypes: [],
     tags: [],
     isArchived: false,
     position: 0,
     updatedBy: mockUserID,
-    actionType: mockActionTypeLabel,
+    actionType: AmpEmailActionTypeLabelEnum.approval,
     companyName: mockCompanyName,
     updatedDate: mockUpdatedDate,
     createdDate: mockCreatedDate,

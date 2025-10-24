@@ -1,7 +1,7 @@
 import { TaskStatusEnum } from '@ignidus/iscx-backend-utils';
 
 import {
-    mockActionType,
+    mockActionTypeLabel,
     mockAgencyID,
     mockAppID,
     mockCompanyName,
@@ -46,7 +46,7 @@ export const utmResponseDto: UtmResponseDto = {
     position: 0,
     groups: [],
     updatedBy: mockUserID,
-    actionType: mockActionType,
+    actionType: mockActionTypeLabel,
     companyName: mockCompanyName,
     updatedDate: mockUpdatedDate,
     createdDate: mockCreatedDate,

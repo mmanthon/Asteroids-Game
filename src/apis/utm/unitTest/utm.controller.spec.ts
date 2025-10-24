@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { SessionByIDGuard } from '../../../shared/guards';
-import { mockEnqueueRequest } from '../mocks';
+import { mockCreateTaskRequest } from '../mocks';
 import { UtmController } from '../utm.controller';
 import { UtmService } from '../utm.service';
 
@@ -16,7 +16,7 @@ describe('UtmController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [UtmController],
             providers: [
-                { provide: UtmService, useValue: { findAll: jest.fn(), enqueue: jest.fn() } },
+                { provide: UtmService, useValue: { findAll: jest.fn(), create: jest.fn() } },
                 { provide: ConfigService, useValue: {} },
                 { provide: JwtService, useValue: {} },
                 { provide: DynamoTaskEntity, useValue: {} },
@@ -36,14 +36,25 @@ describe('UtmController', () => {
         expect(service).toBeDefined();
     });
 
+    describe('create', () => {
+        it('should call service.create', async () => {
+            jest.spyOn(service, 'create').mockResolvedValueOnce(undefined);
+
+            await controller.create(mockCreateTaskRequest);
+
+            expect(service.create).toHaveBeenCalled();
+            expect(service.create).toHaveBeenCalledWith(mockCreateTaskRequest);
+        });
+    });
+
     describe('enqueue', () => {
-        it('should call service.enqueue', async () => {
-            jest.spyOn(service, 'enqueue').mockResolvedValueOnce(undefined);
+        it('should call service.create', async () => {
+            jest.spyOn(service, 'create').mockResolvedValueOnce(undefined);
 
-            await controller.enqueue(mockEnqueueRequest);
+            await controller.enqueue(mockCreateTaskRequest);
 
-            expect(service.enqueue).toHaveBeenCalled();
-            expect(service.enqueue).toHaveBeenCalledWith(mockEnqueueRequest);
+            expect(service.create).toHaveBeenCalled();
+            expect(service.create).toHaveBeenCalledWith(mockCreateTaskRequest);
         });
     });
 

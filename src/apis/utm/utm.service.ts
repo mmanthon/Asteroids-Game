@@ -1,42 +1,58 @@
-import { SQS } from '@aws-sdk/client-sqs';
-import { DynamoTaskEntity, EmailTrackingEntity } from '@ignidus/iscx-backend-utils';
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+/* eslint-disable camelcase */
+import { DynamoTaskEntity } from '@ignidus/iscx-backend-utils';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { EnqueueRequestDto, TaskFilters, UtmResponseDto } from './dto';
+import { CreateTaskRequestDto, TaskFilters, UtmResponseDto } from './dto';
+import { UtmQuery } from './utm.query';
 import { UtmUtil } from './utm.util';
 
 @Injectable()
 export class UtmService {
-    private sqsClient: SQS;
+    private readonly logger = new Logger(UtmService.name);
 
     constructor(
         private readonly utmUtil: UtmUtil,
+        private readonly utmQuery: UtmQuery,
         private readonly taskEntity: DynamoTaskEntity,
-        private readonly configService: ConfigService,
-        private readonly emailTrackingEntity: EmailTrackingEntity,
-    ) {
-        this.sqsClient = new SQS({
-            region: this.configService.get<string>('awsRegion'),
-        });
-    }
+    ) {}
 
     /**
-     * @description Enqueue task
-     * @param {EnqueueRequestDto} body
+     * @description Create task
+     * @param {CreateTaskRequestDto} request
      * @returns {Promise<void>}
      */
-    async enqueue(body: EnqueueRequestDto): Promise<void> {
-        const emailRecord = await this.emailTrackingEntity.getEmailRecordByID(Number(body.emailID));
+    async create(request: CreateTaskRequestDto): Promise<void> {
+        const excludedStatusIDs = [2, 11, 31, 32, 34, 50];
+        const emailTrackingRecord = await this.utmUtil.validateEmailRecord(request.emailID);
+        const { entity_id, subject } = emailTrackingRecord;
 
-        if (!emailRecord) {
-            throw new BadRequestException('Email record not found');
+        // Get application by id
+        const application = await this.utmQuery.getApplicationByID(String(entity_id));
+
+        // If application status is not valid, skip create task
+        if (excludedStatusIDs.includes(application.statusID)) {
+            this.logger.warn(`Application status is not valid. Skipping create task. ${JSON.stringify(application)}`);
+
+            return;
         }
 
-        await this.sqsClient.sendMessage({
-            QueueUrl: this.configService.get<string>('queueUrl'),
-            MessageBody: JSON.stringify(body),
-        });
+        this.logger.log(
+            `Processing create task: ${JSON.stringify(request)}.Application: ${JSON.stringify(application)}`,
+        );
+
+        const newTask = this.utmUtil.buildTaskPayload(application, request.actionType);
+
+        this.utmUtil.addGroups(newTask);
+        this.utmUtil.addTags(application, newTask, subject);
+        await this.utmUtil.addLinkedProducts(newTask);
+        await this.utmUtil.addLinkedProgramTypes(newTask);
+        await this.utmUtil.autoAssign(newTask);
+
+        // create task in dynamodb
+        const createdTask = await this.taskEntity.create(newTask);
+
+        // send created task to websocket
+        await this.utmUtil.sendTasksToWebsocket([createdTask]);
     }
 
     /**

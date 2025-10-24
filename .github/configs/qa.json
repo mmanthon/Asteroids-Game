@@ -46,7 +46,7 @@
             "name": "DYNAMODB_PRODUCTS_TABLE_NAME",
             "value": "ISCxQAProducts"
         },
-          {
+        {
             "name": "DYNAMODB_PRODUCT_VERSIONS_TABLE_NAME",
             "value": "ISCxQAProductVersions"
         },
@@ -59,12 +59,12 @@
             "value": "tracking"
         },
         {
-            "name": "TASK_QUEUE_URL",
-            "value": "https://sqs.us-west-2.amazonaws.com/694679581764/iscx-qa-utm-queue"
-        },
-        {
             "name": "DYNAMODB_RISK_SUMMARIZATIONS_TABLE_NAME",
             "value": "ISCxQARiskSummarizations"
+        },
+        {
+            "name": "SEND_TASKS_TO_WS_FUNCTION_NAME",
+            "value": "iscx-utm-send-tasks-to-ws-clients-qa"
         }
     ],
     "secrets": [

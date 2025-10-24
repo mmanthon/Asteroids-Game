@@ -1,6 +1,7 @@
-import { AmpEmailActionTypeLabelEnum, UtmGroupEnum } from '@ignidus/iscx-backend-utils';
+import { AmpEmailActionTypeEnum, AmpEmailActionTypeLabelEnum, UtmGroupEnum } from '@ignidus/iscx-backend-utils';
 
-export const mockActionType = AmpEmailActionTypeLabelEnum.approval;
+export const mockActionType = AmpEmailActionTypeEnum.APPROVAL_REQUESTED;
+export const mockActionTypeLabel = AmpEmailActionTypeLabelEnum.approval;
 export const mockAgencyID = '2342342';
 export const mockAppID = '234234';
 export const mockCompanyName = 'mockCompanyName';
