@@ -30,7 +30,6 @@ import {
     sanitizeHtml,
 } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
-import { isDefined } from 'class-validator';
 
 import { ApplicationQuery } from './application.query';
 import {
