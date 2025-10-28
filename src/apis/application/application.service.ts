@@ -1,4 +1,4 @@
-import { IJWT } from '@ignidus/iscx-backend-utils';
+import { IJWT, ProductDynamoModel } from '@ignidus/iscx-backend-utils';
 import { Injectable } from '@nestjs/common';
 
 import { ApplicationQuery } from './application.query';
@@ -20,8 +20,13 @@ export class ApplicationService {
     async findAll(filters: FilterParamDto): Promise<FindAllResponseDto> {
         const { applications, ...pagination } = await this.applicationQuery.findAll(filters);
 
+        // Create request-scoped product cache shared across all applications
+        const productCache: { [key: string]: ProductDynamoModel } = {};
+
         const formattedApplications = await Promise.all(
-            applications.map((application) => this.applicationUtil.getBaseFormattedApplicationData(application)),
+            applications.map((application) =>
+                this.applicationUtil.getBaseFormattedApplicationData(application, productCache),
+            ),
         );
 
         return {

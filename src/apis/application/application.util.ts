@@ -47,7 +47,6 @@ import { AdditionalProductData, AmpApplication } from './interfaces';
 
 @Injectable()
 export class ApplicationUtil {
-    private readonly productCache: { [key: string]: ProductDynamoModel } = {};
     private readonly emailSanitizerOptions: SanitizeOptions = {
         allowedAttributes: {
             '*': ['style'],
@@ -100,9 +99,14 @@ export class ApplicationUtil {
      * @description Format application
      * @param {AmpApplication} application
      * @param {IJWT} user - the requesting user
+     * @param {Object} productCache - Optional request-scoped cache for product data (used in batch operations)
      * @returns {Promise<ApplicationDto>}
      */
-    async formatApplication(application: AmpApplication, user: IJWT): Promise<ApplicationDto> {
+    async formatApplication(
+        application: AmpApplication,
+        user: IJWT,
+        productCache?: { [key: string]: ProductDynamoModel },
+    ): Promise<ApplicationDto> {
         const { item_id, last_updated } = application;
         const updatedDate = last_updated ? this.formatDate(application.last_updated) : '';
         const isMarketplaceApp = application.program_type_id === 22;
@@ -110,7 +114,7 @@ export class ApplicationUtil {
         const [agent, policy, baseFormattedAppData, emails] = await Promise.all([
             this.applicationQuery.getAgentInfoByUserId(String(application.user_id)),
             this.applicationQuery.findPolicyByAppID(String(item_id)),
-            this.getBaseFormattedApplicationData(application),
+            this.getBaseFormattedApplicationData(application, productCache),
             isMarketplaceApp ? this.getMarketplaceEmails(String(item_id)) : this.getAmpEmails(String(item_id)),
         ]);
 
@@ -133,20 +137,25 @@ export class ApplicationUtil {
     /**
      * @description Get base formatted application data
      * @param {AmpApplication} application - The AMP application object
+     * @param {Object} productCache - Optional request-scoped cache for product data (used in batch operations)
      * @returns {Promise<SimplifiedApplicationDto>}
      */
-    async getBaseFormattedApplicationData(application: AmpApplication): Promise<SimplifiedApplicationDto> {
+    async getBaseFormattedApplicationData(
+        application: AmpApplication,
+        productCache?: { [key: string]: ProductDynamoModel },
+    ): Promise<SimplifiedApplicationDto> {
         const { item_id, product_ids, effective_date, project_end_date, first_bound_date } = application;
         const isMarketplaceApp = application.program_type_id === 22;
         const dynamoApplication = isMarketplaceApp
             ? await this.applicationEntity.findOne(String(application.item_id))
             : undefined;
-        const products = await this.getApplicationProducts(application, dynamoApplication);
+
+        const products = await this.getApplicationProducts(application, dynamoApplication, productCache);
 
         const [additionalProductData, assignedUsers, marketplaceAppData] = await Promise.all([
             this.applicationQuery.getAdditionalProductDataByAppID(String(item_id)),
             this.getFormattedAssignedUsers(application.item_id),
-            isMarketplaceApp ? this.getMarketplaceAppData(dynamoApplication) : Promise.resolve({}),
+            isMarketplaceApp ? this.getMarketplaceAppData(dynamoApplication, productCache) : Promise.resolve({}),
         ]);
 
         const boundDate = first_bound_date ? this.formatDate(first_bound_date) : '';
@@ -385,13 +394,17 @@ export class ApplicationUtil {
     /**
      * @description Get marketplace application data
      * @param {ApplicationDynamoModel} application
+     * @param {Object} productCache - Optional request-scoped cache for product data (used in batch operations)
      * @returns {Promise<Partial<ApplicationDto>>}
      */
-    private async getMarketplaceAppData(application: ApplicationDynamoModel): Promise<Partial<ApplicationDto>> {
+    private async getMarketplaceAppData(
+        application: ApplicationDynamoModel,
+        productCache?: { [key: string]: ProductDynamoModel },
+    ): Promise<Partial<ApplicationDto>> {
         // if application is not found, return an empty object
         if (!application) return {};
 
-        const product = await this.getCachedProduct(application.product.id, application.product.version);
+        const product = await this.getCachedProduct(application.product.id, application.product.version, productCache);
         const autoDeclinationHistory = await this.getAutoDeclinationHistory(
             application.id,
             application.status,
@@ -467,17 +480,19 @@ export class ApplicationUtil {
      * @description Get application products
      * @param {AmpApplication} ampApplication
      * @param {ApplicationDynamoModel} [dynamoApplication] - The dynamo application object (optional)
+     * @param {Object} productCache - Optional request-scoped cache for product data (used in batch operations)
      * @returns {Promise<ApplicationProductDto[]>}
      */
     private async getApplicationProducts(
         ampApplication: AmpApplication,
-        dynamoApplication?: ApplicationDynamoModel,
+        dynamoApplication: ApplicationDynamoModel | undefined,
+        productCache?: { [key: string]: ProductDynamoModel },
     ): Promise<ApplicationProductDto[]> {
         const { item_id, product_ids, product_name, program_id, program_type_id, carrier_name } = ampApplication;
 
         const [product, linkedProducts] = await Promise.all([
             dynamoApplication
-                ? this.getCachedProduct(dynamoApplication.product.id, dynamoApplication.product.version)
+                ? this.getCachedProduct(dynamoApplication.product.id, dynamoApplication.product.version, productCache)
                 : Promise.resolve(null),
             this.applicationQuery.getLinkedProductsByAppID(String(item_id)),
         ]);
@@ -518,23 +533,33 @@ export class ApplicationUtil {
     }
 
     /**
-     * @description Get cached product data to avoid repeated database calls
+     * @description Get cached product data to avoid repeated database calls within a single request
      * @param {string} productID
-     * @param {string} version
+     * @param {number} version
+     * @param {Object} productCache - Optional request-scoped cache for product data (used in batch operations)
      * @returns {Promise<ProductDynamoModel>}
      */
-    private async getCachedProduct(productID: string, version: number): Promise<ProductDynamoModel> {
+    private async getCachedProduct(
+        productID: string,
+        version: number,
+        productCache?: { [key: string]: ProductDynamoModel },
+    ): Promise<ProductDynamoModel> {
+        // If no cache provided, fetch directly
+        if (!productCache) {
+            return this.productEntity.findOneByVersion(productID, version);
+        }
+
         const cacheKey = `${productID}-${version}`;
 
         // If we already have the resolved data in cache, return it immediately
-        if (this.productCache[cacheKey]) {
-            return this.productCache[cacheKey];
+        if (productCache[cacheKey]) {
+            return productCache[cacheKey];
         }
 
         // Fetch the product and store the resolved data in cache
         const product = await this.productEntity.findOneByVersion(productID, version);
 
-        this.productCache[cacheKey] = product;
+        productCache[cacheKey] = product;
 
         return product;
     }
