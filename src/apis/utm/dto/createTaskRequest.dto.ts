@@ -1,6 +1,6 @@
 import { AmpEmailActionTypeEnum } from '@ignidus/iscx-backend-utils';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class CreateTaskRequestDto {
     @ApiProperty({
@@ -16,6 +16,6 @@ export class CreateTaskRequestDto {
         example: AmpEmailActionTypeEnum.APPROVAL_REQUESTED,
         enum: AmpEmailActionTypeEnum,
     })
-    @IsEnum(AmpEmailActionTypeEnum)
+    @IsString() // TODO: add enum validation
     actionType: AmpEmailActionTypeEnum;
 }
