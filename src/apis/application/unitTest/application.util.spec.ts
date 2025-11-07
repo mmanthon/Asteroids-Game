@@ -4,6 +4,7 @@ import {
     AclRoleEntity,
     AmpRolesEnum,
     ApplicationTypeEnum,
+    DocumentClassificationEntity,
     DynamoApplicationEntity,
     DynamoAutoDeclinationHistoryEntity,
     DynamoEmailHistoryEntity,
@@ -40,6 +41,7 @@ import {
     mockAmpApplicationWithMissingFields,
     mockApplicationDto,
     mockApplicationDynamoModel,
+    mockDocumentClassifications,
     mockEmailDto,
     mockEmailHistoryModel,
     mockEmailTrackingModel,
@@ -105,9 +107,26 @@ describe('ApplicationUtil', () => {
                 { provide: DynamoNoteEntity, useValue: { findAllByEntity: jest.fn() } },
                 { provide: EmailTrackingEntity, useValue: { getByEntityID: jest.fn() } },
                 { provide: DynamoEmailHistoryEntity, useValue: { findAllByEntityID: jest.fn() } },
-                { provide: DynamoProductEntity, useValue: { findOneByVersion: jest.fn() } },
-                { provide: DynamoProductVersionEntity, useValue: { findLatestVersionNumber: jest.fn() } },
                 { provide: DynamoAutoDeclinationHistoryEntity, useValue: { findOneByAppID: jest.fn() } },
+                {
+                    provide: DynamoProductEntity,
+                    useValue: {
+                        findOneByVersion: jest.fn().mockResolvedValue({
+                            documentClassificationOptionIDs: [],
+                        }),
+                    },
+                },
+                {
+                    provide: DynamoProductVersionEntity,
+                    useValue: { findLatestVersionNumber: jest.fn().mockResolvedValue(1) },
+                },
+                {
+                    provide: DocumentClassificationEntity,
+                    useValue: {
+                        batchGet: jest.fn().mockResolvedValue([]),
+                        findAllByIndex: jest.fn().mockResolvedValue(mockDocumentClassifications),
+                    },
+                },
             ],
         }).compile();
 
@@ -127,6 +146,7 @@ describe('ApplicationUtil', () => {
             jest.spyOn(util['applicationEntity'], 'findOne').mockResolvedValueOnce(mockApplicationDynamoModel);
             jest.spyOn(util['productEntity'], 'findOneByVersion').mockResolvedValueOnce({
                 isDirectToConsumer: false,
+                documentClassificationOptionIDs: [],
             } as unknown as ProductDynamoModel);
             const result = await util.getBaseFormattedApplicationData({
                 ...mockAmpApplication,
@@ -396,6 +416,7 @@ describe('ApplicationUtil', () => {
                 id: '123',
                 version: 1,
                 isDirectToConsumer: false,
+                documentClassificationOptionIDs: [],
             } as unknown as ProductDynamoModel);
             jest.spyOn(util['noteEntity'], 'findAllByEntity')
                 .mockResolvedValueOnce([mockNoteDynamoModelMissingAuthor])
@@ -439,6 +460,7 @@ describe('ApplicationUtil', () => {
                 id: '123',
                 version: 1,
                 isDirectToConsumer: false,
+                documentClassificationOptionIDs: [],
             } as unknown as ProductDynamoModel);
             jest.spyOn(applicationQuery, 'getAdditionalProductDataByAppID').mockResolvedValueOnce([]);
             jest.spyOn(applicationQuery, 'findPolicyByAppID').mockResolvedValue(undefined);
@@ -490,6 +512,7 @@ describe('ApplicationUtil', () => {
                 id: '123',
                 version: 1,
                 isDirectToConsumer: false,
+                documentClassificationOptionIDs: [],
             } as unknown as ProductDynamoModel);
 
             const result = await util.formatApplication({ ...mockAmpApplication, program_type_id: 22 }, mockUser);
@@ -512,6 +535,7 @@ describe('ApplicationUtil', () => {
                     {
                         ...mockApplicationDto.products[0],
                         programTypeID: '22',
+                        documentClassificationOptions: ['Not Classified'],
                     },
                     ...mockApplicationDto.products.slice(1),
                 ],
@@ -659,6 +683,7 @@ describe('ApplicationUtil', () => {
             version: 7,
             isDirectToConsumer: false,
             isAutoRiskSummarizationEnabled: true,
+            documentClassificationOptionIDs: [],
         } as unknown as ProductDynamoModel);
 
         jest.spyOn(applicationQuery, 'getAdditionalProductDataByAppID').mockResolvedValueOnce([]);

@@ -63,6 +63,10 @@
             "value": "ISCxProductVersions"
         },
         {
+            "name": "DYNAMODB_DOCUMENT_CLASSIFICATIONS_TABLE_NAME",
+            "value": "ISCxDocumentClassifications"
+        },
+        {
             "name": "SEND_TASKS_TO_WS_FUNCTION_NAME",
             "value": "iscx-utm-send-tasks-to-ws-clients-production"
         }

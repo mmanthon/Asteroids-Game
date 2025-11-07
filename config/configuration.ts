@@ -33,6 +33,7 @@ export default () => ({
         emailHistoryTableName: process.env.DYNAMODB_EMAIL_HISTORY_TABLE_NAME,
         riskSummarizationTableName: process.env.DYNAMODB_RISK_SUMMARIZATIONS_TABLE_NAME,
         productVersionsTableName: process.env.DYNAMODB_PRODUCT_VERSIONS_TABLE_NAME,
+        documentClassificationsTableName: process.env.DYNAMODB_DOCUMENT_CLASSIFICATIONS_TABLE_NAME,
     },
 
     // AMP Database

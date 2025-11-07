@@ -26,6 +26,7 @@ export const envValidationSchema = Joi.object({
     DYNAMODB_AUTO_DECLINATION_HISTORY_TABLE_NAME: Joi.string().required(),
     DYNAMODB_PRODUCTS_TABLE_NAME: Joi.string().required(),
     DYNAMODB_RISK_SUMMARIZATIONS_TABLE_NAME: Joi.string().required(),
+    DYNAMODB_DOCUMENT_CLASSIFICATIONS_TABLE_NAME: Joi.string().required(),
 
     // Amp api
     AMP_API_BASE_URL: Joi.string().required(),

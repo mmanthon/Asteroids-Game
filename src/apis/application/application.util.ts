@@ -9,6 +9,8 @@ import {
     ApplicationStatusNameEnum,
     ApplicationTypeEnum,
     AutoDeclineConditionTypeEnum,
+    DOCUMENT_CLASSIFICATION_SYSTEM_DEFAULT_VALUE,
+    DocumentClassificationEntity,
     DynamoApplicationEntity,
     DynamoAutoDeclinationHistoryEntity,
     DynamoEmailHistoryEntity,
@@ -92,6 +94,7 @@ export class ApplicationUtil {
         private readonly autoDeclinationHistoryEntity: DynamoAutoDeclinationHistoryEntity,
         private readonly productEntity: DynamoProductEntity,
         private readonly productVersionEntity: DynamoProductVersionEntity,
+        private readonly documentClassificationEntity: DocumentClassificationEntity,
     ) {}
 
     /**
@@ -500,7 +503,17 @@ export class ApplicationUtil {
         const sharedProductInfo = {
             isDirectToConsumer: product?.isDirectToConsumer ?? false,
             isAutoRiskSummarizationEnabled: product?.isAutoRiskSummarizationEnabled ?? false,
+            documentClassificationOptions: [],
         };
+
+        // If dynamo application is provided, get the document classification options
+        if (dynamoApplication) {
+            const documentClassificationOptions = await this.getDocumentClassificationOptions(
+                dynamoApplication.product.id,
+            );
+
+            sharedProductInfo.documentClassificationOptions = documentClassificationOptions;
+        }
 
         // Create main product
         const mainProduct: ApplicationProductDto = {
@@ -526,6 +539,7 @@ export class ApplicationUtil {
             carrierName: product.carrier_name,
             isDirectToConsumer: false,
             isAutoRiskSummarizationEnabled: false,
+            documentClassificationOptions: [],
         }));
 
         return [mainProduct, ...linkedProductsDto];
@@ -561,6 +575,35 @@ export class ApplicationUtil {
         productCache[cacheKey] = product;
 
         return product;
+    }
+
+    /**
+     * @description Get the document classification options for a product
+     * @param {string} productID
+     * @returns {Promise<string[]>}
+     */
+    private async getDocumentClassificationOptions(productID: string): Promise<string[]> {
+        const latestVersion = await this.productVersionEntity.findLatestVersionNumber(productID);
+        const product = await this.productEntity.findOneByVersion(productID, latestVersion);
+
+        const { documentClassificationOptionIDs = [] } = product;
+
+        const [productDocumentClassifications, defaultDocumentClassifications] = await Promise.all([
+            this.documentClassificationEntity.batchGet(documentClassificationOptionIDs),
+            this.documentClassificationEntity.findAllByIndex({
+                indexName: 'system-default-index',
+                indexKey: 'systemDefault',
+                indexValue: DOCUMENT_CLASSIFICATION_SYSTEM_DEFAULT_VALUE,
+            }),
+        ]);
+
+        const allClassifications = new Map();
+
+        [...productDocumentClassifications, ...defaultDocumentClassifications].forEach((classification) => {
+            allClassifications.set(classification.id, classification);
+        });
+
+        return Array.from(allClassifications.values()).map((classification) => classification.name);
     }
 
     /**

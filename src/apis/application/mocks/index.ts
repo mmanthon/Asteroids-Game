@@ -8,6 +8,7 @@ export * from './assignedUser.dto.mock';
 export * from './authenticateRequest.interface.mock';
 export * from './claim.dto.mock';
 export * from './constants.mock';
+export * from './documentClassification.mock';
 export * from './email.dto.mock';
 export * from './emailHistory.model.mock';
 export * from './emailTracking.model.mock';

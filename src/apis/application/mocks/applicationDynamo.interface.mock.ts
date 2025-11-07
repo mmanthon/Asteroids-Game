@@ -14,6 +14,8 @@ export const mockApplicationDynamoModel: ApplicationDynamoModel = {
     expirationDate: '2026-04-01T00:00:00Z',
     boundDate: dateToFormat,
     policyNo: policyNumber,
+    productID: String(productID),
+    productVersion: 1,
     product: {
         id: String(productID),
         version: 1,
@@ -69,6 +71,8 @@ export const mockApplicationDynamoModel: ApplicationDynamoModel = {
 export const mockIncompleteApplicationDynamoModel: ApplicationDynamoModel = {
     id: '',
     answers: [],
+    productID: '',
+    productVersion: 0,
     product: { id: '', version: 0 },
     submissionID: undefined,
     effectiveDate: undefined,

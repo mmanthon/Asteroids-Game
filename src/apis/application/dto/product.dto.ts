@@ -21,4 +21,12 @@ export class ApplicationProductDto {
 
     @ApiProperty({ description: 'Is Auto Risk Summarization Enabled', example: true })
     isAutoRiskSummarizationEnabled: boolean;
+
+    @ApiProperty({
+        description: 'Document Classification Options',
+        example: ['Not Classified'],
+        type: String,
+        isArray: true,
+    })
+    documentClassificationOptions: string[];
 }

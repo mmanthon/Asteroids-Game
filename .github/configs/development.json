@@ -63,6 +63,10 @@
             "value": "ISCxDevRiskSummarizations"
         },
         {
+            "name": "DYNAMODB_DOCUMENT_CLASSIFICATIONS_TABLE_NAME",
+            "value": "ISCxDevDocumentClassifications"
+        },
+        {
             "name": "SEND_TASKS_TO_WS_FUNCTION_NAME",
             "value": "iscx-utm-send-tasks-to-ws-clients-development"
         }

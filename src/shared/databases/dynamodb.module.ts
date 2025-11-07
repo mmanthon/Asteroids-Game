@@ -1,5 +1,6 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import {
+    DocumentClassificationEntity,
     DynamoApplicationEntity,
     DynamoAutoDeclinationHistoryEntity,
     DynamoEmailHistoryEntity,
@@ -74,6 +75,10 @@ import { ConfigService } from '@nestjs/config';
                     entityClass: RiskSummarizationEntity,
                     metadata: { tableNameKey: 'dynamodb.riskSummarizationTableName' },
                 },
+                {
+                    entityClass: DocumentClassificationEntity,
+                    metadata: { tableNameKey: 'dynamodb.documentClassificationsTableName' },
+                },
             ],
             dynamoEntityFactory,
         ),
@@ -91,6 +96,7 @@ import { ConfigService } from '@nestjs/config';
         DynamoProductEntity,
         DynamoProductVersionEntity,
         RiskSummarizationEntity,
+        DocumentClassificationEntity,
     ],
 })
 export class DynamoDBModule {}

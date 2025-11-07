@@ -10,6 +10,7 @@ export const mockProductDto: ApplicationProductDto[] = [
         carrierName: 'Carrier 1',
         isDirectToConsumer: false,
         isAutoRiskSummarizationEnabled: false,
+        documentClassificationOptions: [],
     },
     {
         id: '321',
@@ -19,5 +20,6 @@ export const mockProductDto: ApplicationProductDto[] = [
         carrierName: 'Carrier 2',
         isDirectToConsumer: false,
         isAutoRiskSummarizationEnabled: false,
+        documentClassificationOptions: [],
     },
 ];
