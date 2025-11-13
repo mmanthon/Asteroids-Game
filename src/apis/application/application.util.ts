@@ -584,12 +584,10 @@ export class ApplicationUtil {
      */
     private async getDocumentClassificationOptions(productID: string): Promise<string[]> {
         const latestVersion = await this.productVersionEntity.findLatestVersionNumber(productID);
-        const product = await this.productEntity.findOneByVersion(productID, latestVersion);
 
-        const { documentClassificationOptionIDs = [] } = product;
-
-        const [productDocumentClassifications, defaultDocumentClassifications] = await Promise.all([
-            this.documentClassificationEntity.batchGet(documentClassificationOptionIDs),
+        // Fetch latest product and default classifications in parallel
+        const [latestProduct, defaultDocumentClassifications] = await Promise.all([
+            this.productEntity.findOneByVersion(productID, latestVersion),
             this.documentClassificationEntity.findAllByIndex({
                 indexName: 'system-default-index',
                 indexKey: 'systemDefault',
@@ -597,13 +595,15 @@ export class ApplicationUtil {
             }),
         ]);
 
-        const allClassifications = new Map();
+        const { documentClassificationOptions: productDocumentClassifications = [] } = latestProduct;
 
-        [...productDocumentClassifications, ...defaultDocumentClassifications].forEach((classification) => {
-            allClassifications.set(classification.id, classification);
-        });
+        // Combine product classifications and default classifications
+        const allClassifications = new Set<string>([
+            ...productDocumentClassifications,
+            ...defaultDocumentClassifications.map((classification) => classification.name),
+        ]);
 
-        return Array.from(allClassifications.values()).map((classification) => classification.name);
+        return Array.from(allClassifications);
     }
 
     /**
