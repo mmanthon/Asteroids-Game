@@ -1,3 +1,4 @@
+import { DocumentClassificationOptionDto } from '@ignidus/iscx-backend-utils';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ApplicationProductDto {
@@ -24,9 +25,9 @@ export class ApplicationProductDto {
 
     @ApiProperty({
         description: 'Document Classification Options',
-        example: ['Not Classified'],
-        type: String,
+        example: [{ value: 'not_classified', label: 'Not Classified' }],
+        type: 'object',
         isArray: true,
     })
-    documentClassificationOptions: string[];
+    documentClassificationOptions: DocumentClassificationOptionDto[];
 }

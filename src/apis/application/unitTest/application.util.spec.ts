@@ -41,6 +41,7 @@ import {
     mockAmpApplicationWithMissingFields,
     mockApplicationDto,
     mockApplicationDynamoModel,
+    mockDocumentClassificationOptions,
     mockDocumentClassifications,
     mockEmailDto,
     mockEmailHistoryModel,
@@ -535,7 +536,7 @@ describe('ApplicationUtil', () => {
                     {
                         ...mockApplicationDto.products[0],
                         programTypeID: '22',
-                        documentClassificationOptions: ['Not Classified'],
+                        documentClassificationOptions: mockDocumentClassificationOptions,
                     },
                     ...mockApplicationDto.products.slice(1),
                 ],

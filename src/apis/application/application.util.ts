@@ -11,6 +11,7 @@ import {
     AutoDeclineConditionTypeEnum,
     DOCUMENT_CLASSIFICATION_SYSTEM_DEFAULT_VALUE,
     DocumentClassificationEntity,
+    DocumentClassificationOptionDto,
     DynamoApplicationEntity,
     DynamoAutoDeclinationHistoryEntity,
     DynamoEmailHistoryEntity,
@@ -580,14 +581,16 @@ export class ApplicationUtil {
     /**
      * @description Get the document classification options for a product
      * @param {string} productID
-     * @returns {Promise<string[]>}
+     * @returns {Promise<DocumentClassificationOptionDto[]>}
      */
-    private async getDocumentClassificationOptions(productID: string): Promise<string[]> {
+    private async getDocumentClassificationOptions(productID: string): Promise<DocumentClassificationOptionDto[]> {
         const latestVersion = await this.productVersionEntity.findLatestVersionNumber(productID);
+        const product = await this.productEntity.findOneByVersion(productID, latestVersion);
 
-        // Fetch latest product and default classifications in parallel
-        const [latestProduct, defaultDocumentClassifications] = await Promise.all([
-            this.productEntity.findOneByVersion(productID, latestVersion),
+        const { documentClassificationOptionIDs = [] } = product;
+
+        const [productDocumentClassifications, defaultDocumentClassifications] = await Promise.all([
+            this.documentClassificationEntity.batchGet(documentClassificationOptionIDs),
             this.documentClassificationEntity.findAllByIndex({
                 indexName: 'system-default-index',
                 indexKey: 'systemDefault',
@@ -595,15 +598,16 @@ export class ApplicationUtil {
             }),
         ]);
 
-        const { documentClassificationOptions: productDocumentClassifications = [] } = latestProduct;
+        const allClassifications = new Map();
 
-        // Combine product classifications and default classifications
-        const allClassifications = new Set<string>([
-            ...productDocumentClassifications,
-            ...defaultDocumentClassifications.map((classification) => classification.name),
-        ]);
+        [...productDocumentClassifications, ...defaultDocumentClassifications].forEach((classification) => {
+            allClassifications.set(classification.id, classification);
+        });
 
-        return Array.from(allClassifications);
+        return Array.from(allClassifications.values()).map((classification) => ({
+            value: classification.name,
+            label: classification.displayName,
+        }));
     }
 
     /**
