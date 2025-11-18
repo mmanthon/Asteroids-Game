@@ -13,8 +13,8 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule, { bufferLogs: true });
     const server = app.getHttpAdapter().getInstance();
 
-    server.keepAliveTimeout = 65000; // 65 seconds
-    server.headersTimeout = 66000; // must be > keepAliveTimeout
+    server.keepAliveTimeout = 68000; // 65 seconds
+    server.headersTimeout = 69000; // must be > keepAliveTimeout
 
     const configService = app.get(ConfigService);
     const httpExceptionFilter = app.get(HttpExceptionFilter);
