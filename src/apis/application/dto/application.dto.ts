@@ -75,6 +75,9 @@ export class ApplicationDto {
     @ApiProperty({ description: 'Notes', type: NoteDto, isArray: true })
     notes: NoteDto[];
 
+    @ApiProperty({ description: 'Is Auto Approved', example: true })
+    isAutoApproved: boolean;
+
     @ApiProperty({ description: 'Pricing breakdown for a marketplace application', type: PricingDto })
     pricing: PricingDto;
 

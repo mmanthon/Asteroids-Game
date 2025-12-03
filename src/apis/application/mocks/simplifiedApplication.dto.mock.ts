@@ -37,4 +37,5 @@ export const mockSimplifiedApplicationDto: SimplifiedApplicationDto = {
     lastStatusUpdate: mockAmpApplication.last_status_update,
     pricing: mockPricingDto,
     createdDate: formattedDate,
+    isAutoApproved: false,
 };

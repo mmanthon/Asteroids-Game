@@ -46,4 +46,5 @@ export const mockApplicationDto: ApplicationDto = {
     createdDate: formattedCreatedDate,
     pricing: mockPricingDto,
     autoDeclinationHistory: [],
+    isAutoApproved: false,
 };

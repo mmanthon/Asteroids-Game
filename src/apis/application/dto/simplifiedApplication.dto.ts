@@ -56,6 +56,9 @@ export class SimplifiedApplicationDto {
     @ApiProperty({ description: 'Policy Number', example: 'AE123456' })
     boundDate: string;
 
+    @ApiProperty({ description: 'Is Auto Approved', example: true })
+    isAutoApproved: boolean;
+
     @ApiProperty({ description: 'Last status updated date', example: '2021-01-01' })
     lastStatusUpdate: string;
 

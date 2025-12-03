@@ -174,6 +174,7 @@ export class ApplicationUtil {
             project_end_date,
         );
         const totalCost = application.total_cost ? Number(application.total_cost) : 0;
+        const isAutoApproved = dynamoApplication?.isAutoApproved || false;
 
         return {
             id: String(application.item_id),
@@ -204,6 +205,7 @@ export class ApplicationUtil {
             expirationDate,
             lastStatusUpdate,
             boundDate,
+            isAutoApproved,
             pricing: {
                 premium: 0,
                 totalCost,
